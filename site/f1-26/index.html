@@ -17,6 +17,7 @@
   --change: #b4410f;
   --change-bg: #fdeee5;
   --dirty: #0b6e7f;
+  --agree: #7b2fd6;
   --dirty-bg: #e1f2f4;
   --accent: #1d5fa8;
   --accent-ink: #ffffff;
@@ -27,12 +28,12 @@
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
   --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --change-bg: #3a2318;
-  --dirty: #5fd3e3; --dirty-bg: #12313a;
+  --dirty: #5fd3e3; --dirty-bg: #12313a; --agree: #b07cff;
   --accent: #5d9ce6; --accent-ink: #0f151c; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
   --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --change-bg: #3a2318;
-  --dirty: #5fd3e3; --dirty-bg: #12313a;
+  --dirty: #5fd3e3; --dirty-bg: #12313a; --agree: #b07cff;
   --accent: #5d9ce6; --accent-ink: #0f151c; color-scheme: dark }
 
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
@@ -89,7 +90,7 @@ tr.changed { background: var(--change-bg); }
 tr.changed td.yours { color: var(--change); font-weight: 600; }
 td.dirty.moved { color: var(--dirty); font-weight: 600; background: var(--dirty-bg); }
 .chip { display: inline-block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
-.chip.lock { background: var(--lock-bg); color: var(--lock); }
+.chip.lock { background: var(--agree); color: var(--sheet); }
 .chip.chg { background: var(--change); color: var(--sheet); }
 .chip.same { border: 1px solid var(--rule); color: var(--muted); }
 .chip.dirt { background: var(--dirty); color: var(--sheet); }
