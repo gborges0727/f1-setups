@@ -67,9 +67,6 @@ main { padding-block: 20px 48px; display: grid; gap: 22px; }
 .summary .sub { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
 .summary h4 { margin: 14px 0 0; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
 .summary ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; }
-.summary ul.changes { gap: 8px; }
-.summary ul.changes .what { display: block; }
-.summary ul.changes .reason { display: block; color: var(--muted); font-size: 0.88rem; max-width: 72ch; }
 .summary .none { margin: 6px 0 0; color: var(--muted); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .note { margin: 12px 0 0; font-size: 0.88rem; color: var(--muted); }
@@ -255,8 +252,8 @@ function seg(el, opts, cur, onPick, disabled) {
   }
 }
 
-function changeList(keys, from, to, why) {
-  return `<ul class="changes">` + keys.map(k => `<li><span class="what">${F[k].label}: <span class="mono">${fmt(k, from[k])} → <strong>${fmt(k, to[k])}</strong></span></span><span class="reason">${why[k]}</span></li>`).join("") + `</ul>`;
+function changeList(keys, from, to) {
+  return `<ul>` + keys.map(k => `<li>${F[k].label}: <span class="mono">${fmt(k, from[k])} → <strong>${fmt(k, to[k])}</strong></span></li>`).join("") + `</ul>`;
 }
 
 function render() {
@@ -280,15 +277,29 @@ function render() {
   let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${sub.join(" · ")}</div>`;
   if (KERB_MODE) {
     h += `<h4>Kerb attack changes</h4>`;
-    h += kerb.changed.length ? changeList(kerb.changed, meta, yours, KERB_WHY)
+    h += kerb.changed.length ? changeList(kerb.changed, meta, yours)
       : `<p class="none">Fast drivers agree on every setting this style would change, so this setup matches F1Laps exactly.</p>`;
     if (kerb.held.length) h += `<p class="note">Left alone because fast drivers agree on them here: ${kerb.held.map(k => F[k].label.toLowerCase()).join(", ")}.</p>`;
   }
   h += `<h4>If you'll race in traffic</h4>`;
-  h += dirty.changed.length ? changeList(dirty.changed, yours, dirty.out, DIRTY_WHY)
+  h += dirty.changed.length ? changeList(dirty.changed, yours, dirty.out)
     : `<p class="none">This setup is already at the game's limits for every dirty-air change.</p>`;
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry setup is available.</p>`;
   h += `</div>`;
+
+  h += `<details class="rules"><summary>What each change does, and by how much</summary><div class="tablewrap" style="border:0"><table><thead><tr><th>Setting</th>`;
+  h += KERB_MODE ? `<th>Kerb, qualifying</th><th>Kerb, race</th>` : "";
+  h += `<th>Dirty air</th><th>What it fixes</th></tr></thead><tbody>`;
+  const ruleKeys = FIELDS.map(f => f[0]).filter(k => (KERB_MODE && k in KERB.race) || k in DIRTY);
+  const sign = v => v === undefined ? "—" : (v > 0 ? "+" : "") + v;
+  for (const k of ruleKeys) {
+    h += `<tr><td class="name">${F[k].label}</td>`;
+    if (KERB_MODE) h += `<td class="num">${sign(KERB.quali[k])}</td><td class="num">${sign(KERB.race[k])}</td>`;
+    h += `<td class="num">${sign(DIRTY[k])}</td><td class="why">${[KERB_MODE ? KERB_WHY[k] : null, DIRTY_WHY[k]].filter(Boolean).join(" ")}</td></tr>`;
+  }
+  h += `</tbody></table></div>
+    <p class="note">${KERB_MODE ? "Kerb attack changes apply only where F1Laps doesn't mark the setting as agreed. " : ""}Dirty-air changes apply on top of this page's setup, whether or not fast drivers agree on the setting, because their laps were set in clean air. Values are rounded to whole clicks and kept inside the game's limits.</p>
+  </details>`;
 
   h += `<div class="legend">
     <span><span class="chip lock">Agreed</span> fast drivers use the same value</span>
@@ -313,19 +324,6 @@ function render() {
     h += `</tbody></table></div></section>`;
   }
 
-  h += `<details class="rules"><summary>What each change does, and by how much</summary><div class="tablewrap" style="border:0"><table><thead><tr><th>Setting</th>`;
-  h += KERB_MODE ? `<th>Kerb, qualifying</th><th>Kerb, race</th>` : "";
-  h += `<th>Dirty air</th><th>What it fixes</th></tr></thead><tbody>`;
-  const ruleKeys = FIELDS.map(f => f[0]).filter(k => (KERB_MODE && k in KERB.race) || k in DIRTY);
-  const sign = v => v === undefined ? "—" : (v > 0 ? "+" : "") + v;
-  for (const k of ruleKeys) {
-    h += `<tr><td class="name">${F[k].label}</td>`;
-    if (KERB_MODE) h += `<td class="num">${sign(KERB.quali[k])}</td><td class="num">${sign(KERB.race[k])}</td>`;
-    h += `<td class="num">${sign(DIRTY[k])}</td><td class="why">${[KERB_MODE ? KERB_WHY[k] : null, DIRTY_WHY[k]].filter(Boolean).join(" ")}</td></tr>`;
-  }
-  h += `</tbody></table></div>
-    <p class="note">${KERB_MODE ? "Kerb attack changes apply only where F1Laps doesn't mark the setting as agreed. " : ""}Dirty-air changes apply on top of this page's setup, whether or not fast drivers agree on the setting, because their laps were set in clean air. Values are rounded to whole clicks and kept inside the game's limits.</p>
-  </details>`;
 
   h += `<div class="notes">${CONFIG.notes}<p>Source: <a href="${esc(t.url)}" target="_blank" rel="noopener">F1Laps ${esc(t.name)} meta setup</a>, fetched ${esc(CONFIG.fetched)}. F1Laps updates these numbers as new laps arrive.</p></div>`;
 
