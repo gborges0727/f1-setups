@@ -66,6 +66,9 @@ main { padding-block: 20px 48px; display: grid; gap: 22px; }
 .summary .sub { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
 .summary h4 { margin: 14px 0 0; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
 .summary ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+.summary ul.changes { gap: 8px; }
+.summary ul.changes .what { display: block; }
+.summary ul.changes .reason { display: block; color: var(--muted); font-size: 0.88rem; max-width: 72ch; }
 .summary .none { margin: 6px 0 0; color: var(--muted); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .note { margin: 12px 0 0; font-size: 0.88rem; color: var(--muted); }
@@ -82,8 +85,6 @@ thead th { border-top: 0; font-size: 0.72rem; text-transform: uppercase; letter-
 td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 td.name { font-weight: 500; }
 td.why { color: var(--muted); font-size: 0.86rem; min-width: 18ch; }
-td.why p { margin: 0; }
-td.why p + p { margin-top: 4px; }
 tr.changed { background: var(--change-bg); }
 tr.changed td.yours { color: var(--change); font-weight: 600; }
 td.dirty.moved { color: var(--dirty); font-weight: 600; background: var(--dirty-bg); }
@@ -92,7 +93,6 @@ td.dirty.moved { color: var(--dirty); font-weight: 600; background: var(--dirty-
 .chip.chg { background: var(--change); color: var(--sheet); }
 .chip.same { border: 1px solid var(--rule); color: var(--muted); }
 .chip.dirt { background: var(--dirty); color: var(--sheet); }
-.why-dirty { color: var(--dirty); font-weight: 600; }
 
 details.rules { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 16px; }
 details.rules summary { cursor: pointer; font-weight: 600; }
@@ -102,18 +102,17 @@ details.rules td.why { display: table-cell; }
 .notes p { margin: 0; }
 .notes a { color: var(--accent); }
 
-/* Fixed column widths so every group's table lines up with the others. The Why column takes what is left. */
+/* Fixed column widths so every group's table lines up with the others. */
 table.sheet { table-layout: fixed; }
-table.sheet.meta th.c-name { width: 28%; }
-table.sheet.meta th.c-val { width: 14%; }
-table.sheet.meta th.c-chip { width: 13%; }
-table.sheet.kerb th.c-name { width: 24%; }
-table.sheet.kerb th.c-val { width: 12%; }
-table.sheet.kerb th.c-chip { width: 12%; }
+table.sheet.meta th.c-name { width: 40%; }
+table.sheet.meta th.c-val { width: 20%; }
+table.sheet.meta th.c-chip { width: 20%; }
+table.sheet.kerb th.c-name { width: 32%; }
+table.sheet.kerb th.c-val { width: 17%; }
+table.sheet.kerb th.c-chip { width: 17%; }
 
 @media (max-width: 560px) {
   h1 { font-size: 2rem; }
-  table.sheet td.why, table.sheet th.why { display: none; }
   table.sheet th, table.sheet td { padding: 8px 6px; }
   table.sheet .chip { font-size: 0.62rem; padding: 2px 5px; letter-spacing: 0.03em; }
   table.sheet td.num { font-size: 0.86rem; }
@@ -255,8 +254,8 @@ function seg(el, opts, cur, onPick, disabled) {
   }
 }
 
-function changeList(keys, from, to) {
-  return `<ul>` + keys.map(k => `<li>${F[k].label}: <span class="mono">${fmt(k, from[k])} → <strong>${fmt(k, to[k])}</strong></span></li>`).join("") + `</ul>`;
+function changeList(keys, from, to, why) {
+  return `<ul class="changes">` + keys.map(k => `<li><span class="what">${F[k].label}: <span class="mono">${fmt(k, from[k])} → <strong>${fmt(k, to[k])}</strong></span></span><span class="reason">${why[k]}</span></li>`).join("") + `</ul>`;
 }
 
 function render() {
@@ -280,12 +279,12 @@ function render() {
   let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${sub.join(" · ")}</div>`;
   if (KERB_MODE) {
     h += `<h4>Kerb attack changes</h4>`;
-    h += kerb.changed.length ? changeList(kerb.changed, meta, yours)
+    h += kerb.changed.length ? changeList(kerb.changed, meta, yours, KERB_WHY)
       : `<p class="none">Fast drivers agree on every setting this style would change, so this setup matches F1Laps exactly.</p>`;
     if (kerb.held.length) h += `<p class="note">Left alone because fast drivers agree on them here: ${kerb.held.map(k => F[k].label.toLowerCase()).join(", ")}.</p>`;
   }
   h += `<h4>If you'll race in traffic</h4>`;
-  h += dirty.changed.length ? changeList(dirty.changed, yours, dirty.out)
+  h += dirty.changed.length ? changeList(dirty.changed, yours, dirty.out, DIRTY_WHY)
     : `<p class="none">This setup is already at the game's limits for every dirty-air change.</p>`;
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry setup is available.</p>`;
   h += `</div>`;
@@ -301,17 +300,14 @@ function render() {
     const rows = keys.filter(k => k in meta);
     if (!rows.length) continue;
     h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet ${CONFIG.mode}"><thead><tr>
-      <th class="c-name">Setting</th><th class="c-val">F1Laps meta</th>${KERB_MODE ? `<th class="c-val">Kerb attack</th>` : ""}<th class="c-chip"></th><th class="c-val">Dirty air</th><th class="why">Why</th></tr></thead><tbody>`;
+      <th class="c-name">Setting</th><th class="c-val">F1Laps meta</th>${KERB_MODE ? `<th class="c-val">Kerb attack</th>` : ""}<th class="c-chip"></th><th class="c-val">Dirty air</th></tr></thead><tbody>`;
     for (const k of rows) {
       const isChanged = kerb.changed.includes(k);
       const isDirty = dirty.changed.includes(k);
       const chip = isChanged ? `<span class="chip chg">Changed</span>` : lock.has(k) ? `<span class="chip lock">Agreed</span>` : `<span class="chip same">Open</span>`;
-      const why = [];
-      if (isChanged) why.push(`<p>${KERB_WHY[k]}</p>`);
-      if (isDirty) why.push(`<p><span class="why-dirty">Dirty air.</span> ${DIRTY_WHY[k]}</p>`);
       h += `<tr class="${isChanged ? "changed" : ""}"><td class="name">${F[k].label}</td><td class="num">${fmt(k, meta[k])}</td>`;
       if (KERB_MODE) h += `<td class="num yours">${fmt(k, yours[k])}</td>`;
-      h += `<td>${chip}</td><td class="num dirty${isDirty ? " moved" : ""}">${fmt(k, dirty.out[k])}</td><td class="why">${why.join("")}</td></tr>`;
+      h += `<td>${chip}</td><td class="num dirty${isDirty ? " moved" : ""}">${fmt(k, dirty.out[k])}</td></tr>`;
     }
     h += `</tbody></table></div></section>`;
   }
