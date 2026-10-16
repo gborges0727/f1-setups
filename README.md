@@ -22,9 +22,19 @@ F1Laps updates its numbers as new laps arrive. To pull the latest numbers and re
 
 ```sh
 python3 scripts/fetch.py    # downloads every track page into data/f1-25.json and data/f1-26.json
-python3 scripts/build.py    # writes the start page and all four sheets into site/, and copies the icons from static/
+python3 scripts/build.py    # writes the start page and all four sheets into site/, and copies in static/
 ```
 
-Both scripts use only the Python standard library. The kerb-attack and dirty-air changes live in `templates/sheet.html`, in the `KERB` and `DIRTY` tables.
+Both scripts use only the Python standard library. The kerb-attack and dirty-air changes live in `templates/sheet.html`, in the `KERB` and `DIRTY` tables. The built `site/` folder is the whole website, and git ignores it.
 
-The `site/` folder is the whole website. Any static host can serve it.
+## Releases and deploys
+
+Every push to `main` runs the Deploy workflow in GitHub Actions. It builds the site, deploys it to Cloudflare Pages, and publishes a GitHub release. The release number comes from the commit messages since the last release, which follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+| Commit | Example | New version after v1.2.3 |
+|---|---|---|
+| A breaking change (`type!:` or a `BREAKING CHANGE` footer) | `feat!: rename the sheet URLs` | v2.0.0 |
+| A feature | `feat: add a rain setup column` | v1.3.0 |
+| Anything else | `fix: correct the Monza rear wing` | v1.2.4 |
+
+Every page footer shows the version it was built from and links to that release. A local build shows "Development build" instead.

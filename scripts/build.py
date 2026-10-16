@@ -1,7 +1,8 @@
 """Build the site from templates/ and data/.
 
-Writes site/index.html and four sheets, an F1Laps meta sheet and a kerb-attack
-sheet for each game:
+Writes site/index.html and four sheets, then copies in the files from static/
+(the icons and Cloudflare's _redirects file). Each game gets an F1Laps meta
+sheet and a kerb-attack sheet:
 
   site/f1-25/              site/f1-25/kerb-attack/
   site/f1-26/              site/f1-26/kerb-attack/
@@ -10,10 +11,14 @@ Usage: python3 scripts/build.py
 """
 import datetime
 import json
+import os
 import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+REPO = "https://github.com/gborges0727/f1-setups"
+# CI sets SITE_VERSION to the release being deployed. A local build says "dev".
+VERSION = os.environ.get("SITE_VERSION", "dev")
 
 GAMES = {
     "f1-25": {"short": "F1 25", "cars": "2025 cars", "lede_cars": "the 2025 cars",
@@ -89,6 +94,13 @@ def notes(tracks):
     return "".join(f"<p>{p}</p>" for p in out)
 
 
+def version_html():
+    if VERSION == "dev":
+        return f'<p>Development build. The source is on <a href="{REPO}">GitHub</a>.</p>'
+    return (f'<p>Version <a href="{REPO}/releases/tag/{VERSION}">{VERSION}</a>. '
+            f'The source is on <a href="{REPO}">GitHub</a>.</p>')
+
+
 def esc(s):
     return s.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
 
@@ -106,7 +118,7 @@ def build():
                 "key": f"sheet-{game}-{mode}",
                 "cars": g["cars"],
                 "fetched": f"{fetched.day} {fetched:%B %Y}",
-                "notes": notes(data["tracks"]),
+                "notes": notes(data["tracks"]) + version_html(),
             }
             html = (template
                     .replace("__TITLE__", m["title"].format(**fill))
@@ -121,11 +133,12 @@ def build():
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(page(html))
             print(f"wrote {out.relative_to(ROOT)} ({len(data['tracks'])} tracks)")
-    (ROOT / "site" / "index.html").write_text(page((ROOT / "templates" / "index.html").read_text()))
+    index = (ROOT / "templates" / "index.html").read_text().replace("__VERSION__", version_html())
+    (ROOT / "site" / "index.html").write_text(page(index))
     print("wrote site/index.html")
     for f in sorted((ROOT / "static").iterdir()):
         shutil.copy(f, ROOT / "site" / f.name)
-    print("copied static/ into site/")
+    print(f"copied static/ into site/ (version {VERSION})")
 
 
 if __name__ == "__main__":
