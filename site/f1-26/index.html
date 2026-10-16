@@ -102,9 +102,28 @@ details.rules td.why { display: table-cell; }
 .notes p { margin: 0; }
 .notes a { color: var(--accent); }
 
+/* Fixed column widths so every group's table lines up with the others. The Why column takes what is left. */
+table.sheet { table-layout: fixed; }
+table.sheet.meta th.c-name { width: 28%; }
+table.sheet.meta th.c-val { width: 14%; }
+table.sheet.meta th.c-chip { width: 13%; }
+table.sheet.kerb th.c-name { width: 24%; }
+table.sheet.kerb th.c-val { width: 12%; }
+table.sheet.kerb th.c-chip { width: 12%; }
+
 @media (max-width: 560px) {
   h1 { font-size: 2rem; }
   table.sheet td.why, table.sheet th.why { display: none; }
+  table.sheet th, table.sheet td { padding: 8px 6px; }
+  table.sheet .chip { font-size: 0.62rem; padding: 2px 5px; letter-spacing: 0.03em; }
+  table.sheet td.num { font-size: 0.86rem; }
+  table.sheet .unit { display: none; }
+  table.sheet.meta th.c-name { width: 36%; }
+  table.sheet.meta th.c-val { width: 21%; }
+  table.sheet.meta th.c-chip { width: 22%; }
+  table.sheet.kerb th.c-name { width: 31%; }
+  table.sheet.kerb th.c-val { width: 17%; }
+  table.sheet.kerb th.c-chip { width: 18%; }
 }
 </style>
 </head><body>
@@ -201,7 +220,7 @@ function fmt(k, v) {
   if (v === undefined || v === null || Number.isNaN(v)) return "—";
   if (k.endsWith("camber") || k.endsWith("toe")) return v.toFixed(2) + "°";
   if (k.startsWith("diff") || k === "engine_braking" || k === "brake_pressure" || k === "brake_bias") return round2(v) + "%";
-  if (k.endsWith("pressure")) return round2(v) + " psi";
+  if (k.endsWith("pressure")) return round2(v) + `<span class="unit"> psi</span>`;
   return String(round2(v));
 }
 function shift(base, rules, skip) {
@@ -281,8 +300,8 @@ function render() {
   for (const [g, keys] of GROUPS) {
     const rows = keys.filter(k => k in meta);
     if (!rows.length) continue;
-    h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet"><thead><tr>
-      <th>Setting</th><th>F1Laps meta</th>${KERB_MODE ? "<th>Kerb attack</th>" : ""}<th></th><th>Dirty air</th><th class="why">Why</th></tr></thead><tbody>`;
+    h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet ${CONFIG.mode}"><thead><tr>
+      <th class="c-name">Setting</th><th class="c-val">F1Laps meta</th>${KERB_MODE ? `<th class="c-val">Kerb attack</th>` : ""}<th class="c-chip"></th><th class="c-val">Dirty air</th><th class="why">Why</th></tr></thead><tbody>`;
     for (const k of rows) {
       const isChanged = kerb.changed.includes(k);
       const isDirty = dirty.changed.includes(k);
