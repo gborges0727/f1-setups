@@ -1,0 +1,323 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>F1 26 Kerb-Attack Sheet</title>
+<meta name="description" content="F1 26 kerb-attack car setups for every track, built on F1Laps' meta setups, with dirty-air changes for racing in traffic.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a race engineer's setup sheet. Sticky selector bar, then one ruled table per garage menu. */
+:root {
+  --bg: #f3f5f7;
+  --sheet: #ffffff;
+  --ink: #16202b;
+  --muted: #5b6876;
+  --rule: #d9dfe5;
+  --lock: #7a8693;
+  --lock-bg: #e9edf1;
+  --change: #b4410f;
+  --change-bg: #fdeee5;
+  --dirty: #0b6e7f;
+  --dirty-bg: #e1f2f4;
+  --accent: #1d5fa8;
+  --accent-ink: #ffffff;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
+  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --change-bg: #3a2318;
+  --dirty: #5fd3e3; --dirty-bg: #12313a;
+  --accent: #5d9ce6; --accent-ink: #0f151c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
+  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --change-bg: #3a2318;
+  --dirty: #5fd3e3; --dirty-bg: #12313a;
+  --accent: #5d9ce6; --accent-ink: #0f151c; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
+.wrap { max-width: 960px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header.top { padding-block: 24px 8px; }
+nav.home { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.88rem; margin-bottom: 12px; }
+nav.home a { color: var(--muted); text-decoration: none; }
+nav.home a:hover { color: var(--ink); }
+h1 { font-family: var(--display); font-weight: 700; font-size: 2.4rem; line-height: 1; letter-spacing: 0.01em; text-transform: uppercase; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 68ch; margin: 10px 0 0; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--sheet); border-bottom: 1px solid var(--rule); margin-top: 18px; }
+.bar .wrap { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: end; padding-block: 12px; }
+.ctl { display: flex; flex-direction: column; gap: 4px; }
+.ctl > span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.seg button { font: 500 0.9rem var(--body); background: transparent; color: var(--ink); border: 0; padding: 7px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg button:disabled { color: var(--lock); cursor: not-allowed; text-decoration: line-through; }
+select { font: 500 0.95rem var(--body); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 7px 10px; min-width: 0; max-width: 100%; }
+button:focus-visible, select:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ctl.track { flex: 1 1 220px; min-width: 0; }
+.ctl.track select { width: 100%; }
+
+main { padding-block: 20px 48px; display: grid; gap: 22px; }
+.summary { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; }
+.summary h2 { font-family: var(--display); font-size: 1.5rem; text-transform: uppercase; margin: 0; line-height: 1.1; }
+.summary .sub { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+.summary h4 { margin: 14px 0 0; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.summary ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+.summary .none { margin: 6px 0 0; color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.note { margin: 12px 0 0; font-size: 0.88rem; color: var(--muted); }
+.warn { margin: 12px 0 0; font-size: 0.9rem; padding: 10px 12px; border-radius: 6px; background: var(--lock-bg); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.85rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+section.group h3 { font-family: var(--display); font-weight: 600; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 6px; }
+.tablewrap { overflow-x: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--rule); vertical-align: top; }
+thead th { border-top: 0; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.name { font-weight: 500; }
+td.why { color: var(--muted); font-size: 0.86rem; min-width: 18ch; }
+td.why p { margin: 0; }
+td.why p + p { margin-top: 4px; }
+tr.changed { background: var(--change-bg); }
+tr.changed td.yours { color: var(--change); font-weight: 600; }
+td.dirty.moved { color: var(--dirty); font-weight: 600; background: var(--dirty-bg); }
+.chip { display: inline-block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+.chip.lock { background: var(--lock-bg); color: var(--lock); }
+.chip.chg { background: var(--change); color: var(--sheet); }
+.chip.same { border: 1px solid var(--rule); color: var(--muted); }
+.chip.dirt { background: var(--dirty); color: var(--sheet); }
+.why-dirty { color: var(--dirty); font-weight: 600; }
+
+details.rules { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 16px; }
+details.rules summary { cursor: pointer; font-weight: 600; }
+details.rules table { margin-top: 10px; }
+details.rules td.why { display: table-cell; }
+.notes { color: var(--muted); font-size: 0.9rem; display: grid; gap: 8px; max-width: 72ch; }
+.notes p { margin: 0; }
+.notes a { color: var(--accent); }
+
+@media (max-width: 560px) {
+  h1 { font-size: 2rem; }
+  table.sheet td.why, table.sheet th.why { display: none; }
+}
+</style>
+</head><body>
+
+
+<header class="top"><div class="wrap">
+  <nav class="home"><a href="/">← All setup sheets</a><a href="/f1-26/">F1Laps meta version →</a></nav>
+  <h1>F1 26 Kerb-Attack Sheet</h1>
+  <p class="lede">F1Laps' setup for each track, for the 2026 Season Pack cars, tuned for a driver who attacks corners and rides kerbs. Settings fast drivers agree on stay exactly as F1Laps has them, and only the settings where they disagree change. The Dirty air column shows what to change on top for a race spent following other cars.</p>
+</div></header>
+
+<div class="bar"><div class="wrap">
+  <div class="ctl track"><span>Track</span><select id="track" aria-label="Track"></select></div>
+  <div class="ctl" id="session-ctl"><span>Session</span><div class="seg" id="session" role="group" aria-label="Session"></div></div>
+  <div class="ctl"><span>Weather</span><div class="seg" id="weather" role="group" aria-label="Weather"></div></div>
+</div></div>
+
+<main class="wrap" id="main"></main>
+
+<script>
+const CONFIG = {"mode": "kerb", "key": "sheet-f1-26-kerb", "cars": "2026 cars", "fetched": "16 October 2026", "notes": "<p>Some F1Laps values fall between two clicks, such as 26.5 on a wing. Pick either neighbouring click.</p><p>Most of the fastest laps behind these numbers are likely Time Trial laps, and Time Trial turns off tyre wear. For a race, raise tyre pressures if the tyres overheat or wear fast.</p><p>Parc fermé locks the setup once qualifying starts. If you expect to start behind other cars, enter the Dirty air values before qualifying.</p><p>F1Laps has no wet data for Bahrain, Saudi Arabia, Las Vegas, Qatar, Abu Dhabi and Italy (Imola). For those, start from the dry setup, add wing at both ends, soften the suspension, and move brake bias slightly rearward.</p><p>The game can't import setup files. Type a setup in once, then save it in the game as a custom setup for that track.</p>"};
+const TRACKS = [{"id":"australia","name":"Australia","url":"https://www.f1laps.com/f1-26/setups/australia/meta/","important":["Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Front Brake Bias","Rear Right Tyre Pressure","Rear Left Tyre Pressure"],"dry":{"Front Wing":"25","Rear Wing":"25","Differential On Throttle":"70%","Differential Off Throttle":"45%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.11°","Front Suspension":"37","Rear Suspension":"16","Front Anti-Roll Bar":"12","Rear Anti-Roll Bar":"9","Front Ride Height":"22","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"25.75psi","Front Left Tyre Pressure":"25.75psi","Rear Right Tyre Pressure":"21.30psi","Rear Left Tyre Pressure":"21.30psi"},"wet":{"Front Wing":"26.50","Rear Wing":"25","Differential On Throttle":"60%","Differential Off Throttle":"45%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0.02°","Rear Toe":"0.13°","Front Suspension":"37","Rear Suspension":"14.50","Front Anti-Roll Bar":"11","Rear Anti-Roll Bar":"9","Front Ride Height":"23","Rear Ride Height":"49","Brake Pressure":"98%","Front Brake Bias":"57%","Front Right Tyre Pressure":"24.50psi","Front Left Tyre Pressure":"24.50psi","Rear Right Tyre Pressure":"21.30psi","Rear Left Tyre Pressure":"21.30psi"}},{"id":"china","name":"China","url":"https://www.f1laps.com/f1-26/setups/china/meta/","important":["Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Rear Anti-Roll Bar","Front Ride Height","Front Brake Bias"],"dry":{"Front Wing":"41","Rear Wing":"28","Differential On Throttle":"80%","Differential Off Throttle":"50%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"40","Rear Suspension":"16","Front Anti-Roll Bar":"2","Rear Anti-Roll Bar":"9","Front Ride Height":"22","Rear Ride Height":"44","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"26psi","Front Left Tyre Pressure":"26.90psi","Rear Right Tyre Pressure":"21.95psi","Rear Left Tyre Pressure":"22.60psi"},"wet":{"Front Wing":"35","Rear Wing":"26","Differential On Throttle":"62.50%","Differential Off Throttle":"50%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38.50","Rear Suspension":"16","Front Anti-Roll Bar":"8.50","Rear Anti-Roll Bar":"8","Front Ride Height":"22","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"25.40psi","Front Left Tyre Pressure":"25.65psi","Rear Right Tyre Pressure":"21.90psi","Rear Left Tyre Pressure":"22.25psi"}},{"id":"japan","name":"Japan","url":"https://www.f1laps.com/f1-26/setups/japan/meta/","important":["Differential Off Throttle","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Front Brake Bias"],"dry":{"Front Wing":"39","Rear Wing":"23","Differential On Throttle":"100%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"14","Front Anti-Roll Bar":"5","Rear Anti-Roll Bar":"9","Front Ride Height":"23","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"27.50psi","Front Left Tyre Pressure":"27.50psi","Rear Right Tyre Pressure":"22psi","Rear Left Tyre Pressure":"22psi"},"wet":{"Front Wing":"28","Rear Wing":"24.50","Differential On Throttle":"60%","Differential Off Throttle":"45%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0.01°","Rear Toe":"0.12°","Front Suspension":"37","Rear Suspension":"15","Front Anti-Roll Bar":"10","Rear Anti-Roll Bar":"8","Front Ride Height":"24","Rear Ride Height":"49","Brake Pressure":"99%","Front Brake Bias":"57%","Front Right Tyre Pressure":"27.50psi","Front Left Tyre Pressure":"27.50psi","Rear Right Tyre Pressure":"21.30psi","Rear Left Tyre Pressure":"21.30psi"}},{"id":"bahrain","name":"Bahrain","url":"https://www.f1laps.com/f1-26/setups/bahrain/meta/","important":["Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"39","Rear Wing":"28.50","Differential On Throttle":"90%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"16","Front Anti-Roll Bar":"10","Rear Anti-Roll Bar":"10","Front Ride Height":"20","Rear Ride Height":"47","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"25psi","Front Left Tyre Pressure":"25psi","Rear Right Tyre Pressure":"21.30psi","Rear Left Tyre Pressure":"21.50psi"},"wet":null},{"id":"saudi_arabia","name":"Saudi Arabia","url":"https://www.f1laps.com/f1-26/setups/saudi_arabia/meta/","important":["Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Front Brake Bias"],"dry":{"Front Wing":"24.50","Rear Wing":"10","Differential On Throttle":"100%","Differential Off Throttle":"30%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"10","Front Anti-Roll Bar":"5","Rear Anti-Roll Bar":"8","Front Ride Height":"22","Rear Ride Height":"45","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"28psi","Front Left Tyre Pressure":"27.35psi","Rear Right Tyre Pressure":"21.60psi","Rear Left Tyre Pressure":"21.60psi"},"wet":null},{"id":"miami","name":"Miami","url":"https://www.f1laps.com/f1-26/setups/miami/meta/","important":["Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias","Front Right Tyre Pressure","Front Left Tyre Pressure"],"dry":{"Front Wing":"37.50","Rear Wing":"20","Differential On Throttle":"100%","Differential Off Throttle":"45%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"4","Front Anti-Roll Bar":"1","Rear Anti-Roll Bar":"11.50","Front Ride Height":"24","Rear Ride Height":"47.50","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"26psi","Front Left Tyre Pressure":"26psi","Rear Right Tyre Pressure":"20.50psi","Rear Left Tyre Pressure":"20.50psi"},"wet":{"Front Wing":"22.50","Rear Wing":"12","Differential On Throttle":"67.50%","Differential Off Throttle":"50%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"40","Rear Suspension":"10","Front Anti-Roll Bar":"7","Rear Anti-Roll Bar":"10","Front Ride Height":"22","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"26psi","Front Left Tyre Pressure":"26psi","Rear Right Tyre Pressure":"21.50psi","Rear Left Tyre Pressure":"21.50psi"}},{"id":"canada","name":"Canada","url":"https://www.f1laps.com/f1-26/setups/canada/meta/","important":["Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Rear Anti-Roll Bar","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"40","Rear Wing":"24","Differential On Throttle":"90%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"11.50","Front Anti-Roll Bar":"7","Rear Anti-Roll Bar":"7","Front Ride Height":"21","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.40psi","Front Left Tyre Pressure":"24.40psi","Rear Right Tyre Pressure":"21.50psi","Rear Left Tyre Pressure":"21.50psi"},"wet":{"Front Wing":"38","Rear Wing":"25","Differential On Throttle":"75%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"10","Front Anti-Roll Bar":"6","Rear Anti-Roll Bar":"8","Front Ride Height":"21","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.30psi","Front Left Tyre Pressure":"24.30psi","Rear Right Tyre Pressure":"21.50psi","Rear Left Tyre Pressure":"21.50psi"}},{"id":"monaco","name":"Monaco","url":"https://www.f1laps.com/f1-26/setups/monaco/meta/","important":["Front Wing","Rear Wing","Differential Off Throttle","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Ride Height","Rear Ride Height"],"dry":{"Front Wing":"50","Rear Wing":"50","Differential On Throttle":"75%","Differential Off Throttle":"30%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"5","Front Anti-Roll Bar":"2","Rear Anti-Roll Bar":"6","Front Ride Height":"23","Rear Ride Height":"51","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.40psi","Front Left Tyre Pressure":"24.40psi","Rear Right Tyre Pressure":"20.50psi","Rear Left Tyre Pressure":"20.50psi"},"wet":{"Front Wing":"50","Rear Wing":"50","Differential On Throttle":"75%","Differential Off Throttle":"30%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0.01°","Rear Toe":"0.12°","Front Suspension":"35","Rear Suspension":"8","Front Anti-Roll Bar":"4","Rear Anti-Roll Bar":"5","Front Ride Height":"24","Rear Ride Height":"50","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"23psi","Front Left Tyre Pressure":"23psi","Rear Right Tyre Pressure":"20.50psi","Rear Left Tyre Pressure":"20.50psi"}},{"id":"spain","name":"Spain (Barcelona)","url":"https://www.f1laps.com/f1-26/setups/spain/meta/","important":["Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"40","Rear Wing":"31","Differential On Throttle":"80%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"39.50","Rear Suspension":"17","Front Anti-Roll Bar":"9","Rear Anti-Roll Bar":"10.50","Front Ride Height":"22","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.20psi","Front Left Tyre Pressure":"24.20psi","Rear Right Tyre Pressure":"20.90psi","Rear Left Tyre Pressure":"20.90psi"},"wet":{"Front Wing":"40.50","Rear Wing":"31.50","Differential On Throttle":"72.50%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"39","Rear Suspension":"15","Front Anti-Roll Bar":"9","Rear Anti-Roll Bar":"11.50","Front Ride Height":"22","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.20psi","Front Left Tyre Pressure":"24.35psi","Rear Right Tyre Pressure":"21.30psi","Rear Left Tyre Pressure":"21.65psi"}},{"id":"austria","name":"Austria","url":"https://www.f1laps.com/f1-26/setups/austria/meta/","important":["Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Front Brake Bias"],"dry":{"Front Wing":"37","Rear Wing":"20","Differential On Throttle":"90%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"17","Front Anti-Roll Bar":"13","Rear Anti-Roll Bar":"10","Front Ride Height":"22","Rear Ride Height":"47","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"25psi","Front Left Tyre Pressure":"25psi","Rear Right Tyre Pressure":"21.50psi","Rear Left Tyre Pressure":"21.50psi"},"wet":{"Front Wing":"32","Rear Wing":"18","Differential On Throttle":"80%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"17","Front Anti-Roll Bar":"11","Rear Anti-Roll Bar":"9","Front Ride Height":"22","Rear Ride Height":"47","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"24.30psi","Front Left Tyre Pressure":"24.30psi","Rear Right Tyre Pressure":"21.50psi","Rear Left Tyre Pressure":"21.50psi"}},{"id":"silverstone","name":"Great Britain","url":"https://www.f1laps.com/f1-26/setups/silverstone/meta/","important":["Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height"],"dry":{"Front Wing":"38","Rear Wing":"20","Differential On Throttle":"100%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"16","Front Anti-Roll Bar":"2","Rear Anti-Roll Bar":"8","Front Ride Height":"21","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"27psi","Front Left Tyre Pressure":"27psi","Rear Right Tyre Pressure":"21.50psi","Rear Left Tyre Pressure":"21.50psi"},"wet":{"Front Wing":"31","Rear Wing":"24","Differential On Throttle":"80%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"16","Front Anti-Roll Bar":"10.50","Rear Anti-Roll Bar":"8","Front Ride Height":"22","Rear Ride Height":"48.50","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"24.80psi","Front Left Tyre Pressure":"26psi","Rear Right Tyre Pressure":"21.30psi","Rear Left Tyre Pressure":"21.30psi"}},{"id":"spa","name":"Belgium","url":"https://www.f1laps.com/f1-26/setups/spa/meta/","important":["Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure"],"dry":{"Front Wing":"15","Rear Wing":"2","Differential On Throttle":"100%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"40","Rear Suspension":"11","Front Anti-Roll Bar":"5","Rear Anti-Roll Bar":"9","Front Ride Height":"23","Rear Ride Height":"47","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"27.20psi","Front Left Tyre Pressure":"27.45psi","Rear Right Tyre Pressure":"22.50psi","Rear Left Tyre Pressure":"22.75psi"},"wet":{"Front Wing":"15","Rear Wing":"4","Differential On Throttle":"60%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0.02°","Rear Toe":"0.11°","Front Suspension":"38","Rear Suspension":"10","Front Anti-Roll Bar":"7.50","Rear Anti-Roll Bar":"9","Front Ride Height":"23","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"24.50psi","Front Left Tyre Pressure":"24.50psi","Rear Right Tyre Pressure":"21.80psi","Rear Left Tyre Pressure":"21.80psi"}},{"id":"hungary","name":"Hungary","url":"https://www.f1laps.com/f1-26/setups/hungary/meta/","important":["Front Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"50","Rear Wing":"45","Differential On Throttle":"100%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"14","Front Anti-Roll Bar":"3","Rear Anti-Roll Bar":"12","Front Ride Height":"22","Rear Ride Height":"45","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"28psi","Front Left Tyre Pressure":"28psi","Rear Right Tyre Pressure":"21.65psi","Rear Left Tyre Pressure":"21.65psi"},"wet":{"Front Wing":"50","Rear Wing":"41","Differential On Throttle":"80%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"16","Front Anti-Roll Bar":"5","Rear Anti-Roll Bar":"9","Front Ride Height":"22","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"27psi","Front Left Tyre Pressure":"27psi","Rear Right Tyre Pressure":"21.30psi","Rear Left Tyre Pressure":"21.30psi"}},{"id":"netherlands","name":"Netherlands","url":"https://www.f1laps.com/f1-26/setups/netherlands/meta/","important":["Front Wing","Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"50","Rear Wing":"38","Differential On Throttle":"100%","Differential Off Throttle":"30%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"18.50","Front Anti-Roll Bar":"9","Rear Anti-Roll Bar":"16","Front Ride Height":"21","Rear Ride Height":"50","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.20psi","Front Left Tyre Pressure":"24.20psi","Rear Right Tyre Pressure":"20.90psi","Rear Left Tyre Pressure":"20.90psi"},"wet":{"Front Wing":"48","Rear Wing":"38","Differential On Throttle":"80%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"39","Rear Suspension":"18.50","Front Anti-Roll Bar":"9","Rear Anti-Roll Bar":"13","Front Ride Height":"22","Rear Ride Height":"49","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.20psi","Front Left Tyre Pressure":"24.20psi","Rear Right Tyre Pressure":"20.90psi","Rear Left Tyre Pressure":"20.90psi"}},{"id":"monza","name":"Italy (Monza)","url":"https://www.f1laps.com/f1-26/setups/monza/meta/","important":["Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Front Brake Bias"],"dry":{"Front Wing":"14","Rear Wing":"0","Differential On Throttle":"95%","Differential Off Throttle":"37.50%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"4","Front Anti-Roll Bar":"2","Rear Anti-Roll Bar":"15","Front Ride Height":"23","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"29.50psi","Front Left Tyre Pressure":"29.50psi","Rear Right Tyre Pressure":"25psi","Rear Left Tyre Pressure":"25psi"},"wet":{"Front Wing":"9.50","Rear Wing":"0","Differential On Throttle":"77.50%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0.01°","Rear Toe":"0.11°","Front Suspension":"38","Rear Suspension":"4","Front Anti-Roll Bar":"6.50","Rear Anti-Roll Bar":"10","Front Ride Height":"23","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"26.75psi","Front Left Tyre Pressure":"26.85psi","Rear Right Tyre Pressure":"23.05psi","Rear Left Tyre Pressure":"23.30psi"}},{"id":"madrid","name":"Spain (Madrid)","url":"https://www.f1laps.com/f1-26/setups/madrid/meta/","important":["Front Wing","Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"50","Rear Wing":"35","Differential On Throttle":"100%","Differential Off Throttle":"30%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"3","Front Anti-Roll Bar":"1","Rear Anti-Roll Bar":"8","Front Ride Height":"22","Rear Ride Height":"49.50","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"29.25psi","Front Left Tyre Pressure":"29.25psi","Rear Right Tyre Pressure":"20.50psi","Rear Left Tyre Pressure":"20.50psi"},"wet":{"Front Wing":"50","Rear Wing":"49","Differential On Throttle":"77.50%","Differential Off Throttle":"30%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"37.50","Rear Suspension":"7.50","Front Anti-Roll Bar":"9","Rear Anti-Roll Bar":"5.50","Front Ride Height":"23","Rear Ride Height":"50","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"26.30psi","Front Left Tyre Pressure":"26.55psi","Rear Right Tyre Pressure":"20.90psi","Rear Left Tyre Pressure":"20.90psi"}},{"id":"azerbaijan","name":"Azerbaijan","url":"https://www.f1laps.com/f1-26/setups/azerbaijan/meta/","important":["Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Rear Right Tyre Pressure","Rear Left Tyre Pressure"],"dry":{"Front Wing":"20","Rear Wing":"7","Differential On Throttle":"90%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"16","Front Anti-Roll Bar":"5","Rear Anti-Roll Bar":"5","Front Ride Height":"22","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"24.30psi","Front Left Tyre Pressure":"24.30psi","Rear Right Tyre Pressure":"21.50psi","Rear Left Tyre Pressure":"21.50psi"},"wet":{"Front Wing":"23","Rear Wing":"10","Differential On Throttle":"90%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"16","Front Anti-Roll Bar":"7.50","Rear Anti-Roll Bar":"7","Front Ride Height":"22","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"25.80psi","Front Left Tyre Pressure":"25.80psi","Rear Right Tyre Pressure":"21.50psi","Rear Left Tyre Pressure":"21.50psi"}},{"id":"singapore","name":"Singapore","url":"https://www.f1laps.com/f1-26/setups/singapore/meta/","important":["Front Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"50","Rear Wing":"50","Differential On Throttle":"100%","Differential Off Throttle":"30%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"2.50","Front Anti-Roll Bar":"2.50","Rear Anti-Roll Bar":"12","Front Ride Height":"21","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24psi","Front Left Tyre Pressure":"23.70psi","Rear Right Tyre Pressure":"20.90psi","Rear Left Tyre Pressure":"20.90psi"},"wet":{"Front Wing":"50","Rear Wing":"47","Differential On Throttle":"80%","Differential Off Throttle":"30%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0.01°","Rear Toe":"0.11°","Front Suspension":"38","Rear Suspension":"6","Front Anti-Roll Bar":"5","Rear Anti-Roll Bar":"10","Front Ride Height":"22","Rear Ride Height":"48","Brake Pressure":"99%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.20psi","Front Left Tyre Pressure":"24.20psi","Rear Right Tyre Pressure":"20.90psi","Rear Left Tyre Pressure":"20.90psi"}},{"id":"usa","name":"USA (Austin)","url":"https://www.f1laps.com/f1-26/setups/usa/meta/","important":["Rear Wing","Differential Off Throttle","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"46","Rear Wing":"36","Differential On Throttle":"100%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"11","Front Anti-Roll Bar":"8","Rear Anti-Roll Bar":"8","Front Ride Height":"20","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"56.50%","Front Right Tyre Pressure":"28psi","Front Left Tyre Pressure":"28psi","Rear Right Tyre Pressure":"21.70psi","Rear Left Tyre Pressure":"21.85psi"},"wet":{"Front Wing":"42","Rear Wing":"36","Differential On Throttle":"70%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"38","Rear Suspension":"10","Front Anti-Roll Bar":"12","Rear Anti-Roll Bar":"10","Front Ride Height":"21","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"28psi","Front Left Tyre Pressure":"28psi","Rear Right Tyre Pressure":"21.50psi","Rear Left Tyre Pressure":"21.80psi"}},{"id":"mexico","name":"Mexico","url":"https://www.f1laps.com/f1-26/setups/mexico/meta/","important":["Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"47","Rear Wing":"34","Differential On Throttle":"90%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"37","Rear Suspension":"16","Front Anti-Roll Bar":"10","Rear Anti-Roll Bar":"8","Front Ride Height":"23","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.20psi","Front Left Tyre Pressure":"24.20psi","Rear Right Tyre Pressure":"20.90psi","Rear Left Tyre Pressure":"20.90psi"},"wet":{"Front Wing":"44","Rear Wing":"34","Differential On Throttle":"100%","Differential Off Throttle":"30%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"37","Rear Suspension":"11","Front Anti-Roll Bar":"7","Rear Anti-Roll Bar":"8","Front Ride Height":"23","Rear Ride Height":"47","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"25psi","Front Left Tyre Pressure":"25psi","Rear Right Tyre Pressure":"21.90psi","Rear Left Tyre Pressure":"21.90psi"}},{"id":"brazil","name":"Brazil","url":"https://www.f1laps.com/f1-26/setups/brazil/meta/","important":["Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"40","Rear Wing":"24","Differential On Throttle":"100%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"16","Front Anti-Roll Bar":"1","Rear Anti-Roll Bar":"8","Front Ride Height":"22","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"28.50psi","Front Left Tyre Pressure":"28.50psi","Rear Right Tyre Pressure":"21.30psi","Rear Left Tyre Pressure":"21.30psi"},"wet":{"Front Wing":"34.50","Rear Wing":"25","Differential On Throttle":"80%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"37","Rear Suspension":"16","Front Anti-Roll Bar":"5.50","Rear Anti-Roll Bar":"7","Front Ride Height":"22","Rear Ride Height":"48","Brake Pressure":"98.50%","Front Brake Bias":"56%","Front Right Tyre Pressure":"26.75psi","Front Left Tyre Pressure":"26.25psi","Rear Right Tyre Pressure":"21.65psi","Rear Left Tyre Pressure":"21.65psi"}},{"id":"las_vegas","name":"Las Vegas","url":"https://www.f1laps.com/f1-26/setups/las_vegas/meta/","important":["Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"17","Rear Wing":"2","Differential On Throttle":"95%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"37","Rear Suspension":"10","Front Anti-Roll Bar":"7","Rear Anti-Roll Bar":"7","Front Ride Height":"23","Rear Ride Height":"47","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"25.50psi","Front Left Tyre Pressure":"25.50psi","Rear Right Tyre Pressure":"22psi","Rear Left Tyre Pressure":"22psi"},"wet":null},{"id":"qatar","name":"Qatar","url":"https://www.f1laps.com/f1-26/setups/qatar/meta/","important":["Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"45","Rear Wing":"33","Differential On Throttle":"100%","Differential Off Throttle":"40%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"39","Rear Suspension":"12","Front Anti-Roll Bar":"8","Rear Anti-Roll Bar":"10","Front Ride Height":"22","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"24.75psi","Front Left Tyre Pressure":"26psi","Rear Right Tyre Pressure":"21psi","Rear Left Tyre Pressure":"21.30psi"},"wet":null},{"id":"abudhabi","name":"Abu Dhabi","url":"https://www.f1laps.com/f1-26/setups/abudhabi/meta/","important":["Rear Wing","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias"],"dry":{"Front Wing":"47","Rear Wing":"23","Differential On Throttle":"100%","Differential Off Throttle":"35%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"40","Rear Suspension":"13","Front Anti-Roll Bar":"12","Rear Anti-Roll Bar":"6","Front Ride Height":"21","Rear Ride Height":"46","Brake Pressure":"100%","Front Brake Bias":"57%","Front Right Tyre Pressure":"27.20psi","Front Left Tyre Pressure":"27psi","Rear Right Tyre Pressure":"21.20psi","Rear Left Tyre Pressure":"21.20psi"},"wet":null},{"id":"imola","name":"Italy (Imola)","url":"https://www.f1laps.com/f1-26/setups/imola/meta/","important":["Front Wing","Rear Wing","Differential On Throttle","Engine Braking","Front Camber","Rear Camber","Front Toe","Rear Toe","Front Suspension","Front Ride Height","Rear Ride Height","Brake Pressure","Front Brake Bias","Front Right Tyre Pressure","Front Left Tyre Pressure"],"dry":{"Front Wing":"50","Rear Wing":"31","Differential On Throttle":"100%","Differential Off Throttle":"20%","Engine Braking":"50%","Front Camber":"-3.50°","Rear Camber":"-2°","Front Toe":"0°","Rear Toe":"0.10°","Front Suspension":"41","Rear Suspension":"2","Front Anti-Roll Bar":"1","Rear Anti-Roll Bar":"11","Front Ride Height":"22","Rear Ride Height":"48","Brake Pressure":"100%","Front Brake Bias":"56%","Front Right Tyre Pressure":"27.50psi","Front Left Tyre Pressure":"27.50psi","Rear Right Tyre Pressure":"23psi","Rear Left Tyre Pressure":"23psi"},"wet":null}];
+
+// [key, F1Laps label, label shown here, game minimum, game maximum]
+const FIELDS = [
+  ["front_wing", "Front Wing", "Front wing", 0, 50],
+  ["rear_wing", "Rear Wing", "Rear wing", 0, 50],
+  ["diff_on", "Differential On Throttle", "Differential on throttle", 10, 100],
+  ["diff_off", "Differential Off Throttle", "Differential off throttle", 10, 100],
+  ["engine_braking", "Engine Braking", "Engine braking", 0, 100],
+  ["front_camber", "Front Camber", "Front camber", -3.5, -2.5],
+  ["rear_camber", "Rear Camber", "Rear camber", -2.2, -0.7],
+  ["front_toe", "Front Toe", "Front toe", 0, 0.5],
+  ["rear_toe", "Rear Toe", "Rear toe", 0, 0.5],
+  ["front_susp", "Front Suspension", "Front suspension", 1, 41],
+  ["rear_susp", "Rear Suspension", "Rear suspension", 1, 41],
+  ["front_arb", "Front Anti-Roll Bar", "Front anti-roll bar", 1, 21],
+  ["rear_arb", "Rear Anti-Roll Bar", "Rear anti-roll bar", 1, 21],
+  ["front_rh", "Front Ride Height", "Front ride height", 10, 40],
+  ["rear_rh", "Rear Ride Height", "Rear ride height", 40, 100],
+  ["brake_pressure", "Brake Pressure", "Brake pressure", 80, 100],
+  ["brake_bias", "Front Brake Bias", "Front brake bias", 50, 70],
+  ["fr_pressure", "Front Right Tyre Pressure", "Front right tyre", 22.5, 29.5],
+  ["fl_pressure", "Front Left Tyre Pressure", "Front left tyre", 22.5, 29.5],
+  ["rr_pressure", "Rear Right Tyre Pressure", "Rear right tyre", 20.5, 26.5],
+  ["rl_pressure", "Rear Left Tyre Pressure", "Rear left tyre", 20.5, 26.5],
+];
+const F = Object.fromEntries(FIELDS.map(([k, src, label, min, max]) => [k, { src, label, min, max }]));
+const GROUPS = [
+  ["Aerodynamics", ["front_wing", "rear_wing"]],
+  ["Transmission", ["diff_on", "diff_off", "engine_braking"]],
+  ["Suspension geometry", ["front_camber", "rear_camber", "front_toe", "rear_toe"]],
+  ["Suspension", ["front_susp", "rear_susp", "front_arb", "rear_arb", "front_rh", "rear_rh"]],
+  ["Brakes", ["brake_pressure", "brake_bias"]],
+  ["Tyres", ["fr_pressure", "fl_pressure", "rr_pressure", "rl_pressure"]],
+];
+
+// Kerb attack: changes for a kerb-riding, corner-attacking style, applied only to settings F1Laps does not mark as agreed.
+const KERB = {
+  quali: { rear_wing: +1, diff_on: -5, rear_susp: -3, rear_arb: -2, front_rh: +1, rear_rh: +2 },
+  race: { rear_wing: +2, diff_on: -10, rear_susp: -4, rear_arb: -3, front_rh: +1, rear_rh: +2 },
+};
+const KERB_WHY = {
+  rear_wing: "More rear grip on corner exit. Costs a little top speed.",
+  diff_on: "Lets the inside rear wheel turn more freely, so the rear doesn't snap when one wheel goes light on a kerb.",
+  rear_susp: "A softer rear keeps the rear tyres on the ground over kerbs and when you put power down.",
+  rear_arb: "Lets the rear lean more in corners, so the rear tyres grip longer before they slide.",
+  front_rh: "Lifts the floor so it doesn't hit kerbs and unsettle the car.",
+  rear_rh: "Lifts the floor so it doesn't hit kerbs and launch the car. Costs a little top speed.",
+};
+// Dirty air: changes for a race spent following other cars, applied on top of this page's setup.
+const DIRTY = { front_wing: +2, front_arb: -1, brake_bias: -1 };
+const DIRTY_WHY = {
+  front_wing: "Following a car takes air off your front wing more than your rear, so the car understeers. Two clicks more front wing bring the front back.",
+  front_arb: "A softer front bar adds front grip that doesn't depend on air, which helps while the car ahead disturbs your front wing.",
+  brake_bias: "Moves braking toward the rear, so the front tyres slide and overheat less while you follow. You can also change this from the in-car menu during the race.",
+};
+
+const KERB_MODE = CONFIG.mode === "kerb";
+const ORDER = TRACKS.map(t => t.id);
+const BY_ID = Object.fromEntries(TRACKS.map(t => [t.id, t]));
+
+function num(v) { return parseFloat(String(v).replace(/[^0-9.\-]/g, "")); }
+function values(block) {
+  const out = {};
+  if (!block) return null;
+  for (const [k, f] of Object.entries(F)) if (block[f.src] !== undefined) out[k] = num(block[f.src]);
+  return out;
+}
+function agreed(t) { return new Set(t.important.map(label => FIELDS.find(f => f[1] === label)?.[0]).filter(Boolean)); }
+function clamp(k, v) { return Math.min(F[k].max, Math.max(F[k].min, v)); }
+function round2(v) { return Math.round(v * 100) / 100; }
+function fmt(k, v) {
+  if (v === undefined || v === null || Number.isNaN(v)) return "—";
+  if (k.endsWith("camber") || k.endsWith("toe")) return v.toFixed(2) + "°";
+  if (k.startsWith("diff") || k === "engine_braking" || k === "brake_pressure" || k === "brake_bias") return round2(v) + "%";
+  if (k.endsWith("pressure")) return round2(v) + " psi";
+  return String(round2(v));
+}
+function shift(base, rules, skip) {
+  const out = Object.assign({}, base), changed = [], held = [];
+  for (const [k, d] of Object.entries(rules)) {
+    if (!(k in base)) continue;
+    if (skip && skip.has(k)) { held.push(k); continue; }
+    const v = clamp(k, Math.round(base[k]) + d);
+    out[k] = v;
+    if (v !== base[k]) changed.push(k);
+  }
+  return { out, changed, held };
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+
+let state = { slug: ORDER[0], session: "race", cond: "dry" };
+try {
+  const s = JSON.parse(localStorage.getItem(CONFIG.key) || "null");
+  if (s && BY_ID[s.slug]) state = Object.assign(state, s);
+} catch (e) {}
+function save() { try { localStorage.setItem(CONFIG.key, JSON.stringify(state)); } catch (e) {} }
+
+function seg(el, opts, cur, onPick, disabled) {
+  el.innerHTML = "";
+  for (const [val, label] of opts) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = label;
+    b.setAttribute("aria-pressed", String(val === cur));
+    if (disabled && disabled(val)) { b.disabled = true; b.title = "F1Laps doesn't have enough wet setups for this track"; }
+    b.addEventListener("click", () => onPick(val));
+    el.appendChild(b);
+  }
+}
+
+function changeList(keys, from, to) {
+  return `<ul>` + keys.map(k => `<li>${F[k].label}: <span class="mono">${fmt(k, from[k])} → <strong>${fmt(k, to[k])}</strong></span></li>`).join("") + `</ul>`;
+}
+
+function render() {
+  const t = BY_ID[state.slug];
+  if (!t.wet) state.cond = "dry";
+  const meta = values(t[state.cond]);
+  const lock = agreed(t);
+
+  document.getElementById("session-ctl").hidden = !KERB_MODE;
+  if (KERB_MODE) seg(document.getElementById("session"), [["quali", "Qualifying"], ["race", "Race"]], state.session, v => { state.session = v; render(); });
+  seg(document.getElementById("weather"), [["dry", "Dry"], ["wet", "Wet"]], state.cond, v => { state.cond = v; render(); }, v => !t[v]);
+  const sel = document.getElementById("track");
+  sel.innerHTML = ORDER.map(s => `<option value="${s}"${s === state.slug ? " selected" : ""}>${esc(BY_ID[s].name)}</option>`).join("");
+
+  const kerb = KERB_MODE ? shift(meta, KERB[state.session], lock) : { out: meta, changed: [], held: [] };
+  const yours = kerb.out;
+  const dirty = shift(yours, DIRTY, null);
+
+  const sub = [CONFIG.cars, state.cond === "dry" ? "Dry" : "Wet"];
+  if (KERB_MODE) sub.push(state.session === "quali" ? "Qualifying" : "Race");
+  let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${sub.join(" · ")}</div>`;
+  if (KERB_MODE) {
+    h += `<h4>Kerb attack changes</h4>`;
+    h += kerb.changed.length ? changeList(kerb.changed, meta, yours)
+      : `<p class="none">Fast drivers agree on every setting this style would change, so this setup matches F1Laps exactly.</p>`;
+    if (kerb.held.length) h += `<p class="note">Left alone because fast drivers agree on them here: ${kerb.held.map(k => F[k].label.toLowerCase()).join(", ")}.</p>`;
+  }
+  h += `<h4>If you'll race in traffic</h4>`;
+  h += dirty.changed.length ? changeList(dirty.changed, yours, dirty.out)
+    : `<p class="none">This setup is already at the game's limits for every dirty-air change.</p>`;
+  if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry setup is available.</p>`;
+  h += `</div>`;
+
+  h += `<div class="legend">
+    <span><span class="chip lock">Agreed</span> fast drivers use the same value</span>
+    ${KERB_MODE ? `<span><span class="chip chg">Changed</span> adjusted for kerb attack</span>` : ""}
+    <span><span class="chip same">Open</span> fast drivers disagree, so adjust it to taste</span>
+    <span><span class="chip dirt">Dirty air</span> extra change for a race spent following other cars</span>
+  </div>`;
+
+  for (const [g, keys] of GROUPS) {
+    const rows = keys.filter(k => k in meta);
+    if (!rows.length) continue;
+    h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet"><thead><tr>
+      <th>Setting</th><th>F1Laps meta</th>${KERB_MODE ? "<th>Kerb attack</th>" : ""}<th></th><th>Dirty air</th><th class="why">Why</th></tr></thead><tbody>`;
+    for (const k of rows) {
+      const isChanged = kerb.changed.includes(k);
+      const isDirty = dirty.changed.includes(k);
+      const chip = isChanged ? `<span class="chip chg">Changed</span>` : lock.has(k) ? `<span class="chip lock">Agreed</span>` : `<span class="chip same">Open</span>`;
+      const why = [];
+      if (isChanged) why.push(`<p>${KERB_WHY[k]}</p>`);
+      if (isDirty) why.push(`<p><span class="why-dirty">Dirty air.</span> ${DIRTY_WHY[k]}</p>`);
+      h += `<tr class="${isChanged ? "changed" : ""}"><td class="name">${F[k].label}</td><td class="num">${fmt(k, meta[k])}</td>`;
+      if (KERB_MODE) h += `<td class="num yours">${fmt(k, yours[k])}</td>`;
+      h += `<td>${chip}</td><td class="num dirty${isDirty ? " moved" : ""}">${fmt(k, dirty.out[k])}</td><td class="why">${why.join("")}</td></tr>`;
+    }
+    h += `</tbody></table></div></section>`;
+  }
+
+  h += `<details class="rules"><summary>What each change does, and by how much</summary><div class="tablewrap" style="border:0"><table><thead><tr><th>Setting</th>`;
+  h += KERB_MODE ? `<th>Kerb, qualifying</th><th>Kerb, race</th>` : "";
+  h += `<th>Dirty air</th><th>What it fixes</th></tr></thead><tbody>`;
+  const ruleKeys = FIELDS.map(f => f[0]).filter(k => (KERB_MODE && k in KERB.race) || k in DIRTY);
+  const sign = v => v === undefined ? "—" : (v > 0 ? "+" : "") + v;
+  for (const k of ruleKeys) {
+    h += `<tr><td class="name">${F[k].label}</td>`;
+    if (KERB_MODE) h += `<td class="num">${sign(KERB.quali[k])}</td><td class="num">${sign(KERB.race[k])}</td>`;
+    h += `<td class="num">${sign(DIRTY[k])}</td><td class="why">${[KERB_MODE ? KERB_WHY[k] : null, DIRTY_WHY[k]].filter(Boolean).join(" ")}</td></tr>`;
+  }
+  h += `</tbody></table></div>
+    <p class="note">${KERB_MODE ? "Kerb attack changes apply only where F1Laps doesn't mark the setting as agreed. " : ""}Dirty-air changes apply on top of this page's setup, whether or not fast drivers agree on the setting, because their laps were set in clean air. Values are rounded to whole clicks and kept inside the game's limits.</p>
+  </details>`;
+
+  h += `<div class="notes">${CONFIG.notes}<p>Source: <a href="${esc(t.url)}" target="_blank" rel="noopener">F1Laps ${esc(t.name)} meta setup</a>, fetched ${esc(CONFIG.fetched)}. F1Laps updates these numbers as new laps arrive.</p></div>`;
+
+  document.getElementById("main").innerHTML = h;
+  save();
+}
+document.getElementById("track").addEventListener("change", e => { state.slug = e.target.value; render(); });
+render();
+</script>
+
+</body></html>

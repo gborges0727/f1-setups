@@ -11,19 +11,20 @@ The game cannot import setup files. To use a setup, type it in once on the setup
 | Page | What it shows |
 |---|---|
 | `/` | A start page where you pick the cars (2025 or 2026) and the setup style |
-| `/f1-25/` | F1Laps setups for 27 tracks with the 2025 cars, including the three reverse layouts |
-| `/f1-26/` | F1Laps setups for 25 tracks with the 2026 cars |
-| `/kerb-attack/` | The F1Laps setups for both car generations, with the settings fast drivers disagree on changed for riding kerbs, in qualifying and race versions |
+| `/f1-25/` and `/f1-26/` | The F1Laps setup for every track: 27 tracks with the 2025 cars, including the three reverse layouts, and 25 with the 2026 cars |
+| `/f1-25/kerb-attack/` and `/f1-26/kerb-attack/` | The same setups, with the settings fast drivers disagree on changed for riding kerbs, in qualifying and race versions |
+
+Every sheet has a Dirty air column. It shows what to change for a race spent following other cars: two clicks more front wing, a softer front anti-roll bar, and brake bias one step rearward. Parc fermé locks the setup once qualifying starts, so those changes go in before qualifying.
 
 ## Refresh the data
 
-F1Laps updates its numbers as new laps arrive. To pull the latest numbers and rebuild the F1 25 and F1 26 sheets:
+F1Laps updates its numbers as new laps arrive. To pull the latest numbers and rebuild every sheet:
 
 ```sh
 python3 scripts/fetch.py    # downloads every track page into data/f1-25.json and data/f1-26.json
-python3 scripts/build.py    # writes site/index.html, site/f1-25/ and site/f1-26/
+python3 scripts/build.py    # writes the start page and all four sheets into site/
 ```
 
-Both scripts use only the Python standard library. `build.py` leaves `site/kerb-attack/index.html` alone, because that page keeps its own copy of the data.
+Both scripts use only the Python standard library. The kerb-attack and dirty-air changes live in `templates/sheet.html`, in the `KERB` and `DIRTY` tables.
 
 The `site/` folder is the whole website. Any static host can serve it.

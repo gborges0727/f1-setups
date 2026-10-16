@@ -1,53 +1,49 @@
 <title>F1 Setup Sheets</title>
-<meta name="description" content="Free F1 25 and F1 26 car setups for every track, from F1Laps' 100 fastest setups, plus a kerb-attack version.">
+<meta name="description" content="Free F1 25 and F1 26 car setups for every track, from F1Laps' 100 fastest setups, plus a kerb-attack version and dirty-air changes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 /* Layout: a start page with one row per car generation and one card per setup style. */
 :root {
-  --bg: #f3f4f6;
-  --panel: #ffffff;
-  --fg: #16181d;
-  --muted: #5d6370;
-  --line: #dde0e6;
-  --accent: #7b2fd6;
-  --display: "Saira Condensed", "Arial Narrow", system-ui, sans-serif;
-  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bg: #f3f5f7;
+  --sheet: #ffffff;
+  --ink: #16202b;
+  --muted: #5b6876;
+  --rule: #d9dfe5;
+  --change: #b4410f;
+  --accent: #1d5fa8;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0f1115; --panel: #171a20; --fg: #eceef2; --muted: #9aa1ad; --line: #2a2e37; --accent: #b07cff;
-    color-scheme: dark;
-  }
-}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
+  --change: #ff9a62; --accent: #5d9ce6; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #0f1115; --panel: #171a20; --fg: #eceef2; --muted: #9aa1ad; --line: #2a2e37; --accent: #b07cff;
-  color-scheme: dark;
-}
-* { box-sizing: border-box; }
+  --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
+  --change: #ff9a62; --accent: #5d9ce6; color-scheme: dark }
+
 body {
-  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.45;
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 28px 48px;
 }
-.wrap { max-width: 760px; margin: 0 auto; display: grid; gap: 28px; }
-h1 { font: 700 40px/1 var(--display); text-transform: uppercase; margin: 0; letter-spacing: 0.01em; text-wrap: balance; }
-header p { margin: 8px 0 0; color: var(--muted); max-width: 60ch; }
+.wrap { max-width: 960px; margin: 0 auto; display: grid; gap: 28px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: 2.4rem; line-height: 1; letter-spacing: 0.01em; text-transform: uppercase; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 68ch; margin: 10px 0 0; }
 section { display: grid; gap: 10px; }
-h2 { margin: 0; font: 600 14px var(--display); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
-h2 b { color: var(--fg); font-weight: 700; font-size: 22px; letter-spacing: 0.02em; margin-right: 8px; }
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-a.card {
-  display: grid; gap: 6px; padding: 16px 18px; background: var(--panel); color: var(--fg);
-  border: 1px solid var(--line); border-radius: 8px; text-decoration: none; min-width: 0;
-}
+h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+h2 b { color: var(--ink); font-weight: 700; font-size: 1.5rem; letter-spacing: 0.02em; margin-right: 8px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+a.card { display: grid; gap: 6px; padding: 16px 18px; background: var(--sheet); color: var(--ink); border: 1px solid var(--rule); border-radius: 8px; text-decoration: none; min-width: 0; }
 a.card:hover { border-color: var(--accent); }
 a.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.card strong { font: 700 22px/1.1 var(--display); text-transform: uppercase; }
+.card strong { font-family: var(--display); font-weight: 700; font-size: 1.4rem; line-height: 1.1; text-transform: uppercase; }
 .card strong::after { content: " →"; color: var(--accent); }
-.card span { color: var(--muted); font-size: 15px; }
-footer { color: var(--muted); font-size: 14px; max-width: 68ch; display: grid; gap: 6px; }
+.card.kerb strong::after { color: var(--change); }
+.card span { color: var(--muted); font-size: 0.93rem; }
+footer { color: var(--muted); font-size: 0.9rem; max-width: 72ch; display: grid; gap: 6px; }
 footer p { margin: 0; }
 footer a { color: var(--accent); }
 </style>
@@ -55,14 +51,14 @@ footer a { color: var(--accent); }
 <div class="wrap">
   <header>
     <h1>F1 Setup Sheets</h1>
-    <p>Car setups for every track in F1 25. Pick the cars you race, then pick how you want the car set up.</p>
+    <p class="lede">Car setups for every track in F1 25. Pick the cars you race, then pick how you want the car set up. Every sheet also shows what to change for a race spent following other cars.</p>
   </header>
 
   <section aria-labelledby="regs-26">
     <h2 id="regs-26"><b>2026 cars</b>F1 26 Season Pack</h2>
     <div class="cards">
       <a class="card" href="/f1-26/"><strong>F1Laps meta</strong><span>The setup the 100 fastest drivers run at each of 25 tracks, dry and wet.</span></a>
-      <a class="card" href="/kerb-attack/#f1-26"><strong>Kerb attack</strong><span>The same setups, with the settings fast drivers disagree on tuned for riding kerbs. Qualifying and race versions.</span></a>
+      <a class="card kerb" href="/f1-26/kerb-attack/"><strong>Kerb attack</strong><span>The same setups, with the settings fast drivers disagree on tuned for riding kerbs. Qualifying and race versions.</span></a>
     </div>
   </section>
 
@@ -70,7 +66,7 @@ footer a { color: var(--accent); }
     <h2 id="regs-25"><b>2025 cars</b>F1 25 base game</h2>
     <div class="cards">
       <a class="card" href="/f1-25/"><strong>F1Laps meta</strong><span>The setup the 100 fastest drivers run at each of 27 tracks, including the three reverse layouts.</span></a>
-      <a class="card" href="/kerb-attack/#f1-25"><strong>Kerb attack</strong><span>The same setups, with the settings fast drivers disagree on tuned for riding kerbs. Qualifying and race versions.</span></a>
+      <a class="card kerb" href="/f1-25/kerb-attack/"><strong>Kerb attack</strong><span>The same setups, with the settings fast drivers disagree on tuned for riding kerbs. Qualifying and race versions.</span></a>
     </div>
   </section>
 
