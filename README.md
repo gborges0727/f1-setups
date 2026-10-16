@@ -22,7 +22,7 @@ F1Laps updates its numbers as new laps arrive. To pull the latest numbers and re
 
 ```sh
 python3 scripts/fetch.py    # downloads every track page into data/f1-25.json and data/f1-26.json
-python3 scripts/build.py    # writes the start page and all four sheets into site/
+python3 scripts/build.py    # writes the start page and all four sheets into site/, and copies the icons from static/
 ```
 
 Both scripts use only the Python standard library. The kerb-attack and dirty-air changes live in `templates/sheet.html`, in the `KERB` and `DIRTY` tables.

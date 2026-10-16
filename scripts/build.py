@@ -10,6 +10,7 @@ Usage: python3 scripts/build.py
 """
 import datetime
 import json
+import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -53,6 +54,9 @@ HEAD = (
     "padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}"
     "body{margin:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}"
     "img{max-width:100%}[hidden]{display:none!important}</style>\n"
+    '<link rel="icon" href="/favicon.ico" sizes="32x32">'
+    '<link rel="icon" href="/favicon.svg" type="image/svg+xml">'
+    '<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n'
 )
 
 
@@ -119,6 +123,9 @@ def build():
             print(f"wrote {out.relative_to(ROOT)} ({len(data['tracks'])} tracks)")
     (ROOT / "site" / "index.html").write_text(page((ROOT / "templates" / "index.html").read_text()))
     print("wrote site/index.html")
+    for f in sorted((ROOT / "static").iterdir()):
+        shutil.copy(f, ROOT / "site" / f.name)
+    print("copied static/ into site/")
 
 
 if __name__ == "__main__":
