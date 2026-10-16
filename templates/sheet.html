@@ -90,6 +90,10 @@ td.dirty.moved { color: var(--dirty); font-weight: 600; background: var(--dirty-
 .chip.chg { background: var(--change); color: var(--sheet); }
 .chip.same { border: 1px solid var(--rule); color: var(--muted); }
 .chip.dirt { background: var(--dirty); color: var(--sheet); }
+tr.spread td { border-top: 0; padding-top: 0; font-size: 0.8rem; color: var(--muted); }
+.dist { display: flex; flex-wrap: wrap; gap: 2px 14px; }
+.dist b { color: var(--ink); font-weight: 600; }
+.dist .num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 details.rules { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 16px; }
 details.rules summary { cursor: pointer; font-weight: 600; }
@@ -228,6 +232,22 @@ function shift(base, rules, skip) {
   }
   return { out, changed, held };
 }
+// What the fastest setups F1Laps lists use for one setting: the range, then the share of each common value.
+function spread(t, cond, k) {
+  const f = t.fastest && t.fastest[cond];
+  const counts = f && f.counts[F[k].src];
+  if (!counts || f.n < 5) return "";
+  const vals = counts.map(([v]) => v);
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const pct = c => Math.round(c / f.n * 100) + "%";
+  // Show up to five values. Past that, show four and add up the rest.
+  const top = counts.length > 5 ? counts.slice(0, 4) : counts, rest = counts.slice(top.length);
+  const bare = v => fmt(k, v).replace(/<span class="unit">.*?<\/span>|[%°]/g, "");
+  let h = `<span>The ${f.n} fastest use <span class="num">${lo === hi ? fmt(k, lo) : bare(lo) + "–" + fmt(k, hi)}</span></span>`;
+  h += top.map(([v, c]) => `<span class="num"><b>${pct(c)}</b> run ${fmt(k, v)}</span>`).join("");
+  if (rest.length) h += `<span><b>${pct(rest.reduce((a, [, c]) => a + c, 0))}</b> spread over ${rest.length} other values</span>`;
+  return `<div class="dist">${h}</div>`;
+}
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
 
 let state = { slug: ORDER[0], session: "race", cond: "dry" };
@@ -301,7 +321,7 @@ function render() {
   h += `<div class="legend">
     <span><span class="chip lock">Agreed</span> fast drivers use the same value</span>
     ${KERB_MODE ? `<span><span class="chip chg">Changed</span> adjusted for kerb attack</span>` : ""}
-    <span><span class="chip same">Open</span> fast drivers disagree, so adjust it to taste</span>
+    <span><span class="chip same">Open</span> fast drivers disagree, so adjust it to taste. The line under it shows what the fastest setups run.</span>
     <span><span class="chip dirt">Dirty air</span> extra change for a race spent following other cars</span>
   </div>`;
 
@@ -317,6 +337,8 @@ function render() {
       h += `<tr class="${isChanged ? "changed" : ""}"><td class="name">${F[k].label}</td><td class="num">${fmt(k, meta[k])}</td>`;
       if (KERB_MODE) h += `<td class="num yours">${fmt(k, yours[k])}</td>`;
       h += `<td>${chip}</td><td class="num dirty${isDirty ? " moved" : ""}">${fmt(k, dirty.out[k])}</td></tr>`;
+      const dist = lock.has(k) ? "" : spread(t, state.cond, k);
+      if (dist) h += `<tr class="spread${isChanged ? " changed" : ""}"><td colspan="${KERB_MODE ? 5 : 4}">${dist}</td></tr>`;
     }
     h += `</tbody></table></div></section>`;
   }

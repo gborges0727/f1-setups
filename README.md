@@ -14,6 +14,8 @@ The game cannot import setup files. To use a setup, type it in once on the setup
 | `/f1-25/` and `/f1-26/` | The F1Laps setup for every track: 27 tracks with the 2025 cars, including the three reverse layouts, and 25 with the 2026 cars |
 | `/f1-25/kerb-attack/` and `/f1-26/kerb-attack/` | The same setups, with the settings fast drivers disagree on changed for riding kerbs, in qualifying and race versions |
 
+Under each setting fast drivers disagree on, a line shows what the fastest setups F1Laps lists for that track actually run. F1Laps lists the 20 fastest dry setups and up to 20 wet ones. The line gives the range and the share of each common value, such as "35% run 56%" for Monaco brake bias. The most common value among those setups can differ from the F1Laps meta value, which comes from 100 setups. The line is left out when F1Laps lists fewer than five setups.
+
 Every sheet has a Dirty air column. It shows what to change for a race spent following other cars: two clicks more front wing, a softer front anti-roll bar, and brake bias one step rearward. Parc fermé locks the setup once qualifying starts, so those changes go in before qualifying.
 
 ## Refresh the data
@@ -21,11 +23,11 @@ Every sheet has a Dirty air column. It shows what to change for a race spent fol
 F1Laps updates its numbers as new laps arrive. To pull the latest numbers and rebuild every sheet:
 
 ```sh
-python3 scripts/fetch.py    # downloads every track page into data/f1-25.json and data/f1-26.json
+python3 scripts/fetch.py    # downloads every track's meta page and fastest setups into data/f1-25.json and data/f1-26.json
 python3 scripts/build.py    # writes the start page and all four sheets into site/, and copies in static/
 ```
 
-Both scripts use only the Python standard library. The kerb-attack and dirty-air changes live in `templates/sheet.html`, in the `KERB` and `DIRTY` tables. The built `site/` folder is the whole website, and git ignores it.
+A first run reads about 2,000 setup pages, one per second, so it takes about 40 minutes. Setup pages never change, so `fetch.py` caches them in `.cache/setups/` and a later run reads only new ones. Both scripts use only the Python standard library. The kerb-attack and dirty-air changes live in `templates/sheet.html`, in the `KERB` and `DIRTY` tables. The built `site/` folder is the whole website, and git ignores it.
 
 ## Releases and deploys
 

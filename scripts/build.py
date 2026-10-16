@@ -84,6 +84,10 @@ def notes(tracks):
         "Parc fermé locks the setup once qualifying starts. If you expect to start behind other "
         "cars, enter the Dirty air values before qualifying.",
     ]
+    out.append("The line under each open setting counts the fastest setups F1Laps lists for the "
+               "track: the 20 fastest dry setups, or up to 20 wet ones. Most are Time Trial laps. F1Laps "
+               "builds its meta value from 100 setups, so the most common value in the line can differ "
+               "from it.")
     dry_only = [t["name"] for t in tracks if not t["wet"]]
     if dry_only:
         out.append(f"F1Laps has no wet data for {names(dry_only)}. For those, start from the dry "
