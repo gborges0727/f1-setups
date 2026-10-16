@@ -1,0 +1,179 @@
+<title>__TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: a pit-wall sheet. Track picker on top, then the six garage menus in game order, one value per row. */
+:root {
+  --bg: #f3f4f6;
+  --panel: #ffffff;
+  --fg: #16181d;
+  --muted: #5d6370;
+  --line: #dde0e6;
+  --purple: #7b2fd6;       /* timing-screen "fastest sector" purple marks settings fast drivers agree on */
+  --purple-soft: #efe6fb;
+  --dry: #d8262f;          /* soft-tyre red */
+  --wet: #1f6fc4;          /* full-wet blue */
+  --chip: #e8eaee;
+  --display: "Saira Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1115; --panel: #171a20; --fg: #eceef2; --muted: #9aa1ad; --line: #2a2e37;
+    --purple: #b07cff; --purple-soft: #2a1d40; --dry: #ff5a60; --wet: #5aa6ff; --chip: #222631;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1115; --panel: #171a20; --fg: #eceef2; --muted: #9aa1ad; --line: #2a2e37;
+  --purple: #b07cff; --purple-soft: #2a1d40; --dry: #ff5a60; --wet: #5aa6ff; --chip: #222631;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+.wrap { max-width: 720px; margin: 0 auto; display: grid; gap: 18px; }
+header h1 {
+  font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1; margin: 0;
+  letter-spacing: 0.01em; text-transform: uppercase; text-wrap: balance;
+}
+header p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+.picker { display: grid; gap: 10px; }
+.picker label { font-family: var(--display); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; color: var(--muted); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+select {
+  font: 600 18px var(--display); color: var(--fg); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; min-width: 0; flex: 1 1 220px;
+}
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--panel); }
+.seg button {
+  font: 600 15px var(--display); text-transform: uppercase; letter-spacing: 0.08em;
+  border: 0; background: transparent; color: var(--muted); padding: 9px 18px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.seg button .dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid currentColor; }
+.seg button[data-c="dry"] .dot { color: var(--dry); }
+.seg button[data-c="wet"] .dot { color: var(--wet); }
+.seg button[aria-pressed="true"] { background: var(--chip); color: var(--fg); }
+.seg button:disabled { opacity: 0.4; cursor: not-allowed; }
+button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+.legend { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 14px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; background: var(--purple); flex: none; }
+.sheet { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.sheet-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.sheet-head h2 { margin: 0; font: 700 24px/1.1 var(--display); text-transform: uppercase; }
+.sheet-head a { color: var(--muted); font-size: 13px; }
+.cond { font: 600 13px var(--display); text-transform: uppercase; letter-spacing: 0.08em; }
+.cond.dry { color: var(--dry); } .cond.wet { color: var(--wet); }
+.group h3 {
+  margin: 0; padding: 10px 16px 6px; font: 600 13px var(--display); text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--muted); background: var(--bg);
+  border-top: 1px solid var(--line);
+}
+.group:first-child h3 { border-top: 0; }
+dl { margin: 0; }
+.item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 16px; border-top: 1px solid var(--line); }
+.group dl .item:first-child { border-top: 0; }
+.item dt { min-width: 0; }
+.item dd { margin: 0; font: 600 21px var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.item.imp { background: var(--purple-soft); }
+.item.imp dd { color: var(--purple); }
+.item.imp dt::after { content: "agreed"; margin-left: 8px; font: 600 11px var(--display); text-transform: uppercase; letter-spacing: 0.08em; color: var(--purple); }
+.nowet { padding: 16px; color: var(--muted); }
+.notes { color: var(--muted); font-size: 14px; display: grid; gap: 8px; max-width: 68ch; }
+.notes p { margin: 0; }
+.notes ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.home { font-size: 14px; } .home a { color: var(--muted); text-decoration: none; } .home a:hover { color: var(--fg); }
+</style>
+
+<div class="wrap">
+  <nav class="home"><a href="/">← All setup sheets</a></nav>
+  <header>
+    <h1>__TITLE__</h1>
+    <p>__INTRO__</p>
+  </header>
+
+  <div class="picker">
+    <label for="track">Track</label>
+    <div class="row">
+      <select id="track"></select>
+      <div class="seg" role="group" aria-label="Conditions">
+        <button type="button" id="btn-dry" data-c="dry" aria-pressed="true"><span class="dot"></span>Dry</button>
+        <button type="button" id="btn-wet" data-c="wet" aria-pressed="false"><span class="dot"></span>Wet</button>
+      </div>
+    </div>
+    <div class="legend"><i></i>Purple rows are settings the fastest drivers agree on. Copy those exactly and adjust the rest to taste.</div>
+  </div>
+
+  <section class="sheet" id="sheet" aria-live="polite"></section>
+
+  <div class="notes">
+    <p>The values are averages, so some fall between two clicks (for example 26.5 on a wing). Pick either neighbouring click.</p>
+    <p>Most of the fastest laps are likely Time Trial laps, and Time Trial turns off tyre wear. For a race, adjust three things as needed:</p>
+    <ul>
+      <li>Raise tyre pressures if the tyres overheat or wear fast.</li>
+      <li>Lower the on-throttle diff if the rear steps out on corner exit.</li>
+      <li>Add a click or two of rear wing if the car feels nervous.</li>
+    </ul>
+    __WET_NOTE__
+    <p>These numbers came from f1laps.com on __FETCHED__. F1Laps updates its pages as new laps arrive, so tap the source link for the latest numbers.</p>
+  </div>
+</div>
+
+<script>
+const TRACKS = __DATA__;
+const GROUPS = [
+  ["Aerodynamics", ["Front Wing", "Rear Wing"]],
+  ["Transmission", ["Differential On Throttle", "Differential Off Throttle", "Engine Braking"]],
+  ["Suspension Geometry", ["Front Camber", "Rear Camber", "Front Toe", "Rear Toe"]],
+  ["Suspension", ["Front Suspension", "Rear Suspension", "Front Anti-Roll Bar", "Rear Anti-Roll Bar", "Front Ride Height", "Rear Ride Height"]],
+  ["Brakes", ["Brake Pressure", "Front Brake Bias"]],
+  ["Tyres", ["Front Right Tyre Pressure", "Front Left Tyre Pressure", "Rear Right Tyre Pressure", "Rear Left Tyre Pressure"]],
+];
+const sel = document.getElementById("track");
+const sheet = document.getElementById("sheet");
+const btnDry = document.getElementById("btn-dry");
+const btnWet = document.getElementById("btn-wet");
+let cond = "dry";
+
+function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function save(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+TRACKS.forEach(t => { const o = document.createElement("option"); o.value = t.id; o.textContent = t.name; sel.appendChild(o); });
+const saved = load("__KEY__-track");
+if (saved && TRACKS.some(t => t.id === saved)) sel.value = saved;
+if (load("__KEY__-cond") === "wet") cond = "wet";
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+
+function render() {
+  const t = TRACKS.find(x => x.id === sel.value);
+  btnWet.disabled = !t.wet;
+  const c = cond === "wet" && t.wet ? "wet" : "dry";
+  btnDry.setAttribute("aria-pressed", c === "dry");
+  btnWet.setAttribute("aria-pressed", c === "wet");
+  const vals = t[c];
+  const imp = new Set(c === "dry" ? t.important : []);
+  let h = `<div class="sheet-head"><div><h2>${esc(t.name)}</h2><span class="cond ${c}">${c === "dry" ? "Dry" : "Wet"} setup</span></div><a href="${esc(t.url)}" target="_blank" rel="noopener">Source on F1Laps</a></div>`;
+  if (cond === "wet" && !t.wet) h += `<p class="nowet">F1Laps has no wet setups for this track yet. The dry setup is shown.</p>`;
+  for (const [g, keys] of GROUPS) {
+    h += `<div class="group"><h3>${g}</h3><dl>`;
+    for (const k of keys) {
+      if (vals[k] === undefined) continue;
+      const v = vals[k];
+      h += `<div class="item${imp.has(k) ? " imp" : ""}"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`;
+    }
+    h += `</dl></div>`;
+  }
+  sheet.innerHTML = h;
+}
+sel.addEventListener("change", () => { save("__KEY__-track", sel.value); render(); });
+btnDry.addEventListener("click", () => { cond = "dry"; save("__KEY__-cond", cond); render(); });
+btnWet.addEventListener("click", () => { cond = "wet"; save("__KEY__-cond", cond); render(); });
+render();
+</script>
