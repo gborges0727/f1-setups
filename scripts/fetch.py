@@ -91,9 +91,77 @@ def one_setup(game, slug, sid):
     return out
 
 
+# Two setups count as the same when these match. Ride heights, the differential, brake bias
+# and tyre pressures can still vary a little inside one shared setup.
+SAME = ["Front Wing", "Rear Wing", "Front Suspension", "Rear Suspension",
+        "Front Anti-Roll Bar", "Rear Anti-Roll Bar"]
+
+
+def ease(s):
+    """Score how forgiving a setup is to drive. Higher is easier.
+
+    It rewards more rear wing against front wing, an open on-throttle differential, a locked
+    off-throttle differential, a soft rear spring, a rear anti-roll bar softer than the front,
+    and brake bias further forward. The first two count double, because they decide most of
+    how the rear behaves.
+    """
+    return (2 * (s["Rear Wing"] - s["Front Wing"]) / 10
+            - 2 * (s["Differential On Throttle"] - 50) / 25
+            + (s["Differential Off Throttle"] - 10) / 20
+            - s["Rear Suspension"] / 20
+            - (s["Rear Anti-Roll Bar"] - s["Front Anti-Roll Bar"]) / 10
+            + (s["Front Brake Bias"] - 50) / 3)
+
+
+def lap(s):
+    m, _, sec = s.partition(":")
+    return float(m) * 60 + float(sec) if sec else None
+
+
+def forgiving(setups, laps):
+    """The most forgiving setup that two or more of the fastest share, or None.
+
+    Returns {"values": {setting: value}, "runs": setups that share it, "best": the list
+    position of its fastest lap, "gap": seconds behind the fastest lap}. Inside a shared
+    setup, each setting takes its most common value, and the faster setup wins a tie.
+    """
+    groups = {}
+    for i, s in enumerate(setups):
+        if all(k in s for k in SAME):
+            groups.setdefault(tuple(s[k] for k in SAME), []).append(i)
+    best = None
+    for members in groups.values():
+        if len(members) < 2:
+            continue
+        values = {}
+        for k in setups[members[0]]:
+            seen = [setups[i][k] for i in members if k in setups[i]]
+            values[k] = max(seen, key=lambda v: (seen.count(v), -seen.index(v)))
+        score = ease(values)
+        if best is None or score > best[0]:
+            best = (score, members, values)
+    if not best:
+        return None
+    _, members, values = best
+    first, mine = lap(laps[0]), lap(laps[members[0]])
+    gap = round(mine - first, 3) if first and mine else None
+    return {"values": values, "runs": len(members), "best": members[0] + 1, "gap": gap}
+
+
 def fastest(game, slug, cond):
-    """Count the values the fastest listed setups use: {"n": setups, "counts": {setting: [[value, count], ...]}}."""
+    """Count the values the fastest listed setups use.
+
+    Returns {"n": setups, "counts": {setting: [[value, count], ...]}}, plus "forgiving" for
+    dry setups (see forgiving()). Wet lists are race laps in changing rain, so their lap
+    times can't rank setups, and the wet sheets keep the vote.
+    """
     page = get(f"{BASE}/{game}/setups/{slug}/" + ("wet/" if cond == "wet" else ""))
+    laps = {}
+    for row in re.findall(r"<tr\b.*?</tr>", page, re.S):
+        m = re.search(rf'href="/{game}/setups/{slug}/([0-9a-f-]{{36}})/"', row)
+        cells = [text(c) for c in re.findall(r"<td\b.*?</td>", row, re.S)]
+        if m and len(cells) > 4:
+            laps.setdefault(m.group(1), cells[4])
     ids = list(dict.fromkeys(re.findall(rf'href="/{game}/setups/{slug}/([0-9a-f-]{{36}})/"', page)))
     setups = [one_setup(game, slug, i) for i in ids]
     counts = {}
@@ -101,9 +169,12 @@ def fastest(game, slug, cond):
         for k, v in s.items():
             counts.setdefault(k, {})
             counts[k][v] = counts[k].get(v, 0) + 1
-    return {"n": len(setups),
-            "counts": {k: sorted(([v, c] for v, c in c.items()), key=lambda vc: (-vc[1], vc[0]))
-                       for k, c in counts.items()}}
+    out = {"n": len(setups),
+           "counts": {k: sorted(([v, c] for v, c in c.items()), key=lambda vc: (-vc[1], vc[0]))
+                      for k, c in counts.items()}}
+    if cond == "dry":
+        out["forgiving"] = forgiving(setups, [laps.get(i, "") for i in ids])
+    return out
 
 
 def track(game, slug):

@@ -99,7 +99,7 @@ section.group h3 { font-family: var(--display); font-weight: 600; font-size: 1.0
 </style>
 
 <header class="top"><div class="wrap">
-  <nav class="home"><a href="/">← All setup sheets</a><a data-keep="__SHEET_URL__" href="__SHEET_URL__">Consensus sheet →</a><a data-keep="__KERB_URL__" href="__KERB_URL__">Kerb attack sheet →</a></nav>
+  <nav class="home"><a href="/">← All setup sheets</a><a data-keep="__SHEET_URL__" href="__SHEET_URL__">Main sheet →</a><a data-keep="__KERB_URL__" href="__KERB_URL__">Kerb attack sheet →</a></nav>
   <h1>__TITLE__</h1>
   <p class="lede">__LEDE__</p>
 </div></header>
@@ -140,16 +140,16 @@ function seg(el, opts, cur, onPick, disabled) {
   }
 }
 
-// One card: every value the fastest setups run, lowest first, with the consensus bar coloured and the median marked.
+// One card: every value the fastest setups run, lowest first, with the sheet's value coloured and the median marked.
 function card(k, base, f) {
   const shown = base.out[k], median = base.median[k];
   const differs = shown !== median;
   const chip = base.agreed.has(k) ? `<span class="chip lock">Agreed</span>` : `<span class="chip same">Open</span>`;
   let h = `<div class="set${differs ? " differs" : ""}"><div class="head"><span class="name">${F[k].label}</span>${chip}</div>`;
-  h += `<p class="vs">Consensus <b>${fmt(k, shown)}</b> · F1Laps median <b>${fmt(k, median)}</b></p>`;
+  h += `<p class="vs">Sheet <b>${fmt(k, shown)}</b> · F1Laps median <b>${fmt(k, median)}</b></p>`;
   if (!base.counted.has(k)) {
     const why = f && f.n >= 5 ? "F1Laps' setup pages don't show this setting." : `F1Laps lists only ${f ? f.n : 0} setups here, too few to count.`;
-    return h + `<p class="nodata">${why} The consensus uses F1Laps' median.</p></div>`;
+    return h + `<p class="nodata">${why} The sheet uses F1Laps' median.</p></div>`;
   }
   const counts = f.counts[F[k].src].slice();
   if (!counts.some(([v]) => v === median)) counts.push([median, 0]);
@@ -179,19 +179,19 @@ function render() {
     return c ? ` (${Math.round(c[1] / f.n * 100)}% of setups)` : "";
   };
   let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${CONFIG.cars} · ${state.cond === "dry" ? "Dry" : "Wet"} · ${f ? f.n : 0} fastest setups counted</div>`;
-  h += `<h4>Where the consensus differs from F1Laps' median</h4>`;
+  h += `<h4>Where the sheet differs from F1Laps' median</h4>`;
   h += moved.length
     ? `<ul>` + moved.map(k => `<li>${F[k].label}: <span class="mono">${fmt(k, base.median[k])} → <strong>${fmt(k, base.out[k])}</strong></span>${share(k)}</li>`).join("") + `</ul>`
-    : `<p class="none">The consensus matches F1Laps' median on every setting.</p>`;
+    : `<p class="none">The sheet matches F1Laps' median on every setting.</p>`;
   if (!f || f.n < 5) h += `<p class="warn">F1Laps lists only ${f ? f.n : 0} ${state.cond} setups at this track, too few to count. Every value here is F1Laps' median.</p>`;
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry breakdown is available.</p>`;
   h += `</div>`;
 
   h += `<div class="legend">
-    <span><span class="swatch top"></span> consensus, the value the sheets use</span>
+    <span><span class="swatch top"></span> the value the sheets use</span>
     <span><span class="swatch"></span> other values</span>
     <span><span style="color:var(--change)">◆</span> F1Laps median of its 100 fastest setups</span>
-    <span><span class="chip lock">Agreed</span> at least 70% run the consensus value</span>
+    <span><span class="chip lock">Agreed</span> at least 70% run the sheet's value</span>
   </div>`;
 
   for (const [g, gk] of GROUPS) {

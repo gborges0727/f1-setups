@@ -247,6 +247,11 @@ function render() {
   const sub = [CONFIG.cars, state.cond === "dry" ? "Dry" : "Wet"];
   if (KERB_MODE) sub.push(state.session === "quali" ? "Qualifying" : "Race");
   let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${sub.join(" · ")}</div>`;
+  const fg = base.forgiving;
+  if (fg) {
+    const gap = fg.gap === null ? "" : fg.best === 1 ? " It set the fastest lap." : ` Its best lap is ${fg.gap.toFixed(3)} s behind the fastest.`;
+    h += `<p class="note">This is the most forgiving setup that two or more of the ${base.n} fastest share. ${fg.runs} of them run it.${gap}</p>`;
+  }
   if (base.picked.size) {
     h += `<h4>Picked by hand</h4>` + changeList([...base.picked], base.voted, meta);
     h += `<p class="note">${esc(base.why)}</p>`;
@@ -254,7 +259,7 @@ function render() {
   if (KERB_MODE) {
     h += `<h4>Kerb attack changes</h4>`;
     h += kerb.changed.length ? changeList(kerb.changed, meta, yours)
-      : `<p class="none">Fast drivers agree on every setting this style would change, so this setup matches the consensus exactly.</p>`;
+      : `<p class="none">Fast drivers agree on every setting this style would change, so this setup matches the main sheet exactly.</p>`;
     if (kerb.held.length) h += `<p class="note">Left alone because fast drivers agree on them here: ${kerb.held.map(k => F[k].label.toLowerCase()).join(", ")}.</p>`;
   }
   h += `<h4>If you'll race in traffic</h4>`;
@@ -289,7 +294,7 @@ function render() {
     const rows = keys.filter(k => k in meta);
     if (!rows.length) continue;
     h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet ${CONFIG.mode}"><thead><tr>
-      <th class="c-name">Setting</th><th class="c-val">Consensus</th>${KERB_MODE ? `<th class="c-val">Kerb attack</th>` : ""}<th class="c-chip"></th><th class="c-val">Dirty air</th></tr></thead><tbody>`;
+      <th class="c-name">Setting</th><th class="c-val">Setup</th>${KERB_MODE ? `<th class="c-val">Kerb attack</th>` : ""}<th class="c-chip"></th><th class="c-val">Dirty air</th></tr></thead><tbody>`;
     for (const k of rows) {
       const isChanged = kerb.changed.includes(k);
       const isDirty = dirty.changed.includes(k);

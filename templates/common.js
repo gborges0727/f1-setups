@@ -52,8 +52,9 @@ function fmt(k, v) {
 }
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
 
-// The value each setting gets on this site: the one most of the fastest setups F1Laps lists run.
-// When F1Laps' median is a value whose share is within 10 points of the top share (45% against
+// The value each setting gets on this site. A dry sheet uses the most forgiving setup that two
+// or more of the fastest share, when there is one. Otherwise the value is the one most of the
+// fastest setups F1Laps lists run. When F1Laps' median is a value whose share is within 10 points of the top share (45% against
 // 55%, say), the median wins instead. F1Laps' own value, the median of its 100 fastest setups,
 // fills in where it lists fewer than five setups, or where its setup pages leave the setting out
 // (engine braking).
@@ -78,11 +79,16 @@ function consensus(t, cond) {
     const tied = counts.filter(([, c]) => c === most).map(([v]) => v);
     out[k] = within.includes(median[k]) ? median[k]
       : tied.reduce((a, b) => Math.abs(b - median[k]) < Math.abs(a - median[k]) ? b : a);
-    if (most / f.n >= AGREE) agreed.add(k);
+    // A dry sheet takes every counted setting from the most forgiving setup two or more of the
+    // fastest share (fetch.py picks it). Agreed then means the setup runs the value at least
+    // 70% of the fastest run.
+    const easy = cond === "dry" && f.forgiving ? f.forgiving.values[F[k].src] : undefined;
+    if (easy !== undefined) out[k] = easy;
+    if (most / f.n >= AGREE && out[k] === counts[0][0]) agreed.add(k);
     counted.add(k);
   }
-  // A pick from data/picks.json replaces the vote for that setting. The sheets get picks, and
-  // the breakdown pages don't.
+  // A pick from data/picks.json replaces the sheet's value for that setting. The sheets get
+  // picks, and the breakdown pages don't.
   const voted = { ...out }, picked = new Set(), pick = t.pick && t.pick[cond];
   if (pick) for (const [label, v] of Object.entries(pick.values)) {
     const k = FIELDS.find(x => x[1] === label)[0];
@@ -90,7 +96,8 @@ function consensus(t, cond) {
     picked.add(k);
     agreed.delete(k);
   }
-  return { out, voted, median, agreed, counted, picked, why: pick ? pick.why : "", n: f ? f.n : 0 };
+  const forgiving = cond === "dry" && f && f.n >= 5 ? f.forgiving : null;
+  return { out, voted, median, agreed, counted, picked, forgiving, why: pick ? pick.why : "", n: f ? f.n : 0 };
 }
 
 // The chosen track rides in the address (#monaco), so links between one game's pages open the same track.

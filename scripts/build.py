@@ -2,12 +2,12 @@
 
 Writes site/index.html, four sheets and two breakdown pages, then copies in the
 files from static/ (the icons and Cloudflare's _redirects file). Each game gets
-a consensus sheet, a kerb-attack sheet and a breakdown page:
+a main sheet, a kerb-attack sheet and a breakdown page:
 
   site/f1-25/    site/f1-25/kerb-attack/    site/f1-25/breakdown/
   site/f1-26/    site/f1-26/kerb-attack/    site/f1-26/breakdown/
 
-templates/common.js holds the setting list and the consensus rule. build.py
+templates/common.js holds the setting list and the rule that picks each value. build.py
 pastes it into every sheet and breakdown page.
 
 Usage: python3 scripts/build.py
@@ -34,25 +34,26 @@ MODES = {
     "meta": {
         "title": "{short} Setup Sheet",
         "path": "{game}/",
-        "lede": "Each value is the one most of the 20 fastest setups on F1Laps run at that "
-                "track, for {lede_cars}.{extra} F1Laps' own meta setup takes the median of 100 setups instead, "
-                "so some values differ from it. Settings marked Agreed are ones at least 70% of the "
-                "20 run. The Dirty air column shows what to change for a race spent following "
-                "other cars.",
-        "description": "{short} car setups for every track, using the value most of the 20 "
-                       "fastest setups on F1Laps run, with dirty-air changes for racing in traffic.",
+        "lede": "Each dry setup is the most forgiving one that two or more of the 20 fastest "
+                "setups on F1Laps share, for {lede_cars}.{extra} It gives up a little lap time for "
+                "a car that's easier to drive. Each wet setting is the value most of the fastest wet "
+                "setups run. Settings marked Agreed are ones at least 70% of the 20 run. The Dirty "
+                "air column shows what to change for a race spent following other cars.",
+        "description": "{short} car setups for every track, using the most forgiving setup the "
+                       "fastest F1Laps drivers share, with dirty-air changes for racing in traffic.",
         "sibling": ("{game}/kerb-attack/", "Kerb attack version"),
     },
     "kerb": {
         "title": "{short} Kerb-Attack Sheet",
         "path": "{game}/kerb-attack/",
-        "lede": "The consensus setup for each track, for {lede_cars}, tuned for a driver who "
+        "lede": "The main sheet's setup for each track, for {lede_cars}, tuned for a driver who "
                 "attacks corners and rides kerbs.{extra} Settings marked Agreed stay as the fastest "
                 "setups run them, and only the others change. The Dirty air column shows what to "
                 "change on top for a race spent following other cars.",
-        "description": "{short} kerb-attack car setups for every track, built on the values the "
-                       "fastest F1Laps setups run, with dirty-air changes for racing in traffic.",
-        "sibling": ("{game}/", "Consensus version"),
+        "description": "{short} kerb-attack car setups for every track, built on the most "
+                       "forgiving setups the fastest F1Laps drivers share, with dirty-air changes "
+                       "for racing in traffic.",
+        "sibling": ("{game}/", "Main version"),
     },
 }
 
@@ -81,11 +82,14 @@ def names(items):
 
 def notes(tracks):
     out = [
-        "Each value is the one most of the fastest setups F1Laps lists for the track run: the 20 "
-        "fastest dry setups, or up to 20 wet ones. When F1Laps' median is a value whose share is "
-        "within 10 points of the most common one's, the median wins. Where F1Laps lists fewer "
-        "than five setups, or leaves a setting off its setup pages, the sheet uses F1Laps' meta "
-        "value, the median of its 100 fastest setups.",
+        "A dry setup comes from the 20 fastest setups F1Laps lists for the track. The sheet "
+        "groups the ones that share wings, springs and anti-roll bars, and takes the group that "
+        "is easiest to drive. It favours more rear wing, an open on-throttle differential, a "
+        "locked off-throttle differential, a soft rear, and brake bias further forward.",
+        "A wet setting is the value most of the fastest wet setups run. When F1Laps' median is a "
+        "value whose share is within 10 points of the most common one's, the median wins. Where "
+        "F1Laps lists fewer than five setups, or leaves a setting off its setup pages, the sheet "
+        "uses F1Laps' meta value, the median of its 100 fastest setups.",
         "A median can fall between two clicks, such as 26.5 on a wing. Pick either neighbouring "
         "click.",
         "Most of the fastest laps are Time Trial laps, and Time Trial turns off tyre wear. For a "
@@ -117,9 +121,10 @@ def esc(s):
 BREAKDOWN = {
     "title": "{short} Setup Breakdown",
     "lede": "What the 20 fastest setups on F1Laps run for every setting, for {lede_cars}, against "
-            "F1Laps' median of its 100 fastest.{extra} The sheets use the value the most setups "
-            "run, or the median when its share is within 10 points of that value's. Cards with an "
-            "orange border are where the two differ.",
+            "F1Laps' median of its 100 fastest.{extra} The blue bar is the value the sheets use. "
+            "A dry sheet takes the most forgiving setup two or more drivers share, so its value "
+            "isn't always the most common one. Cards with an orange border are where the sheet "
+            "differs from the median.",
     "description": "How many of the fastest {short} setups on F1Laps run each value, setting by "
                    "setting, for every track, against F1Laps' median.",
 }
