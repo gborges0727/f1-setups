@@ -84,9 +84,9 @@ def names(items):
 
 def notes(tracks):
     out = [
-        "A dry setup comes from the 20 fastest qualifying setups and the 20 fastest race setups "
-        "F1Laps lists for the track. The sheet groups the ones that share wings, springs and "
-        "anti-roll bars. It prefers a group run in both qualifying and the race, and takes the "
+        "A dry setup comes from up to 20 of the fastest qualifying setups and up to 20 of the "
+        "fastest race setups F1Laps lists for the track. The sheet groups the ones that share "
+        "wings, springs and anti-roll bars. It prefers a group run in both qualifying and the race, and takes the "
         "one that is easiest to drive. It favours more rear wing, an open on-throttle "
         "differential, a locked off-throttle differential, a soft rear, and brake bias further "
         "forward. The Fast column shows the shared setup with the best qualifying and race pace "
@@ -125,8 +125,8 @@ def esc(s):
 
 BREAKDOWN = {
     "title": "{short} Setup Breakdown",
-    "lede": "What the 20 fastest qualifying and 20 fastest race setups on F1Laps run for every "
-            "setting, for {lede_cars}, against "
+    "lede": "What up to 20 of the fastest qualifying setups and 20 of the fastest race setups on "
+            "F1Laps run for every setting, for {lede_cars}, against "
             "F1Laps' median of its 100 fastest.{extra} The blue bar is the value the sheets use. "
             "A dry sheet takes the most forgiving setup two or more drivers share, so its value "
             "isn't always the most common one. Cards with an orange border are where the sheet "

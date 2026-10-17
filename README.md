@@ -2,7 +2,7 @@
 
 Car setups for every track in EA Sports F1 25, for both the 2025 cars and the 2026 cars from the F1 26 Season Pack. The live site is https://f1-setups-cgn.pages.dev/.
 
-The setups come from [F1Laps](https://www.f1laps.com/). For each track, F1Laps lists the 20 fastest setups its users uploaded, dry and wet, and filters the list by session. The sheets read the 20 fastest qualifying setups and the 20 fastest race setups. They leave out Time Trial, because it has no tyre wear or fuel load, so its setups are built for one lap. The sheets also favour a car that's easy to drive over the fastest lap.
+The setups come from [F1Laps](https://www.f1laps.com/). For each track, F1Laps lists the 20 fastest setups its users uploaded, dry and wet, and filters the list by session. The sheets read up to 20 of the fastest qualifying setups and up to 20 of the fastest race setups. They leave out Time Trial, because it has no tyre wear or fuel load, so its setups are built for one lap. The sheets also favour a car that's easy to drive over the fastest lap.
 
 For a dry track, `fetch.py` groups the up to 40 setups that share the same wings, springs and anti-roll bars. It keeps the groups that two or more drivers run. When some of those groups appear in both the qualifying and the race list, it keeps only those. Then it scores each group on how forgiving it is. A setup scores higher for each of these:
 
@@ -13,7 +13,7 @@ For a dry track, `fetch.py` groups the up to 40 setups that share the same wings
 - a rear anti-roll bar softer than the front
 - brake bias further forward
 
-The wing balance and the on-throttle differential count double. The sheet uses the top-scoring group whole. That keeps it from mixing two setups, which happened at Saudi Arabia in F1 25 under the old per-setting vote. In October 2026 the picked setup's best lap was a median of 0.63 s behind the fastest lap at its track.
+The wing balance and the on-throttle differential count double. The sheet uses the top-scoring group whole. That keeps it from mixing two setups, which happened at Saudi Arabia in F1 25 under the old per-setting vote.
 
 For a wet track, each setting uses the value the most of the fastest wet setups run. Wet laps are set in changing rain, so their lap times can't rank setups. When F1Laps' meta value is one of the values the setups run, and its share is within 10 percentage points of the most common value's share, the meta value wins. So if 55% run 55% brake bias and 45% run 53%, and F1Laps says 53%, the sheet says 53%.
 

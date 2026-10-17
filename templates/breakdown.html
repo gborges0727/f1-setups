@@ -184,6 +184,7 @@ function render() {
     ? `<ul>` + moved.map(k => `<li>${F[k].label}: <span class="mono">${fmt(k, base.median[k])} → <strong>${fmt(k, base.out[k])}</strong></span>${share(k)}</li>`).join("") + `</ul>`
     : `<p class="none">The sheet matches F1Laps' median on every setting.</p>`;
   if (!f || f.n < 5) h += `<p class="warn">F1Laps lists only ${f ? f.n : 0} ${state.cond} setups at this track, too few to count. Every value here is F1Laps' median.</p>`;
+  if (f && f.race === undefined) h += `<p class="warn">This track still counts the ${f.n} fastest Time Trial setups. Its qualifying and race setups are still downloading and arrive in the next update.</p>`;
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry breakdown is available.</p>`;
   h += `</div>`;
 

@@ -92,6 +92,7 @@ function consensus(t, cond) {
   const voted = { ...out }, picked = new Set(), pick = t.pick && t.pick[cond];
   if (pick) for (const [label, v] of Object.entries(pick.values)) {
     const k = FIELDS.find(x => x[1] === label)[0];
+    if (out[k] === v) continue;
     out[k] = v;
     picked.add(k);
     agreed.delete(k);
@@ -100,8 +101,11 @@ function consensus(t, cond) {
   // The Fast column: the shared setup with the quickest lap, for drivers who want lap time over
   // ease. Settings its setup pages leave out (engine braking) keep the sheet's value.
   const q = cond === "dry" && f && f.n >= 5 && f.quickest;
-  const quick = q ? Object.fromEntries(Object.keys(out).map(k => [k, q.values[F[k].src] ?? out[k]])) : null;
-  return { out, voted, median, agreed, counted, picked, forgiving, quick, quickInfo: q || null,
+  let quick = q ? Object.fromEntries(Object.keys(out).map(k => [k, q.values[F[k].src] ?? out[k]])) : null;
+  // When the quickest shared setup is the forgiving one, the Fast column would only repeat it.
+  const sameAsMain = !!quick && Object.keys(out).every(k => quick[k] === out[k]);
+  if (sameAsMain) quick = null;
+  return { out, voted, median, agreed, counted, picked, forgiving, quick, quickInfo: q || null, sameAsMain,
     why: pick ? pick.why : "", n: f ? f.n : 0 };
 }
 
