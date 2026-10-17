@@ -34,15 +34,16 @@ MODES = {
     "meta": {
         "title": "{short} Setup Sheet",
         "path": "{game}/",
-        "lede": "Each dry setup is the most forgiving one that two or more of the fastest "
-                "qualifying and race setups on F1Laps share, for {lede_cars}.{extra} Time Trial "
+        "lede": "Each dry setup is the safe setup for the track, for {lede_cars}: the quickest "
+                "setup with a locked on-throttle differential that two or more of the fastest "
+                "qualifying and race drivers on F1Laps share.{extra} Time Trial "
                 "setups are left out, because Time Trial has no tyre wear or fuel load. Each wet "
                 "setting is the value most of the fastest wet setups run. Settings marked Agreed "
                 "are ones at least 70% of the setups run. The Dirty air column shows what to "
                 "change for a race spent following other cars.",
-        "description": "{short} car setups for every track, using the most forgiving setup the "
-                       "fastest F1Laps qualifying and race drivers share, with dirty-air changes "
-                       "for racing in traffic.",
+        "description": "{short} car setups for every track, using the quickest safe setup fast "
+                       "F1Laps qualifying and race drivers share, with dirty-air changes for "
+                       "racing in traffic.",
         "sibling": ("{game}/kerb-attack/", "Kerb attack version"),
     },
     "kerb": {
@@ -52,9 +53,9 @@ MODES = {
                 "attacks corners and rides kerbs.{extra} Settings marked Agreed stay as the fastest "
                 "setups run them, and only the others change. The Dirty air column shows what to "
                 "change on top for a race spent following other cars.",
-        "description": "{short} kerb-attack car setups for every track, built on the most "
-                       "forgiving setups the fastest F1Laps qualifying and race drivers share, "
-                       "with dirty-air changes for racing in traffic.",
+        "description": "{short} kerb-attack car setups for every track, built on the quickest "
+                       "safe setups fast F1Laps qualifying and race drivers share, with "
+                       "dirty-air changes for racing in traffic.",
         "sibling": ("{game}/", "Main version"),
     },
 }
@@ -86,11 +87,12 @@ def notes(tracks):
     out = [
         "A dry setup comes from up to 20 of the fastest qualifying setups and up to 20 of the "
         "fastest race setups F1Laps lists for the track. The sheet groups the ones that share "
-        "wings, springs and anti-roll bars. It prefers a group run in both qualifying and the race, and takes the "
-        "one that is easiest to drive. It favours more rear wing, an open on-throttle "
-        "differential, a locked off-throttle differential, a soft rear, and brake bias further "
-        "forward. The Fast column shows the shared setup with the best qualifying and race pace "
-        "instead, for drivers who want lap time over ease.",
+        "wings, springs and anti-roll bars, and keeps the groups two or more different drivers "
+        "run. It prefers a group run in both qualifying and the race. The safe setup is the "
+        "quickest group with an on-throttle differential of 85% or more, so both rear wheels "
+        "drive together out of corners. The Fast column shows the shared setup "
+        "with the best qualifying and race pace instead, for drivers who want lap time over "
+        "a car that's easy to drive.",
         "A wet setting is the value most of the fastest wet setups run. When F1Laps' median is a "
         "value whose share is within 10 points of the most common one's, the median wins. Where "
         "F1Laps lists fewer than five setups, or leaves a setting off its setup pages, the sheet "
@@ -128,7 +130,7 @@ BREAKDOWN = {
     "lede": "What up to 20 of the fastest qualifying setups and 20 of the fastest race setups on "
             "F1Laps run for every setting, for {lede_cars}, against "
             "F1Laps' median of its 100 fastest.{extra} The blue bar is the value the sheets use. "
-            "A dry sheet takes the most forgiving setup two or more drivers share, so its value "
+            "A dry sheet takes the quickest safe setup two or more drivers share, so its value "
             "isn't always the most common one. Cards with an orange border are where the sheet "
             "differs from the median.",
     "description": "How many of the fastest {short} setups on F1Laps run each value, setting by "

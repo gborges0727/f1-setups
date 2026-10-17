@@ -98,27 +98,6 @@ SAME = ["Front Wing", "Rear Wing", "Front Suspension", "Rear Suspension",
         "Front Anti-Roll Bar", "Rear Anti-Roll Bar"]
 
 
-# The settings ease() reads. A shared setup missing any of them can't be scored.
-EASE = ["Front Wing", "Rear Wing", "Differential On Throttle", "Differential Off Throttle",
-        "Rear Suspension", "Front Anti-Roll Bar", "Rear Anti-Roll Bar", "Front Brake Bias"]
-
-
-def ease(s):
-    """Score how forgiving a setup is to drive. Higher is easier.
-
-    It rewards more rear wing against front wing, an open on-throttle differential, a locked
-    off-throttle differential, a soft rear spring, a rear anti-roll bar softer than the front,
-    and brake bias further forward. The first two count double, because they decide most of
-    how the rear behaves.
-    """
-    return (2 * (s["Rear Wing"] - s["Front Wing"]) / 10
-            - 2 * (s["Differential On Throttle"] - 50) / 25
-            + (s["Differential Off Throttle"] - 10) / 20
-            - s["Rear Suspension"] / 20
-            - (s["Rear Anti-Roll Bar"] - s["Front Anti-Roll Bar"]) / 10
-            + (s["Front Brake Bias"] - 50) / 3)
-
-
 def lap(s):
     m, _, sec = s.partition(":")
     try:
@@ -132,29 +111,46 @@ def lap(s):
 SESSIONS = {"quali": "4", "race": "5"}
 
 
-def forgiving(setups, entries):
-    """The most forgiving setup that two or more of the fastest share, or None. See pick()."""
-    return pick(setups, entries, lambda values, pace: ease(values))
+# The safe setup has a locked on-throttle differential, so both rear wheels drive together out
+# of corners, like the F1 25 Saudi Arabia setup the owner tested. That leaves out the soft setup
+# many race drivers share, whose open differential (30 to 60%) and locked off-throttle
+# differential make the car slow to turn in.
+LOCKED = 85
+
+
+def pace(values, pace, drivers):
+    """Score a shared setup on lap time: minus the average of its qualifying and race gaps."""
+    gaps = [p["gap"] for p in pace.values() if p["gap"] is not None]
+    return -sum(gaps) / len(gaps) if gaps else float("-inf")
+
+
+def safe(setups, entries):
+    """The safe setup for the sheet's main column, or None. See pick().
+
+    Among the shared setups with an on-throttle differential of LOCKED% or more, it takes the
+    one with the best qualifying and race pace. When no shared setup has a locked differential,
+    it takes the quickest shared setup of any kind.
+    """
+    locked = lambda values: values.get("Differential On Throttle", 0) >= LOCKED
+    return pick(setups, entries, pace, keep=locked) or pick(setups, entries, pace)
 
 
 def quickest(setups, entries):
     """The shared setup with the best qualifying and race pace, for the Fast column. See pick()."""
-    def pace_score(values, pace):
-        gaps = [p["gap"] for p in pace.values() if p["gap"] is not None]
-        return -sum(gaps) / len(gaps) if gaps else float("-inf")
-    return pick(setups, entries, pace_score)
+    return pick(setups, entries, pace)
 
 
-def pick(setups, entries, score):
+def pick(setups, entries, score, keep=None):
     """The setup that two or more drivers among the fastest share with the highest score, or None.
 
     One driver can upload the same setup from qualifying and from a race, so the count is of
-    different drivers, not uploads. A setup run in both qualifying and the race beats one run in
-    only one of them. Returns {"values": {setting: value}, "runs": drivers who run it, and
-    "quali" and "race": {"best": list position of its fastest lap, "gap": seconds behind that
-    list's fastest lap, or None when F1Laps shows no lap time}, or None where nobody ran it in
-    that session}. Inside a shared setup,
-    each setting takes its most common value, and the setup listed first wins a tie.
+    different drivers, not uploads. keep(values), when given, drops setups that fail it. A setup
+    run in both qualifying and the race beats one run in only one of them. Returns
+    {"values": {setting: value}, "runs": drivers who run it, and "quali" and "race": {"best":
+    list position of its fastest lap, "gap": seconds behind that list's fastest lap, or None
+    when F1Laps shows no lap time}, or None where nobody ran it in that session}. Inside a
+    shared setup, each setting takes its most common value, and the setup listed first wins a
+    tie. score(values, pace, drivers) ranks the candidates, highest first.
     """
     first = {}
     for e in entries:
@@ -165,16 +161,20 @@ def pick(setups, entries, score):
         if all(k in s for k in SAME):
             groups.setdefault(tuple(s[k] for k in SAME), []).append(i)
     drivers = lambda members: len({entries[i]["user"] for i in members})
-    shared = [m for m in groups.values() if drivers(m) >= 2]
-    both = [m for m in shared if {entries[i]["kind"] for i in m} == set(SESSIONS)]
-    best = None
-    for members in both or shared:
+    found = []
+    for members in groups.values():
+        if drivers(members) < 2:
+            continue
         values = {}
         for k in setups[members[0]]:
             seen = [setups[i][k] for i in members if k in setups[i]]
             values[k] = max(seen, key=lambda v: (seen.count(v), -seen.index(v)))
-        if any(k not in values for k in EASE):
+        if keep and not keep(values):
             continue
+        found.append((members, values))
+    both = [(m, v) for m, v in found if {entries[i]["kind"] for i in m} == set(SESSIONS)]
+    best = None
+    for members, values in both or found:
         pace = {}
         for kind in SESSIONS:
             mine = [entries[i] for i in members if entries[i]["kind"] == kind]
@@ -183,7 +183,7 @@ def pick(setups, entries, score):
                 top = timed[0] if timed else min(mine, key=lambda e: e["rank"])
                 t, f = lap(top["lap"]), first.get(kind)
                 pace[kind] = {"best": top["rank"], "gap": round(t - f, 3) if t and f else None}
-        s = score(values, pace)
+        s = score(values, pace, drivers(members))
         if best is None or s > best[0]:
             best = (s, members, values, pace)
     if not best:
@@ -198,8 +198,8 @@ def fastest(game, slug, cond):
 
     Reads F1Laps' lists of up to 20 fastest qualifying setups and up to 20 fastest race setups.
     Returns {"n": setups, "quali": how many came from qualifying, "race": how many from the
-    race, "counts": {setting: [[value, count], ...]}}, plus "forgiving" and "quickest" for
-    dry setups (see pick()). Wet laps are set in changing rain, so the wet sheets keep the vote.
+    race, "counts": {setting: [[value, count], ...]}}, plus "forgiving" (the
+    safe setup, see safe()) and "quickest" for dry setups. Wet laps are set in changing rain, so the wet sheets keep the vote.
     """
     entries = []
     for kind, code in SESSIONS.items():
@@ -225,7 +225,8 @@ def fastest(game, slug, cond):
            "counts": {k: sorted(([v, c] for v, c in c.items()), key=lambda vc: (-vc[1], vc[0]))
                       for k, c in counts.items()}}
     if cond == "dry":
-        out["forgiving"] = forgiving(setups, entries)
+        # The sheets read the safe setup from "forgiving", the key's name before the safe rule.
+        out["forgiving"] = safe(setups, entries)
         out["quickest"] = quickest(setups, entries)
     return out
 

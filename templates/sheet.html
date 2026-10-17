@@ -270,7 +270,9 @@ function render() {
   const tf = t.fastest && t.fastest[state.cond];
   if (tf && tf.race === undefined) h += `<p class="warn">This track still uses the ${tf.n} fastest Time Trial setups. Its qualifying and race setups are still downloading and arrive in the next update.</p>`;
   const among = legacy(tf) ? `two or more of the ${base.n} fastest Time Trial setups` : `two or more drivers among the ${base.n} fastest qualifying and race setups`;
-  if (fg) h += `<p class="note">This is the most forgiving setup that ${among} share. ${who(fg)} run it. ${paceLine(fg)}${base.sameAsMain ? " It's also the shared setup with the best pace, so there's no Fast column here." : ""}</p>`;
+  const kind = fg && fg.values["Differential On Throttle"] >= 85 ? "the quickest shared setup with a locked on-throttle differential" : "the quickest shared setup, because none here has a locked on-throttle differential";
+  if (fg && legacy(tf)) h += `<p class="note">This is the most forgiving setup that ${among} share. ${who(fg)} run it. ${paceLine(fg)}</p>`;
+  else if (fg) h += `<p class="note">This is the safe setup: ${kind} among the ${base.n} fastest qualifying and race setups. ${who(fg)} run it. ${paceLine(fg)}${base.sameAsMain ? " It's also the quickest shared setup of any kind, so there's no Fast column here." : ""}</p>`;
   else if (state.cond === "dry" && tf && tf.n >= 5) h += `<p class="warn">No setup here is shared by two or more drivers, so each setting uses the value most of these setups run.</p>`;
   const fast = KERB_MODE ? null : base.quick, qi = base.quickInfo;
   if (fast) h += `<p class="note">The Fast column is the shared setup with the best ${tf && tf.race === undefined ? "lap" : "qualifying and race pace"}, for when you want lap time over ease. ${who(qi)} run it. ${paceLine(qi)}</p>`;

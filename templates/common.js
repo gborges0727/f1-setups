@@ -52,7 +52,7 @@ function fmt(k, v) {
 }
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
 
-// The value each setting gets on this site. A dry sheet uses the most forgiving setup that two
+// The value each setting gets on this site. A dry sheet uses the safe setup (fetch.py safe()) that two
 // or more of the fastest share, when there is one. Otherwise the value is the one most of the
 // fastest setups F1Laps lists run. When F1Laps' median is a value whose share is within 10 points of the top share (45% against
 // 55%, say), the median wins instead. F1Laps' own value, the median of its 100 fastest setups,
@@ -79,7 +79,7 @@ function consensus(t, cond) {
     const tied = counts.filter(([, c]) => c === most).map(([v]) => v);
     out[k] = within.includes(median[k]) ? median[k]
       : tied.reduce((a, b) => Math.abs(b - median[k]) < Math.abs(a - median[k]) ? b : a);
-    // A dry sheet takes every counted setting from the most forgiving setup two or more of the
+    // A dry sheet takes every counted setting from the safe setup two or more of the
     // fastest share (fetch.py picks it). Agreed then means the setup runs the value at least
     // 70% of the fastest run.
     const easy = cond === "dry" && f.forgiving ? f.forgiving.values[F[k].src] : undefined;
@@ -102,7 +102,7 @@ function consensus(t, cond) {
   // ease. Settings its setup pages leave out (engine braking) keep the sheet's value.
   const q = cond === "dry" && f && f.n >= 5 && f.quickest;
   let quick = q ? Object.fromEntries(Object.keys(out).map(k => [k, q.values[F[k].src] ?? out[k]])) : null;
-  // When the quickest shared setup is the forgiving one, the Fast column would only repeat it.
+  // When the quickest shared setup is the safe one, the Fast column would only repeat it.
   const sameAsMain = !!quick && Object.keys(out).every(k => quick[k] === out[k]);
   if (sameAsMain) quick = null;
   return { out, voted, median, agreed, counted, picked, forgiving, quick, quickInfo: q || null, sameAsMain,
