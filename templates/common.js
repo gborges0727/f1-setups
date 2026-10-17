@@ -104,7 +104,12 @@ function consensus(t, cond) {
   const q = cond === "dry" && f && f.n >= 5 && f.quickest;
   const quick = q ? Object.fromEntries(Object.keys(out).map(k => [k, q.values[F[k].src] ?? out[k]])) : null;
   const sameAsMain = !!quick && Object.keys(out).every(k => quick[k] === out[k]);
+  // The Segrob's column: the setup here that drives most like the owner's tested Saudi Arabia
+  // setup (fetch.py segrob()). Settings its setup pages leave out keep the sheet's value.
+  const m = cond === "dry" && f && f.n >= 5 && f.segrob;
+  const mine = m ? Object.fromEntries(Object.keys(out).map(k => [k, m.values[F[k].src] ?? out[k]])) : null;
   return { out, voted, median, agreed, against, counted, picked, forgiving, quick, quickInfo: q || null, sameAsMain,
+    mine, mineInfo: m || null,
     why: pick ? pick.why : "", n: f ? f.n : 0 };
 }
 

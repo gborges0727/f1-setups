@@ -20,6 +20,7 @@
   --dirty-bg: #e1f2f4;
   --accent: #1d5fa8;
   --accent-ink: #ffffff;
+  --mine: #2f7d32;
   --display: "Barlow Condensed", "Arial Narrow", sans-serif;
   --body: "IBM Plex Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
@@ -28,12 +29,12 @@
   --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
   --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --change-bg: #3a2318;
   --dirty: #5fd3e3; --dirty-bg: #12313a; --agree: #b07cff;
-  --accent: #5d9ce6; --accent-ink: #0f151c; color-scheme: dark } }
+  --accent: #5d9ce6; --accent-ink: #0f151c; --mine: #6fd38a; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
   --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --change-bg: #3a2318;
   --dirty: #5fd3e3; --dirty-bg: #12313a; --agree: #b07cff;
-  --accent: #5d9ce6; --accent-ink: #0f151c; color-scheme: dark }
+  --accent: #5d9ce6; --accent-ink: #0f151c; --mine: #6fd38a; color-scheme: dark }
 
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
@@ -110,9 +111,12 @@ table.sheet { table-layout: fixed; }
 /* The name column holds the setting and its chip. The value columns share the rest equally. */
 table.sheet th.c-name { width: 46%; }
 table.sheet.kerb th.c-name, table.sheet.has-fast th.c-name { width: 40%; }
+table.sheet.has-fast.has-mine th.c-name { width: 34%; }
 td.name .chip { margin-left: 6px; vertical-align: 1px; }
 td.fast.moved { color: var(--accent); font-weight: 600; }
 .fastkey { color: var(--accent); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+td.mine.moved { color: var(--mine); font-weight: 600; }
+.minekey { color: var(--mine); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
 
 @media (max-width: 560px) {
   h1 { font-size: 2rem; }
@@ -122,6 +126,7 @@ td.fast.moved { color: var(--accent); font-weight: 600; }
   table.sheet .unit { display: none; }
   table.sheet th.c-name { width: 40%; }
   table.sheet.kerb th.c-name, table.sheet.has-fast th.c-name { width: 37%; }
+  table.sheet.has-fast.has-mine th.c-name { width: 30%; }
   td.name .chip { margin-left: 0; margin-top: 3px; }
   td.name .lbl { display: block; }
 }
@@ -271,6 +276,8 @@ function render() {
   else if (state.cond === "dry" && tf && tf.n >= 5) h += `<p class="warn">No setup here is shared by two or more drivers, so each setting uses the value most of these setups run.</p>`;
   const fast = KERB_MODE ? null : base.quick, qi = base.quickInfo;
   if (fast && !base.sameAsMain) h += `<p class="note">The Fast column is ${legacy(tf) ? "the shared setup with the best lap" : "the quickest shared setup of any kind, open differentials included"}. ${who(qi)} run it. ${paceLine(qi)}</p>`;
+  const mine = KERB_MODE ? null : base.mine, mi = base.mineInfo;
+  if (mine) h += `<p class="note">The Segrob's column is the setup among ${pool40} that drives most like segrob's tested Saudi Arabia setup. It compares every setting except the wings and ride heights, which change from track to track. ${mi.runs === 1 ? "One driver runs" : `${mi.runs} different drivers run`} it. ${paceLine(mi)}</p>`;
   if (base.picked.size) {
     h += `<h4>Picked by hand</h4>` + changeList([...base.picked], base.voted, meta);
     h += `<p class="note">${esc(base.why)}</p>`;
@@ -309,13 +316,14 @@ function render() {
     ${base.against.size ? `<span><span class="chip odd">Unusual</span> at least 70% of the fastest setups run a different value. The line under it shows which.</span>` : ""}
     <span><span class="chip dirt">Dirty air</span> extra change for a race spent following other cars</span>
     ${fast ? `<span><b class="fastkey">Fast</b> the quickest shared setup of any kind. Blue values differ from the Safe column.</span>` : ""}
+    ${mine ? `<span><b class="minekey">Segrob's</b> the setup here that drives most like segrob's Saudi Arabia setup. Green values differ from the Safe column.</span>` : ""}
   </div>`;
 
   for (const [g, keys] of GROUPS) {
     const rows = keys.filter(k => k in meta);
     if (!rows.length) continue;
-    h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet ${CONFIG.mode}${fast ? " has-fast" : ""}"><thead><tr>
-      <th class="c-name">Setting</th><th class="c-val">${fg && !legacy(tf) ? "Safe" : "Setup"}</th>${KERB_MODE ? `<th class="c-val">Kerb attack</th>` : ""}<th class="c-val">Dirty air</th>${fast ? `<th class="c-val">Fast</th>` : ""}</tr></thead><tbody>`;
+    h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet ${CONFIG.mode}${fast ? " has-fast" : ""}${mine ? " has-mine" : ""}"><thead><tr>
+      <th class="c-name">Setting</th><th class="c-val">${fg && !legacy(tf) ? "Safe" : "Setup"}</th>${KERB_MODE ? `<th class="c-val">Kerb attack</th>` : ""}<th class="c-val">Dirty air</th>${fast ? `<th class="c-val">Fast</th>` : ""}${mine ? `<th class="c-val">Segrob's</th>` : ""}</tr></thead><tbody>`;
     for (const k of rows) {
       const isChanged = kerb.changed.includes(k);
       const isDirty = dirty.changed.includes(k);
@@ -325,9 +333,10 @@ function render() {
       if (KERB_MODE) h += `<td class="num yours">${fmt(k, yours[k])}</td>`;
       h += `<td class="num dirty${isDirty ? " moved" : ""}">${fmt(k, dirty.out[k])}</td>`;
       if (fast) h += `<td class="num fast${fast[k] !== meta[k] ? " moved" : ""}">${fmt(k, fast[k])}</td>`;
+      if (mine) h += `<td class="num mine${mine[k] !== meta[k] ? " moved" : ""}">${fmt(k, mine[k])}</td>`;
       h += `</tr>`;
       const dist = lock.has(k) && meta[k] === base.median[k] ? "" : spread(t, state.cond, k, meta[k], base.median[k]);
-      if (dist) h += `<tr class="spread${isChanged ? " changed" : ""}"><td colspan="${KERB_MODE || fast ? 4 : 3}">${dist}</td></tr>`;
+      if (dist) h += `<tr class="spread${isChanged ? " changed" : ""}"><td colspan="${3 + (KERB_MODE ? 1 : 0) + (fast ? 1 : 0) + (mine ? 1 : 0)}">${dist}</td></tr>`;
     }
     h += `</tbody></table></div></section>`;
   }

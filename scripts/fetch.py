@@ -196,13 +196,61 @@ def pick(setups, entries, score, keep=None, min_drivers=2):
             **{kind: pace.get(kind) for kind in SESSIONS}}
 
 
+# The Segrob's column starts from the owner's tested F1 25 Saudi Arabia setup, the most stable
+# car the owner has driven. Each track gets the setup among its fastest that drives most like it.
+MINE = {"f1-25": {
+    "Differential On Throttle": 100, "Differential Off Throttle": 10,
+    "Front Camber": -3.5, "Rear Camber": -2, "Front Toe": 0, "Rear Toe": 0.1,
+    "Front Suspension": 41, "Rear Suspension": 12,
+    "Front Anti-Roll Bar": 21, "Rear Anti-Roll Bar": 18,
+    "Brake Pressure": 100, "Front Brake Bias": 52,
+    "Front Right Tyre Pressure": 26.5, "Rear Right Tyre Pressure": 23,
+}}
+# The game's range for each setting MINE compares, so a click on a narrow setting counts for as
+# much as a click's share of a wide one. Wings and ride heights are left out, because each track
+# needs its own.
+RANGE = {"Differential On Throttle": 90, "Differential Off Throttle": 90,
+         "Front Camber": 1, "Rear Camber": 1.5, "Front Toe": 0.5, "Rear Toe": 0.5,
+         "Front Suspension": 40, "Rear Suspension": 40,
+         "Front Anti-Roll Bar": 20, "Rear Anti-Roll Bar": 20,
+         "Brake Pressure": 20, "Front Brake Bias": 20,
+         "Front Right Tyre Pressure": 7, "Rear Right Tyre Pressure": 6}
+
+
+def segrob(setups, entries, mine):
+    """The setup for the Segrob's column: the uploaded setup closest to mine, or None.
+
+    Closeness is the distance between the two setups across the settings in RANGE, each
+    divided by its range. Only setups with a locked on-throttle differential count, unless none
+    has one. A tie goes to the setup higher in its list. Returns the same shape as pick(), with
+    "runs" counting the drivers who upload exactly this setup.
+    """
+    def far(s):
+        return sum(((s.get(k, v) - v) / RANGE[k]) ** 2 for k, v in mine.items()) ** 0.5
+    pool = [i for i, s in enumerate(setups) if s.get("Differential On Throttle", 0) >= LOCKED]
+    pool = pool or list(range(len(setups)))
+    if not pool:
+        return None
+    best = min(pool, key=lambda i: (round(far(setups[i]), 6), entries[i]["rank"]))
+    members = [i for i, s in enumerate(setups) if s == setups[best]]
+    first = {e["kind"]: lap(e["lap"]) for e in entries if e["rank"] == 1}
+    pace = {}
+    for kind in SESSIONS:
+        ups = sorted((entries[i] for i in members if entries[i]["kind"] == kind), key=lambda e: e["rank"])
+        if ups:
+            t, f = lap(ups[0]["lap"]), first.get(kind)
+            pace[kind] = {"best": ups[0]["rank"], "gap": round(t - f, 3) if t and f else None}
+    return {"values": setups[best], "runs": len({entries[i]["user"] for i in members}),
+            "distance": round(far(setups[best]), 3), **{kind: pace.get(kind) for kind in SESSIONS}}
+
+
 def fastest(game, slug, cond):
     """Count the values the fastest qualifying and race setups use.
 
     Reads F1Laps' lists of up to 20 fastest qualifying setups and up to 20 fastest race setups.
     Returns {"n": setups, "quali": how many came from qualifying, "race": how many from the
     race, "counts": {setting: [[value, count], ...]}}, plus "forgiving" (the
-    safe setup, see safe()) and "quickest" for dry setups. Wet laps are set in changing rain, so the wet sheets keep the vote.
+    safe setup, see safe()), "quickest" and, for a game in MINE, "segrob" for dry setups. Wet laps are set in changing rain, so the wet sheets keep the vote.
     """
     entries = []
     for kind, code in SESSIONS.items():
@@ -231,6 +279,8 @@ def fastest(game, slug, cond):
         # The sheets read the safe setup from "forgiving", the key's name before the safe rule.
         out["forgiving"] = safe(setups, entries)
         out["quickest"] = quickest(setups, entries)
+        if game in MINE:
+            out["segrob"] = segrob(setups, entries, MINE[game])
     return out
 
 

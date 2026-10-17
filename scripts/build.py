@@ -25,9 +25,11 @@ VERSION = os.environ.get("SITE_VERSION", "dev")
 
 GAMES = {
     "f1-25": {"short": "F1 25", "cars": "2025 cars", "lede_cars": "the 2025 cars",
-              "extra": " The three reverse layouts are included."},
+              "extra": " The three reverse layouts are included.",
+              "mine": " The Segrob's column is the setup that drives most like segrob's tested Saudi "
+                      "Arabia setup."},
     "f1-26": {"short": "F1 26", "cars": "2026 cars", "lede_cars": "the 2026 Season Pack cars",
-              "extra": ""},
+              "extra": "", "mine": ""},
 }
 
 MODES = {
@@ -37,7 +39,7 @@ MODES = {
         "lede": "Each dry Safe column is the quickest setup with a locked on-throttle "
                 "differential among the fastest qualifying and race setups on F1Laps for "
                 "{lede_cars}, shared by two or more drivers where possible. The Fast "
-                "column next to it is the quickest shared setup of any kind.{extra} Time Trial "
+                "column next to it is the quickest shared setup of any kind.{mine}{extra} Time Trial "
                 "setups are left out, because Time Trial has no tyre wear or fuel load. Each wet "
                 "setting is the value most of the fastest wet setups run. Settings marked Agreed "
                 "are ones at least 70% of the setups run. The Dirty air column shows what to "
@@ -95,6 +97,10 @@ def notes(tracks):
         "the average of how far its best qualifying and race laps are behind the fastest in "
         "each list. The Fast column shows the quickest shared setup of any kind, open "
         "differentials included.",
+        "On F1 25, the Segrob's column starts from segrob's tested Saudi Arabia setup. For each "
+        "track it takes the setup among the fastest qualifying and race setups that sits closest "
+        "to it. The comparison covers every setting except the wings and ride heights, which "
+        "change from track to track. Only setups with an on-throttle differential of 85% or more count.",
         "A wet setting is the value most of the fastest wet setups run. When F1Laps' median is a "
         "value whose share is within 10 points of the most common one's, the median wins. Where "
         "F1Laps lists fewer than five setups, or leaves a setting off its setup pages, the sheet "

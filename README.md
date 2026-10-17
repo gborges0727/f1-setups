@@ -41,6 +41,8 @@ Some values on the sheets can be picked by hand, and a pick replaces the sheet's
 
 Each dry main sheet also has a Fast column. It shows the quickest shared setup of any kind, open differentials included, taken whole like the safe setup. Where the quickest shared setup has a locked differential, the two columns match. The kerb-attack and wet sheets don't have it.
 
+The F1 25 dry main sheets also have a Segrob's column. It starts from segrob's tested Saudi Arabia setup, kept as `MINE` in `scripts/fetch.py`. For each track it takes the setup among the fastest qualifying and race setups that sits closest to it. The comparison covers every setting except the wings and ride heights, which change from track to track. Each setting's difference is divided by the game's range for it, so a click on a narrow setting counts for as much as its share of a wide one. Only setups with an on-throttle differential of 85% or more count.
+
 Every sheet has a Dirty air column. It shows what to change for a race spent following other cars: two clicks more front wing, a softer front anti-roll bar, and brake bias one step rearward. Parc fermé locks the setup once qualifying starts, so those changes go in before qualifying.
 
 ## Refresh the data
