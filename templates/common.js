@@ -53,9 +53,12 @@ function fmt(k, v) {
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
 
 // The value each setting gets on this site: the one most of the fastest setups F1Laps lists run.
-// F1Laps' own value, the median of its 100 fastest setups, fills in where it lists fewer than
-// five setups, or where its setup pages leave the setting out (engine braking).
+// When other values come within 10 points of its share (45% against 55%, say), the one closest
+// to F1Laps' median wins, so a near split goes the median's way. F1Laps' own value, the median
+// of its 100 fastest setups, fills in where it lists fewer than five setups, or where its setup
+// pages leave the setting out (engine braking).
 const AGREE = 0.7;
+const CLOSE = 0.1;
 function consensus(t, cond) {
   const median = values(t[cond]);
   const f = t.fastest && t.fastest[cond];
@@ -68,10 +71,11 @@ function consensus(t, cond) {
       if (marked.has(k)) agreed.add(k);
       continue;
     }
-    // A tie goes to the tied value closest to F1Laps' median.
+    // counts runs from most to fewest setups, so when two values sit equally close to the
+    // median, the one more setups run wins.
     const most = counts[0][1];
-    const tied = counts.filter(([, c]) => c === most).map(([v]) => v);
-    out[k] = tied.reduce((a, b) => Math.abs(b - median[k]) < Math.abs(a - median[k]) ? b : a);
+    const close = counts.filter(([, c]) => (most - c) / f.n <= CLOSE + 1e-9).map(([v]) => v);
+    out[k] = close.reduce((a, b) => Math.abs(b - median[k]) < Math.abs(a - median[k]) ? b : a);
     if (most / f.n >= AGREE) agreed.add(k);
     counted.add(k);
   }
