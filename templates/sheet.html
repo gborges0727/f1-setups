@@ -267,7 +267,7 @@ function render() {
     : fg.runs >= 2 ? `The safe setup is the quickest setup with a locked on-throttle differential that two or more drivers share among ${pool40}. ${who(fg)} run it.`
     : `The safe setup is the quickest setup with a locked on-throttle differential among ${pool40}. No two drivers share a setup with one here, so this is one driver's setup.`;
   if (fg && legacy(tf)) h += `<p class="note">This is the most forgiving setup that ${among} share. ${who(fg)} run it. ${paceLine(fg)}</p>`;
-  else if (fg) h += `<p class="note">${safeLine} ${paceLine(fg)}${base.sameAsMain && !KERB_MODE ? " The Fast column matches it, because the quickest shared setup also has a locked differential." : ""}</p>`;
+  else if (fg && !base.picked.size) h += `<p class="note">${safeLine} ${paceLine(fg)}${base.sameAsMain && !KERB_MODE ? " The Fast column matches it, because the quickest shared setup also has a locked differential." : ""}</p>`;
   else if (state.cond === "dry" && tf && tf.n >= 5) h += `<p class="warn">No setup here is shared by two or more drivers, so each setting uses the value most of these setups run.</p>`;
   const fast = KERB_MODE ? null : base.quick, qi = base.quickInfo;
   if (fast && !base.sameAsMain) h += `<p class="note">The Fast column is ${legacy(tf) ? "the shared setup with the best lap" : "the quickest shared setup of any kind, open differentials included"}. ${who(qi)} run it. ${paceLine(qi)}</p>`;
