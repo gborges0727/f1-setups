@@ -34,13 +34,15 @@ MODES = {
     "meta": {
         "title": "{short} Setup Sheet",
         "path": "{game}/",
-        "lede": "Each dry setup is the most forgiving one that two or more of the 20 fastest "
-                "setups on F1Laps share, for {lede_cars}.{extra} It gives up a little lap time for "
-                "a car that's easier to drive. Each wet setting is the value most of the fastest wet "
-                "setups run. Settings marked Agreed are ones at least 70% of the 20 run. The Dirty "
-                "air column shows what to change for a race spent following other cars.",
+        "lede": "Each dry setup is the most forgiving one that two or more of the fastest "
+                "qualifying and race setups on F1Laps share, for {lede_cars}.{extra} Time Trial "
+                "setups are left out, because Time Trial has no tyre wear or fuel load. Each wet "
+                "setting is the value most of the fastest wet setups run. Settings marked Agreed "
+                "are ones at least 70% of the setups run. The Dirty air column shows what to "
+                "change for a race spent following other cars.",
         "description": "{short} car setups for every track, using the most forgiving setup the "
-                       "fastest F1Laps drivers share, with dirty-air changes for racing in traffic.",
+                       "fastest F1Laps qualifying and race drivers share, with dirty-air changes "
+                       "for racing in traffic.",
         "sibling": ("{game}/kerb-attack/", "Kerb attack version"),
     },
     "kerb": {
@@ -51,8 +53,8 @@ MODES = {
                 "setups run them, and only the others change. The Dirty air column shows what to "
                 "change on top for a race spent following other cars.",
         "description": "{short} kerb-attack car setups for every track, built on the most "
-                       "forgiving setups the fastest F1Laps drivers share, with dirty-air changes "
-                       "for racing in traffic.",
+                       "forgiving setups the fastest F1Laps qualifying and race drivers share, "
+                       "with dirty-air changes for racing in traffic.",
         "sibling": ("{game}/", "Main version"),
     },
 }
@@ -82,20 +84,21 @@ def names(items):
 
 def notes(tracks):
     out = [
-        "A dry setup comes from the 20 fastest setups F1Laps lists for the track. The sheet "
-        "groups the ones that share wings, springs and anti-roll bars, and takes the group that "
-        "is easiest to drive. It favours more rear wing, an open on-throttle differential, a "
-        "locked off-throttle differential, a soft rear, and brake bias further forward. The "
-        "Fast column shows the shared setup with the quickest lap instead, for drivers who want "
-        "lap time over ease.",
+        "A dry setup comes from the 20 fastest qualifying setups and the 20 fastest race setups "
+        "F1Laps lists for the track. The sheet groups the ones that share wings, springs and "
+        "anti-roll bars. It prefers a group run in both qualifying and the race, and takes the "
+        "one that is easiest to drive. It favours more rear wing, an open on-throttle "
+        "differential, a locked off-throttle differential, a soft rear, and brake bias further "
+        "forward. The Fast column shows the shared setup with the best qualifying and race pace "
+        "instead, for drivers who want lap time over ease.",
         "A wet setting is the value most of the fastest wet setups run. When F1Laps' median is a "
         "value whose share is within 10 points of the most common one's, the median wins. Where "
         "F1Laps lists fewer than five setups, or leaves a setting off its setup pages, the sheet "
         "uses F1Laps' meta value, the median of its 100 fastest setups.",
         "A median can fall between two clicks, such as 26.5 on a wing. Pick either neighbouring "
         "click.",
-        "Most of the fastest laps are Time Trial laps, and Time Trial turns off tyre wear. For a "
-        "race, raise tyre pressures if the tyres overheat or wear fast.",
+        "The sheets leave out Time Trial setups, because Time Trial has no tyre wear or fuel "
+        "load. If the tyres overheat or wear fast in a race, raise the tyre pressures.",
         "Parc fermé locks the setup once qualifying starts. If you expect to start behind other "
         "cars, enter the Dirty air values before qualifying.",
     ]
@@ -122,7 +125,8 @@ def esc(s):
 
 BREAKDOWN = {
     "title": "{short} Setup Breakdown",
-    "lede": "What the 20 fastest setups on F1Laps run for every setting, for {lede_cars}, against "
+    "lede": "What the 20 fastest qualifying and 20 fastest race setups on F1Laps run for every "
+            "setting, for {lede_cars}, against "
             "F1Laps' median of its 100 fastest.{extra} The blue bar is the value the sheets use. "
             "A dry sheet takes the most forgiving setup two or more drivers share, so its value "
             "isn't always the most common one. Cards with an orange border are where the sheet "

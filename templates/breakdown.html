@@ -178,7 +178,7 @@ function render() {
     const c = base.counted.has(k) && f.counts[F[k].src].find(([v]) => v === base.out[k]);
     return c ? ` (${Math.round(c[1] / f.n * 100)}% of setups)` : "";
   };
-  let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${CONFIG.cars} · ${state.cond === "dry" ? "Dry" : "Wet"} · ${f ? f.n : 0} fastest setups counted</div>`;
+  let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${CONFIG.cars} · ${state.cond === "dry" ? "Dry" : "Wet"} · ${f ? f.n : 0} fastest ${pool(f)} counted</div>`;
   h += `<h4>Where the sheet differs from F1Laps' median</h4>`;
   h += moved.length
     ? `<ul>` + moved.map(k => `<li>${F[k].label}: <span class="mono">${fmt(k, base.median[k])} → <strong>${fmt(k, base.out[k])}</strong></span>${share(k)}</li>`).join("") + `</ul>`

@@ -106,6 +106,10 @@ function consensus(t, cond) {
 }
 
 // The chosen track rides in the address (#monaco), so links between one game's pages open the same track.
+// Which F1Laps lists a track's counts come from. Data fetched before the switch to qualifying and
+// race setups has no "race" count and came from the Time Trial list.
+function pool(f) { return f && f.race === undefined ? "Time Trial setups" : "qualifying and race setups"; }
+
 function startSlug(fallback) {
   const h = decodeURIComponent(location.hash.slice(1));
   return BY_ID[h] ? h : fallback;

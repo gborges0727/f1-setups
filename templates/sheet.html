@@ -204,7 +204,7 @@ function spread(t, cond, k, shown, median) {
   // Show up to five values. Past that, show four and add up the rest.
   const top = counts.length > 5 ? counts.slice(0, 4) : counts, rest = counts.slice(top.length);
   const bare = v => fmt(k, v).replace(/<span class="unit">.*?<\/span>|[%°]/g, "");
-  let h = `<span>The ${f.n} fastest use <span class="num">${lo === hi ? fmt(k, lo) : bare(lo) + "–" + fmt(k, hi)}</span></span>`;
+  let h = `<span>The ${f.n} fastest ${pool(f)} use <span class="num">${lo === hi ? fmt(k, lo) : bare(lo) + "–" + fmt(k, hi)}</span></span>`;
   h += top.map(([v, c]) => `<span class="num"><b>${pct(c)}</b> run ${fmt(k, v)}</span>`).join("");
   if (rest.length) h += `<span><b>${pct(rest.reduce((a, [, c]) => a + c, 0))}</b> spread over ${rest.length} other values</span>`;
   if (shown !== median) h += `<span>F1Laps median <span class="num">${fmt(k, median)}</span></span>`;
@@ -255,16 +255,18 @@ function render() {
   const sub = [CONFIG.cars, state.cond === "dry" ? "Dry" : "Wet"];
   if (KERB_MODE) sub.push(state.session === "quali" ? "Qualifying" : "Race");
   let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${sub.join(" · ")}</div>`;
+  // How a picked setup's best qualifying and race laps compare with the fastest in each list.
+  const paceLine = p => "best" in p ? (p.best === 1 ? "It set the fastest lap." : `Its best lap is ${p.gap.toFixed(3)} s off the fastest.`) : [["quali", "qualifying"], ["race", "race"]].map(([k, name]) => {
+    const x = p[k];
+    if (!x) return `Nobody in the ${name} list runs it.`;
+    return x.best === 1 ? `It set the fastest ${name} lap.` : `Its best ${name} lap is ${x.gap.toFixed(3)} s off the fastest.`;
+  }).join(" ");
   const fg = base.forgiving;
-  if (fg) {
-    const gap = fg.gap === null ? "" : fg.best === 1 ? " It set the fastest lap." : ` Its best lap is ${fg.gap.toFixed(3)} s behind the fastest.`;
-    h += `<p class="note">This is the most forgiving setup that two or more of the ${base.n} fastest share. ${fg.runs} of them run it.${gap}</p>`;
-  }
+  const tf = t.fastest && t.fastest[state.cond];
+  if (tf && tf.race === undefined) h += `<p class="warn">This track still uses the ${tf.n} fastest Time Trial setups. Its qualifying and race setups are still downloading and arrive in the next update.</p>`;
+  if (fg) h += `<p class="note">This is the most forgiving setup that two or more of the ${base.n} fastest ${pool(tf)} share. ${fg.runs} of them run it. ${paceLine(fg)}</p>`;
   const fast = KERB_MODE ? null : base.quick, qi = base.quickInfo;
-  if (fast) {
-    const gap = qi.best === 1 ? "It set the fastest lap." : qi.gap === null ? "" : `Its best lap is ${qi.gap.toFixed(3)} s behind the fastest.`;
-    h += `<p class="note">The Fast column is the shared setup with the quickest lap, for when you want lap time over ease. ${qi.runs} of the ${base.n} run it. ${gap}</p>`;
-  }
+  if (fast) h += `<p class="note">The Fast column is the shared setup with the best ${tf && tf.race === undefined ? "lap" : "qualifying and race pace"}, for when you want lap time over ease. ${qi.runs} of the ${base.n} run it. ${paceLine(qi)}</p>`;
   if (base.picked.size) {
     h += `<h4>Picked by hand</h4>` + changeList([...base.picked], base.voted, meta);
     h += `<p class="note">${esc(base.why)}</p>`;
@@ -301,7 +303,7 @@ function render() {
     ${KERB_MODE ? `<span><span class="chip chg">Changed</span> adjusted for kerb attack</span>` : ""}
     <span><span class="chip same">Open</span> the fastest setups split, so adjust it to taste. The line under it shows what they run.</span>
     <span><span class="chip dirt">Dirty air</span> extra change for a race spent following other cars</span>
-    ${fast ? `<span><b class="fastkey">Fast</b> the shared setup with the quickest lap, which is harder to drive. Blue values differ from this page's setup.</span>` : ""}
+    ${fast ? `<span><b class="fastkey">Fast</b> the shared setup with the best qualifying and race pace, which is harder to drive. Blue values differ from this page's setup.</span>` : ""}
   </div>`;
 
   for (const [g, keys] of GROUPS) {

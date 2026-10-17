@@ -5,10 +5,11 @@ setups uploaded for that track, a wet version when there is enough wet data,
 and which settings fast drivers agree on (marked "important").
 
 Each track's setup list on F1Laps also shows the 20 fastest setups one by one,
-dry and wet. The script reads each of them and counts how many use each value,
-so the sheets can show how much fast drivers disagree on a setting. Setup pages
-never change, so it caches them in .cache/setups/ and a later run fetches only
-new ones.
+dry and wet, filtered by session. The script reads the 20 fastest qualifying
+setups and the 20 fastest race setups and counts how many use each value, so the
+sheets can show how much fast drivers disagree on a setting. It leaves out Time
+Trial, which has no tyre wear or fuel load. Setup pages never change, so it
+caches them in .cache/setups/ and a later run fetches only new ones.
 
 Usage: python3 scripts/fetch.py [f1-25] [f1-26]
 """
@@ -115,77 +116,103 @@ def ease(s):
 
 def lap(s):
     m, _, sec = s.partition(":")
-    return float(m) * 60 + float(sec) if sec else None
+    try:
+        return float(m) * 60 + float(sec) if sec else None
+    except ValueError:
+        return None
 
 
-def forgiving(setups, laps):
+# F1Laps' session filter codes. Time Trial (6) is left out: it has no tyre wear or fuel load,
+# so its setups are built for one lap rather than a race weekend.
+SESSIONS = {"quali": "4", "race": "5"}
+
+
+def forgiving(setups, entries):
     """The most forgiving setup that two or more of the fastest share, or None. See pick()."""
-    return pick(setups, laps, lambda values, members: ease(values))
+    return pick(setups, entries, lambda values, pace: ease(values))
 
 
-def quickest(setups, laps):
-    """The shared setup with the fastest lap, for the sheets' Fast column. See pick()."""
-    return pick(setups, laps, lambda values, members: -members[0])
+def quickest(setups, entries):
+    """The shared setup with the best qualifying and race pace, for the Fast column. See pick()."""
+    return pick(setups, entries,
+                lambda values, pace: -sum(p["gap"] for p in pace.values()) / len(pace))
 
 
-def pick(setups, laps, score):
+def pick(setups, entries, score):
     """The setup that two or more of the fastest share with the highest score, or None.
 
-    Returns {"values": {setting: value}, "runs": setups that share it, "best": the list
-    position of its fastest lap, "gap": seconds behind the fastest lap}. Inside a shared
-    setup, each setting takes its most common value, and the faster setup wins a tie.
+    A setup run in both qualifying and the race beats one run in only one of them. Returns
+    {"values": {setting: value}, "runs": setups that share it, "quali" and "race": {"best":
+    list position of its fastest lap, "gap": seconds behind that list's fastest lap}, or None
+    where nobody ran it in that session}. Inside a shared setup, each setting takes its most
+    common value, and the setup listed first wins a tie.
     """
+    first = {}
+    for e in entries:
+        if e["rank"] == 1:
+            first[e["kind"]] = lap(e["lap"])
     groups = {}
     for i, s in enumerate(setups):
         if all(k in s for k in SAME):
             groups.setdefault(tuple(s[k] for k in SAME), []).append(i)
+    shared = [m for m in groups.values() if len(m) >= 2]
+    both = [m for m in shared if {entries[i]["kind"] for i in m} == set(SESSIONS)]
     best = None
-    for members in groups.values():
-        if len(members) < 2:
-            continue
+    for members in both or shared:
         values = {}
         for k in setups[members[0]]:
             seen = [setups[i][k] for i in members if k in setups[i]]
             values[k] = max(seen, key=lambda v: (seen.count(v), -seen.index(v)))
-        s = score(values, members)
+        pace = {}
+        for kind in SESSIONS:
+            mine = [entries[i] for i in members if entries[i]["kind"] == kind]
+            if mine:
+                top = min(mine, key=lambda e: e["rank"])
+                t, f = lap(top["lap"]), first.get(kind)
+                pace[kind] = {"best": top["rank"], "gap": round(t - f, 3) if t and f else 0.0}
+        s = score(values, pace)
         if best is None or s > best[0]:
-            best = (s, members, values)
+            best = (s, members, values, pace)
     if not best:
         return None
-    _, members, values = best
-    first, mine = lap(laps[0]), lap(laps[members[0]])
-    gap = round(mine - first, 3) if first and mine else None
-    return {"values": values, "runs": len(members), "best": members[0] + 1, "gap": gap}
+    _, members, values, pace = best
+    return {"values": values, "runs": len(members),
+            **{kind: pace.get(kind) for kind in SESSIONS}}
 
 
 def fastest(game, slug, cond):
-    """Count the values the fastest listed setups use.
+    """Count the values the fastest qualifying and race setups use.
 
-    Returns {"n": setups, "counts": {setting: [[value, count], ...]}}, plus "forgiving" and
-    "quickest" for dry setups (see pick()). Wet lists are race laps in changing rain, so their lap
-    times can't rank setups, and the wet sheets keep the vote.
+    Reads F1Laps' list of the 20 fastest qualifying setups and the 20 fastest race setups.
+    Returns {"n": setups, "quali": how many came from qualifying, "race": how many from the
+    race, "counts": {setting: [[value, count], ...]}}, plus "forgiving" and "quickest" for
+    dry setups (see pick()). Wet laps are set in changing rain, so the wet sheets keep the vote.
     """
-    page = get(f"{BASE}/{game}/setups/{slug}/" + ("wet/" if cond == "wet" else ""))
-    laps = {}
-    for row in re.findall(r"<tr\b.*?</tr>", page, re.S):
-        m = re.search(rf'href="/{game}/setups/{slug}/([0-9a-f-]{{36}})/"', row)
-        cells = [text(c) for c in re.findall(r"<td\b.*?</td>", row, re.S)]
-        if m and len(cells) > 4:
-            laps.setdefault(m.group(1), cells[4])
-    ids = list(dict.fromkeys(re.findall(rf'href="/{game}/setups/{slug}/([0-9a-f-]{{36}})/"', page)))
-    setups = [one_setup(game, slug, i) for i in ids]
+    entries = []
+    for kind, code in SESSIONS.items():
+        page = get(f"{BASE}/{game}/setups/{slug}/" + ("wet/" if cond == "wet" else "") +
+                   f"?session={code}")
+        seen = set()
+        for row in re.findall(r"<tr\b.*?</tr>", page, re.S):
+            m = re.search(rf'href="/{game}/setups/{slug}/([0-9a-f-]{{36}})/"', row)
+            cells = [text(c) for c in re.findall(r"<td\b.*?</td>", row, re.S)]
+            if m and len(cells) > 4 and m.group(1) not in seen:
+                seen.add(m.group(1))
+                entries.append({"kind": kind, "rank": len(seen), "lap": cells[4], "id": m.group(1)})
+        time.sleep(1)
+    setups = [one_setup(game, slug, e["id"]) for e in entries]
     counts = {}
     for s in setups:
         for k, v in s.items():
             counts.setdefault(k, {})
             counts[k][v] = counts[k].get(v, 0) + 1
     out = {"n": len(setups),
+           **{kind: sum(e["kind"] == kind for e in entries) for kind in SESSIONS},
            "counts": {k: sorted(([v, c] for v, c in c.items()), key=lambda vc: (-vc[1], vc[0]))
                       for k, c in counts.items()}}
     if cond == "dry":
-        times = [laps.get(i, "") for i in ids]
-        out["forgiving"] = forgiving(setups, times)
-        out["quickest"] = quickest(setups, times)
+        out["forgiving"] = forgiving(setups, entries)
+        out["quickest"] = quickest(setups, entries)
     return out
 
 
