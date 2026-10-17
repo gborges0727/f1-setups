@@ -82,9 +82,10 @@ def names(items):
 def notes(tracks):
     out = [
         "Each value is the one most of the fastest setups F1Laps lists for the track run: the 20 "
-        "fastest dry setups, or up to 20 wet ones. When another value comes within 10 "
-        "points of the most common one's share, the one closest to F1Laps' median wins. Where F1Laps lists fewer than five setups, or leaves a setting off its setup "
-        "pages, the sheet uses F1Laps' meta value, the median of its 100 fastest setups.",
+        "fastest dry setups, or up to 20 wet ones. When F1Laps' median is a value whose share is "
+        "within 10 points of the most common one's, the median wins. Where F1Laps lists fewer "
+        "than five setups, or leaves a setting off its setup pages, the sheet uses F1Laps' meta "
+        "value, the median of its 100 fastest setups.",
         "A median can fall between two clicks, such as 26.5 on a wing. Pick either neighbouring "
         "click.",
         "Most of the fastest laps are Time Trial laps, and Time Trial turns off tyre wear. For a "
@@ -117,7 +118,8 @@ BREAKDOWN = {
     "title": "{short} Setup Breakdown",
     "lede": "What the 20 fastest setups on F1Laps run for every setting, for {lede_cars}, against "
             "F1Laps' median of its 100 fastest.{extra} The sheets use the value the most setups "
-            "run, or the one closest to the median when another comes within 10 points of it. Cards with an orange border are where that differs from F1Laps' median.",
+            "run, or the median when its share is within 10 points of that value's. Cards with an "
+            "orange border are where the two differ.",
     "description": "How many of the fastest {short} setups on F1Laps run each value, setting by "
                    "setting, for every track, against F1Laps' median.",
 }
