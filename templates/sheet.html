@@ -90,6 +90,7 @@ td.dirty.moved { color: var(--dirty); font-weight: 600; background: var(--dirty-
 .chip.chg { background: var(--change); color: var(--sheet); }
 .chip.same { border: 1px solid var(--rule); color: var(--muted); }
 .chip.dirt { background: var(--dirty); color: var(--sheet); }
+.chip.pick { background: var(--accent); color: var(--accent-ink); }
 tr.spread td { border-top: 0; padding-top: 0; font-size: 0.8rem; color: var(--muted); }
 .dist { display: flex; flex-wrap: wrap; gap: 2px 14px; }
 .dist b { color: var(--ink); font-weight: 600; }
@@ -246,6 +247,10 @@ function render() {
   const sub = [CONFIG.cars, state.cond === "dry" ? "Dry" : "Wet"];
   if (KERB_MODE) sub.push(state.session === "quali" ? "Qualifying" : "Race");
   let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${sub.join(" · ")}</div>`;
+  if (base.picked.size) {
+    h += `<h4>Picked by hand</h4>` + changeList([...base.picked], base.voted, meta);
+    h += `<p class="note">${esc(base.why)}</p>`;
+  }
   if (KERB_MODE) {
     h += `<h4>Kerb attack changes</h4>`;
     h += kerb.changed.length ? changeList(kerb.changed, meta, yours)
@@ -274,6 +279,7 @@ function render() {
 
   h += `<div class="legend">
     <span><span class="chip lock">Agreed</span> at least 70% of the fastest setups run this value</span>
+    ${base.picked.size ? `<span><span class="chip pick">Picked</span> set by hand for this track instead of the vote</span>` : ""}
     ${KERB_MODE ? `<span><span class="chip chg">Changed</span> adjusted for kerb attack</span>` : ""}
     <span><span class="chip same">Open</span> the fastest setups split, so adjust it to taste. The line under it shows what they run.</span>
     <span><span class="chip dirt">Dirty air</span> extra change for a race spent following other cars</span>
@@ -287,7 +293,7 @@ function render() {
     for (const k of rows) {
       const isChanged = kerb.changed.includes(k);
       const isDirty = dirty.changed.includes(k);
-      const chip = isChanged ? `<span class="chip chg">Changed</span>` : lock.has(k) ? `<span class="chip lock">Agreed</span>` : `<span class="chip same">Open</span>`;
+      const chip = isChanged ? `<span class="chip chg">Changed</span>` : base.picked.has(k) ? `<span class="chip pick">Picked</span>` : lock.has(k) ? `<span class="chip lock">Agreed</span>` : `<span class="chip same">Open</span>`;
       h += `<tr class="${isChanged ? "changed" : ""}"><td class="name">${F[k].label}</td><td class="num">${fmt(k, meta[k])}</td>`;
       if (KERB_MODE) h += `<td class="num yours">${fmt(k, yours[k])}</td>`;
       h += `<td>${chip}</td><td class="num dirty${isDirty ? " moved" : ""}">${fmt(k, dirty.out[k])}</td></tr>`;

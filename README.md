@@ -21,6 +21,14 @@ The game cannot import setup files. To use a setup, type it in once on the setup
 
 Under each setting not marked Agreed, a line shows what the fastest setups run. It gives their range and the share of each common value, such as "35% run 56%" for Monaco brake bias. It also gives F1Laps' median when that differs from the sheet's value. The page addresses carry the chosen track (`/f1-25/breakdown/#japan`), so the links between a game's sheets and its breakdown page keep the same track.
 
+## Picked values
+
+Some values on the sheets are picked by hand instead of voted. `data/picks.json` lists them by game, track and weather, with each setting under its F1Laps label. Each entry also has a `why`, which the sheet prints above the setup. A picked setting shows a blue Picked chip, and the kerb-attack and dirty-air changes still apply on top of it. The breakdown pages ignore picks and show the vote. `fetch.py` never writes `data/picks.json`, so a refresh keeps the picks. `build.py` stops with an error when a pick names a track or setting the data doesn't have.
+
+The vote counts each setting on its own, so it can mix two setups that many fast drivers share. At Saudi Arabia in F1 25, it took front wing 15 from one shared setup and most other settings from a second. That left the rear short of grip. The pick there restores the second setup's values.
+
+## Dirty air
+
 Every sheet has a Dirty air column. It shows what to change for a race spent following other cars: two clicks more front wing, a softer front anti-roll bar, and brake bias one step rearward. Parc fermé locks the setup once qualifying starts, so those changes go in before qualifying.
 
 ## Refresh the data

@@ -125,12 +125,33 @@ BREAKDOWN = {
 }
 
 
+def with_picks(tracks, picks):
+    """Copy the tracks with each one's hand-picked values from data/picks.json attached as "pick"."""
+    ids = {t["id"] for t in tracks}
+    for slug in picks:
+        if slug not in ids:
+            raise SystemExit(f"data/picks.json: no track {slug!r}")
+    out = []
+    for t in tracks:
+        p = picks.get(t["id"])
+        if p:
+            for cond, pick in p.items():
+                bad = [k for k in pick["values"] if not t.get(cond) or k not in t[cond]]
+                if bad:
+                    raise SystemExit(f"data/picks.json: {t['id']} {cond} has no {', '.join(bad)}")
+            t = dict(t, pick=p)
+        out.append(t)
+    return out
+
+
 def build():
     common = (ROOT / "templates" / "common.js").read_text()
     template = (ROOT / "templates" / "sheet.html").read_text().replace("__COMMON__", common)
     breakdown = (ROOT / "templates" / "breakdown.html").read_text().replace("__COMMON__", common)
+    picks = json.loads((ROOT / "data" / "picks.json").read_text())
     for game, g in GAMES.items():
         data = json.loads((ROOT / "data" / f"{game}.json").read_text())
+        picked = with_picks(data["tracks"], picks.get(game, {}))
         fetched = datetime.date.fromisoformat(data["fetched"])
         for mode, m in MODES.items():
             fill = dict(g, game=game)
@@ -150,7 +171,7 @@ def build():
                     .replace("__SIBLING_LABEL__", sib_label)
                     .replace("__BREAKDOWN_URL__", f"/{game}/breakdown/")
                     .replace("__CONFIG__", json.dumps(config, ensure_ascii=False))
-                    .replace("__DATA__", json.dumps(data["tracks"], separators=(",", ":"),
+                    .replace("__DATA__", json.dumps(picked, separators=(",", ":"),
                                                     ensure_ascii=False)))
             out = ROOT / "site" / m["path"].format(**fill) / "index.html"
             out.parent.mkdir(parents=True, exist_ok=True)

@@ -81,7 +81,16 @@ function consensus(t, cond) {
     if (most / f.n >= AGREE) agreed.add(k);
     counted.add(k);
   }
-  return { out, median, agreed, counted, n: f ? f.n : 0 };
+  // A pick from data/picks.json replaces the vote for that setting. The sheets get picks, and
+  // the breakdown pages don't.
+  const voted = { ...out }, picked = new Set(), pick = t.pick && t.pick[cond];
+  if (pick) for (const [label, v] of Object.entries(pick.values)) {
+    const k = FIELDS.find(x => x[1] === label)[0];
+    out[k] = v;
+    picked.add(k);
+    agreed.delete(k);
+  }
+  return { out, voted, median, agreed, counted, picked, why: pick ? pick.why : "", n: f ? f.n : 0 };
 }
 
 // The chosen track rides in the address (#monaco), so links between one game's pages open the same track.
