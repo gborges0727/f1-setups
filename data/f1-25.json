@@ -407,6 +407,33 @@
       "runs": 5,
       "best": 3,
       "gap": 0.147
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 23.0,
+       "Rear Wing": 10.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 12.0,
+       "Rear Anti-Roll Bar": 17.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 44.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 52.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 21.3,
+       "Rear Left Tyre Pressure": 21.3
+      },
+      "runs": 9,
+      "best": 2,
+      "gap": 0.14
      }
     },
     "wet": {
@@ -1451,6 +1478,33 @@
       ]
      },
      "forgiving": {
+      "values": {
+       "Front Wing": 39.0,
+       "Rear Wing": 32.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 10.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 37.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 1.0,
+       "Rear Anti-Roll Bar": 7.0,
+       "Front Ride Height": 22.0,
+       "Rear Ride Height": 45.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 52.0,
+       "Front Right Tyre Pressure": 26.0,
+       "Front Left Tyre Pressure": 26.0,
+       "Rear Right Tyre Pressure": 22.0,
+       "Rear Left Tyre Pressure": 22.0
+      },
+      "runs": 9,
+      "best": 1,
+      "gap": 0.0
+     },
+     "quickest": {
       "values": {
        "Front Wing": 39.0,
        "Rear Wing": 32.0,
@@ -2582,6 +2636,33 @@
       "runs": 2,
       "best": 5,
       "gap": 0.74
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 31.0,
+       "Rear Wing": 21.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 35.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 6.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 22.0,
+       "Rear Ride Height": 42.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 50.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 21.0,
+       "Rear Left Tyre Pressure": 21.0
+      },
+      "runs": 8,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -3735,6 +3816,33 @@
       "runs": 2,
       "best": 10,
       "gap": 0.746
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 32.0,
+       "Rear Wing": 29.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 30.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 10.0,
+       "Front Anti-Roll Bar": 9.0,
+       "Rear Anti-Roll Bar": 18.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 54.0,
+       "Front Right Tyre Pressure": 29.0,
+       "Front Left Tyre Pressure": 29.0,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 2,
+      "best": 2,
+      "gap": 0.083
      }
     },
     "wet": {
@@ -4730,6 +4838,33 @@
       "runs": 5,
       "best": 8,
       "gap": 0.564
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 15.0,
+       "Rear Wing": 1.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 10.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 6.0,
+       "Front Anti-Roll Bar": 1.0,
+       "Rear Anti-Roll Bar": 7.0,
+       "Front Ride Height": 18.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 51.0,
+       "Front Right Tyre Pressure": 28.5,
+       "Front Left Tyre Pressure": 28.5,
+       "Rear Right Tyre Pressure": 21.5,
+       "Rear Left Tyre Pressure": 21.5
+      },
+      "runs": 6,
+      "best": 2,
+      "gap": 0.053
      }
     },
     "wet": {
@@ -5563,6 +5698,33 @@
       "runs": 3,
       "best": 11,
       "gap": 0.728
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 14.0,
+       "Rear Wing": 13.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 40.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 8.0,
+       "Front Anti-Roll Bar": 10.0,
+       "Rear Anti-Roll Bar": 10.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 47.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 55.0,
+       "Front Right Tyre Pressure": 24.2,
+       "Front Left Tyre Pressure": 24.2,
+       "Rear Right Tyre Pressure": 21.3,
+       "Rear Left Tyre Pressure": 21.3
+      },
+      "runs": 2,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -6700,6 +6862,33 @@
       "runs": 2,
       "best": 9,
       "gap": 1.039
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 45.0,
+       "Rear Wing": 40.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 50.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 9.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 23.0,
+       "Rear Ride Height": 52.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 53.0,
+       "Front Right Tyre Pressure": 22.5,
+       "Front Left Tyre Pressure": 22.5,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 10,
+      "best": 3,
+      "gap": 0.819
      }
     },
     "wet": {
@@ -7704,6 +7893,33 @@
       "runs": 2,
       "best": 10,
       "gap": 1.032
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 50.0,
+       "Rear Wing": 50.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 15.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 22.0,
+       "Front Anti-Roll Bar": 3.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 19.0,
+       "Rear Ride Height": 49.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 52.0,
+       "Front Right Tyre Pressure": 22.5,
+       "Front Left Tyre Pressure": 22.5,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 10,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -8579,6 +8795,33 @@
       "runs": 6,
       "best": 3,
       "gap": 0.04
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 41.0,
+       "Rear Wing": 32.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 20.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 38.0,
+       "Rear Suspension": 2.0,
+       "Front Anti-Roll Bar": 6.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 43.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 53.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 7,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -9839,6 +10082,33 @@
       "runs": 2,
       "best": 8,
       "gap": 0.8
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 50.0,
+       "Rear Wing": 42.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 30.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 38.0,
+       "Rear Suspension": 9.0,
+       "Front Anti-Roll Bar": 8.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 21.0,
+       "Rear Ride Height": 48.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 53.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 26.5,
+       "Rear Left Tyre Pressure": 26.5
+      },
+      "runs": 2,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -11035,6 +11305,33 @@
       "runs": 5,
       "best": 2,
       "gap": 0.012
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 35.0,
+       "Rear Wing": 24.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 1.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 54.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 22.5,
+       "Rear Left Tyre Pressure": 22.5
+      },
+      "runs": 7,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -12040,6 +12337,33 @@
       ]
      },
      "forgiving": {
+      "values": {
+       "Front Wing": 12.0,
+       "Rear Wing": 0.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.01,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 5.0,
+       "Rear Anti-Roll Bar": 18.0,
+       "Front Ride Height": 21.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 53.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 26.5,
+       "Rear Left Tyre Pressure": 26.5
+      },
+      "runs": 7,
+      "best": 1,
+      "gap": 0.0
+     },
+     "quickest": {
       "values": {
        "Front Wing": 12.0,
        "Rear Wing": 0.0,
@@ -13164,6 +13488,33 @@
       "runs": 2,
       "best": 8,
       "gap": 0.663
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 7.0,
+       "Rear Wing": 2.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 30.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.02,
+       "Rear Toe": 0.13,
+       "Front Suspension": 40.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 5.0,
+       "Rear Anti-Roll Bar": 20.0,
+       "Front Ride Height": 22.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 51.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 26.5,
+       "Rear Left Tyre Pressure": 26.5
+      },
+      "runs": 5,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -14191,6 +14542,33 @@
       ]
      },
      "forgiving": {
+      "values": {
+       "Front Wing": 50.0,
+       "Rear Wing": 50.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 9.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 21.0,
+       "Rear Ride Height": 44.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 52.0,
+       "Front Right Tyre Pressure": 26.9,
+       "Front Left Tyre Pressure": 26.9,
+       "Rear Right Tyre Pressure": 23.6,
+       "Rear Left Tyre Pressure": 23.6
+      },
+      "runs": 9,
+      "best": 1,
+      "gap": 0.0
+     },
+     "quickest": {
       "values": {
        "Front Wing": 50.0,
        "Rear Wing": 50.0,
@@ -15376,6 +15754,33 @@
       "runs": 2,
       "best": 11,
       "gap": 0.831
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 50.0,
+       "Rear Wing": 48.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 20.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 9.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 22.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 50.0,
+       "Front Right Tyre Pressure": 28.5,
+       "Front Left Tyre Pressure": 28.5,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 5,
+      "best": 4,
+      "gap": 0.594
      }
     },
     "wet": {
@@ -16362,6 +16767,33 @@
       "runs": 2,
       "best": 8,
       "gap": 0.633
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 3.0,
+       "Rear Wing": 0.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 10.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 1.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 21.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 54.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 26.5,
+       "Rear Left Tyre Pressure": 26.5
+      },
+      "runs": 8,
+      "best": 2,
+      "gap": 0.109
      }
     },
     "wet": {
@@ -17480,6 +17912,33 @@
       "runs": 2,
       "best": 8,
       "gap": 0.948
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 2.0,
+       "Rear Wing": 2.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 8.0,
+       "Front Anti-Roll Bar": 14.0,
+       "Rear Anti-Roll Bar": 14.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 45.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 54.0,
+       "Front Right Tyre Pressure": 24.4,
+       "Front Left Tyre Pressure": 24.4,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 5,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -18435,6 +18894,33 @@
       ]
      },
      "forgiving": {
+      "values": {
+       "Front Wing": 50.0,
+       "Rear Wing": 47.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 15.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 16.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 50.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 53.0,
+       "Front Right Tyre Pressure": 22.5,
+       "Front Left Tyre Pressure": 22.5,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 10,
+      "best": 1,
+      "gap": 0.0
+     },
+     "quickest": {
       "values": {
        "Front Wing": 50.0,
        "Rear Wing": 47.0,
@@ -19621,6 +20107,33 @@
       "runs": 2,
       "best": 9,
       "gap": 0.446
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 41.0,
+       "Rear Wing": 34.0,
+       "Differential On Throttle": 90.0,
+       "Differential Off Throttle": 20.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 3.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 52.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 3,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -20777,6 +21290,33 @@
       "runs": 5,
       "best": 8,
       "gap": 0.355
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 40.0,
+       "Rear Wing": 36.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.15,
+       "Front Suspension": 32.0,
+       "Rear Suspension": 3.0,
+       "Front Anti-Roll Bar": 5.0,
+       "Rear Anti-Roll Bar": 16.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 53.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 22.0,
+       "Rear Left Tyre Pressure": 22.0
+      },
+      "runs": 2,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -21835,6 +22375,33 @@
       "runs": 2,
       "best": 14,
       "gap": 0.873
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 27.0,
+       "Rear Wing": 14.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 5.0,
+       "Front Anti-Roll Bar": 2.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 22.0,
+       "Rear Ride Height": 41.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 52.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 4,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -22950,6 +23517,33 @@
       "runs": 11,
       "best": 2,
       "gap": 0.084
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 1.0,
+       "Rear Wing": 0.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 20.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 6.0,
+       "Front Anti-Roll Bar": 5.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 23.0,
+       "Rear Ride Height": 48.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 52.0,
+       "Front Right Tyre Pressure": 24.5,
+       "Front Left Tyre Pressure": 24.5,
+       "Rear Right Tyre Pressure": 22.0,
+       "Rear Left Tyre Pressure": 22.0
+      },
+      "runs": 11,
+      "best": 2,
+      "gap": 0.084
      }
     },
     "wet": {
@@ -23894,6 +24488,33 @@
       "runs": 4,
       "best": 2,
       "gap": 0.017
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 45.0,
+       "Rear Wing": 37.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 4.0,
+       "Front Anti-Roll Bar": 1.0,
+       "Rear Anti-Roll Bar": 14.0,
+       "Front Ride Height": 21.0,
+       "Rear Ride Height": 47.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 52.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 21.0,
+       "Rear Left Tyre Pressure": 21.0
+      },
+      "runs": 4,
+      "best": 2,
+      "gap": 0.017
      }
     },
     "wet": {
@@ -24578,6 +25199,33 @@
       "runs": 2,
       "best": 5,
       "gap": 0.749
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 29.0,
+       "Rear Wing": 18.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 15.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 1.0,
+       "Rear Anti-Roll Bar": 17.0,
+       "Front Ride Height": 17.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 52.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 10,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -25491,6 +26139,33 @@
       "runs": 2,
       "best": 14,
       "gap": 1.547
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 42.0,
+       "Rear Wing": 33.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 39.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 8.0,
+       "Rear Anti-Roll Bar": 20.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 42.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 50.0,
+       "Front Right Tyre Pressure": 27.0,
+       "Front Left Tyre Pressure": 27.0,
+       "Rear Right Tyre Pressure": 20.5,
+       "Rear Left Tyre Pressure": 20.5
+      },
+      "runs": 5,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -26432,6 +27107,33 @@
       "runs": 2,
       "best": 12,
       "gap": 0.911
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 21.0,
+       "Rear Wing": 12.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 20.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.12,
+       "Front Suspension": 28.0,
+       "Rear Suspension": 8.0,
+       "Front Anti-Roll Bar": 13.0,
+       "Rear Anti-Roll Bar": 21.0,
+       "Front Ride Height": 21.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 53.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 25.5,
+       "Rear Left Tyre Pressure": 25.5
+      },
+      "runs": 6,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {
@@ -27228,6 +27930,33 @@
       "runs": 2,
       "best": 12,
       "gap": 1.24
+     },
+     "quickest": {
+      "values": {
+       "Front Wing": 8.0,
+       "Rear Wing": 0.0,
+       "Differential On Throttle": 100.0,
+       "Differential Off Throttle": 25.0,
+       "Front Camber": -3.5,
+       "Rear Camber": -2.0,
+       "Front Toe": 0.0,
+       "Rear Toe": 0.1,
+       "Front Suspension": 41.0,
+       "Rear Suspension": 1.0,
+       "Front Anti-Roll Bar": 1.0,
+       "Rear Anti-Roll Bar": 19.0,
+       "Front Ride Height": 20.0,
+       "Rear Ride Height": 40.0,
+       "Brake Pressure": 100.0,
+       "Front Brake Bias": 51.0,
+       "Front Right Tyre Pressure": 29.5,
+       "Front Left Tyre Pressure": 29.5,
+       "Rear Right Tyre Pressure": 26.5,
+       "Rear Left Tyre Pressure": 26.5
+      },
+      "runs": 4,
+      "best": 1,
+      "gap": 0.0
      }
     },
     "wet": {

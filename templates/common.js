@@ -97,7 +97,12 @@ function consensus(t, cond) {
     agreed.delete(k);
   }
   const forgiving = cond === "dry" && f && f.n >= 5 ? f.forgiving : null;
-  return { out, voted, median, agreed, counted, picked, forgiving, why: pick ? pick.why : "", n: f ? f.n : 0 };
+  // The Fast column: the shared setup with the quickest lap, for drivers who want lap time over
+  // ease. Settings its setup pages leave out (engine braking) keep the sheet's value.
+  const q = cond === "dry" && f && f.n >= 5 && f.quickest;
+  const quick = q ? Object.fromEntries(Object.keys(out).map(k => [k, q.values[F[k].src] ?? out[k]])) : null;
+  return { out, voted, median, agreed, counted, picked, forgiving, quick, quickInfo: q || null,
+    why: pick ? pick.why : "", n: f ? f.n : 0 };
 }
 
 // The chosen track rides in the address (#monaco), so links between one game's pages open the same track.

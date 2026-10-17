@@ -119,7 +119,17 @@ def lap(s):
 
 
 def forgiving(setups, laps):
-    """The most forgiving setup that two or more of the fastest share, or None.
+    """The most forgiving setup that two or more of the fastest share, or None. See pick()."""
+    return pick(setups, laps, lambda values, members: ease(values))
+
+
+def quickest(setups, laps):
+    """The shared setup with the fastest lap, for the sheets' Fast column. See pick()."""
+    return pick(setups, laps, lambda values, members: -members[0])
+
+
+def pick(setups, laps, score):
+    """The setup that two or more of the fastest share with the highest score, or None.
 
     Returns {"values": {setting: value}, "runs": setups that share it, "best": the list
     position of its fastest lap, "gap": seconds behind the fastest lap}. Inside a shared
@@ -137,9 +147,9 @@ def forgiving(setups, laps):
         for k in setups[members[0]]:
             seen = [setups[i][k] for i in members if k in setups[i]]
             values[k] = max(seen, key=lambda v: (seen.count(v), -seen.index(v)))
-        score = ease(values)
-        if best is None or score > best[0]:
-            best = (score, members, values)
+        s = score(values, members)
+        if best is None or s > best[0]:
+            best = (s, members, values)
     if not best:
         return None
     _, members, values = best
@@ -151,8 +161,8 @@ def forgiving(setups, laps):
 def fastest(game, slug, cond):
     """Count the values the fastest listed setups use.
 
-    Returns {"n": setups, "counts": {setting: [[value, count], ...]}}, plus "forgiving" for
-    dry setups (see forgiving()). Wet lists are race laps in changing rain, so their lap
+    Returns {"n": setups, "counts": {setting: [[value, count], ...]}}, plus "forgiving" and
+    "quickest" for dry setups (see pick()). Wet lists are race laps in changing rain, so their lap
     times can't rank setups, and the wet sheets keep the vote.
     """
     page = get(f"{BASE}/{game}/setups/{slug}/" + ("wet/" if cond == "wet" else ""))
@@ -173,7 +183,9 @@ def fastest(game, slug, cond):
            "counts": {k: sorted(([v, c] for v, c in c.items()), key=lambda vc: (-vc[1], vc[0]))
                       for k, c in counts.items()}}
     if cond == "dry":
-        out["forgiving"] = forgiving(setups, [laps.get(i, "") for i in ids])
+        times = [laps.get(i, "") for i in ids]
+        out["forgiving"] = forgiving(setups, times)
+        out["quickest"] = quickest(setups, times)
     return out
 
 

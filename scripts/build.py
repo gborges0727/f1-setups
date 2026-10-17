@@ -85,7 +85,9 @@ def notes(tracks):
         "A dry setup comes from the 20 fastest setups F1Laps lists for the track. The sheet "
         "groups the ones that share wings, springs and anti-roll bars, and takes the group that "
         "is easiest to drive. It favours more rear wing, an open on-throttle differential, a "
-        "locked off-throttle differential, a soft rear, and brake bias further forward.",
+        "locked off-throttle differential, a soft rear, and brake bias further forward. The "
+        "Fast column shows the shared setup with the quickest lap instead, for drivers who want "
+        "lap time over ease.",
         "A wet setting is the value most of the fastest wet setups run. When F1Laps' median is a "
         "value whose share is within 10 points of the most common one's, the median wins. Where "
         "F1Laps lists fewer than five setups, or leaves a setting off its setup pages, the sheet "

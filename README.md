@@ -42,6 +42,8 @@ Some values on the sheets can be picked by hand, and a pick replaces the sheet's
 
 ## Dirty air
 
+Each dry main sheet also has a Fast column for drivers who want lap time over ease. It shows the setup that two or more of the 20 fastest share with the quickest lap, taken whole like the forgiving setup. The kerb-attack and wet sheets don't have it.
+
 Every sheet has a Dirty air column. It shows what to change for a race spent following other cars: two clicks more front wing, a softer front anti-roll bar, and brake bias one step rearward. Parc fermé locks the setup once qualifying starts, so those changes go in before qualifying.
 
 ## Refresh the data
