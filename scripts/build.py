@@ -34,9 +34,10 @@ MODES = {
     "meta": {
         "title": "{short} Setup Sheet",
         "path": "{game}/",
-        "lede": "Each dry setup is the safe setup for the track, for {lede_cars}: the quickest "
-                "setup with a locked on-throttle differential that two or more of the fastest "
-                "qualifying and race drivers on F1Laps share.{extra} Time Trial "
+        "lede": "Each dry Safe column is the quickest setup with a locked on-throttle "
+                "differential among the fastest qualifying and race setups on F1Laps for "
+                "{lede_cars}, shared by two or more drivers where possible. The Fast "
+                "column next to it is the quickest shared setup of any kind.{extra} Time Trial "
                 "setups are left out, because Time Trial has no tyre wear or fuel load. Each wet "
                 "setting is the value most of the fastest wet setups run. Settings marked Agreed "
                 "are ones at least 70% of the setups run. The Dirty air column shows what to "
@@ -87,12 +88,13 @@ def notes(tracks):
     out = [
         "A dry setup comes from up to 20 of the fastest qualifying setups and up to 20 of the "
         "fastest race setups F1Laps lists for the track. The sheet groups the ones that share "
-        "wings, springs and anti-roll bars, and keeps the groups two or more different drivers "
-        "run. It prefers a group run in both qualifying and the race. The safe setup is the "
-        "quickest group with an on-throttle differential of 85% or more, so both rear wheels "
-        "drive together out of corners. The Fast column shows the shared setup "
-        "with the best qualifying and race pace instead, for drivers who want lap time over "
-        "a car that's easy to drive.",
+        "wings, springs and anti-roll bars. The safe setup is the quickest group with an "
+        "on-throttle differential of 85% or more, so both rear wheels drive together out of "
+        "corners. It needs two or more different drivers where any such group has them, and "
+        "among those it prefers a group run in both qualifying and the race. A group's pace is "
+        "the average of how far its best qualifying and race laps are behind the fastest in "
+        "each list. The Fast column shows the quickest shared setup of any kind, open "
+        "differentials included.",
         "A wet setting is the value most of the fastest wet setups run. When F1Laps' median is a "
         "value whose share is within 10 points of the most common one's, the median wins. Where "
         "F1Laps lists fewer than five setups, or leaves a setting off its setup pages, the sheet "

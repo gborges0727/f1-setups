@@ -64,7 +64,8 @@ function consensus(t, cond) {
   const median = values(t[cond]);
   const f = t.fastest && t.fastest[cond];
   const marked = new Set(t.important.map(label => FIELDS.find(x => x[1] === label)?.[0]).filter(Boolean));
-  const out = {}, agreed = new Set(), counted = new Set();
+  // against: settings where at least 70% run one value and the sheet runs another.
+  const out = {}, agreed = new Set(), against = new Set(), counted = new Set();
   for (const k of Object.keys(median)) {
     const counts = f && f.n >= 5 && f.counts[F[k].src];
     if (!counts) {
@@ -84,7 +85,7 @@ function consensus(t, cond) {
     // 70% of the fastest run.
     const easy = cond === "dry" && f.forgiving ? f.forgiving.values[F[k].src] : undefined;
     if (easy !== undefined) out[k] = easy;
-    if (most / f.n >= AGREE && out[k] === counts[0][0]) agreed.add(k);
+    if (most / f.n >= AGREE) (out[k] === counts[0][0] ? agreed : against).add(k);
     counted.add(k);
   }
   // A pick from data/picks.json replaces the sheet's value for that setting. The sheets get
@@ -98,14 +99,12 @@ function consensus(t, cond) {
     agreed.delete(k);
   }
   const forgiving = cond === "dry" && f && f.n >= 5 ? f.forgiving : null;
-  // The Fast column: the shared setup with the quickest lap, for drivers who want lap time over
-  // ease. Settings its setup pages leave out (engine braking) keep the sheet's value.
+  // The Fast column: the quickest shared setup of any kind, open differentials included.
+  // Settings its setup pages leave out (engine braking) keep the sheet's value.
   const q = cond === "dry" && f && f.n >= 5 && f.quickest;
-  let quick = q ? Object.fromEntries(Object.keys(out).map(k => [k, q.values[F[k].src] ?? out[k]])) : null;
-  // When the quickest shared setup is the safe one, the Fast column would only repeat it.
+  const quick = q ? Object.fromEntries(Object.keys(out).map(k => [k, q.values[F[k].src] ?? out[k]])) : null;
   const sameAsMain = !!quick && Object.keys(out).every(k => quick[k] === out[k]);
-  if (sameAsMain) quick = null;
-  return { out, voted, median, agreed, counted, picked, forgiving, quick, quickInfo: q || null, sameAsMain,
+  return { out, voted, median, agreed, against, counted, picked, forgiving, quick, quickInfo: q || null, sameAsMain,
     why: pick ? pick.why : "", n: f ? f.n : 0 };
 }
 

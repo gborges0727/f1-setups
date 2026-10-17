@@ -127,12 +127,14 @@ def pace(values, pace, drivers):
 def safe(setups, entries):
     """The safe setup for the sheet's main column, or None. See pick().
 
-    Among the shared setups with an on-throttle differential of LOCKED% or more, it takes the
-    one with the best qualifying and race pace. When no shared setup has a locked differential,
-    it takes the quickest shared setup of any kind.
+    It takes the quickest setup with an on-throttle differential of LOCKED% or more that two or
+    more drivers share. When no two drivers share one, it takes the quickest one-driver setup
+    with a locked differential. When no setup has one, it takes the quickest shared setup.
     """
-    locked = lambda values: values.get("Differential On Throttle", 0) >= LOCKED
-    return pick(setups, entries, pace, keep=locked) or pick(setups, entries, pace)
+    locked = lambda s: s.get("Differential On Throttle", 0) >= LOCKED
+    return (pick(setups, entries, pace, keep=locked)
+            or pick(setups, entries, pace, keep=locked, min_drivers=1)
+            or pick(setups, entries, pace))
 
 
 def quickest(setups, entries):
@@ -140,11 +142,12 @@ def quickest(setups, entries):
     return pick(setups, entries, pace)
 
 
-def pick(setups, entries, score, keep=None):
+def pick(setups, entries, score, keep=None, min_drivers=2):
     """The setup that two or more drivers among the fastest share with the highest score, or None.
 
     One driver can upload the same setup from qualifying and from a race, so the count is of
-    different drivers, not uploads. keep(values), when given, drops setups that fail it. A setup
+    different drivers, not uploads. keep(setup), when given, drops each setup that fails it
+    before the drivers are counted, so a group's drivers all pass it. A setup
     run in both qualifying and the race beats one run in only one of them. Returns
     {"values": {setting: value}, "runs": drivers who run it, and "quali" and "race": {"best":
     list position of its fastest lap, "gap": seconds behind that list's fastest lap, or None
@@ -163,14 +166,14 @@ def pick(setups, entries, score, keep=None):
     drivers = lambda members: len({entries[i]["user"] for i in members})
     found = []
     for members in groups.values():
-        if drivers(members) < 2:
+        if keep:
+            members = [i for i in members if keep(setups[i])]
+        if not members or drivers(members) < min_drivers:
             continue
         values = {}
         for k in setups[members[0]]:
             seen = [setups[i][k] for i in members if k in setups[i]]
             values[k] = max(seen, key=lambda v: (seen.count(v), -seen.index(v)))
-        if keep and not keep(values):
-            continue
         found.append((members, values))
     both = [(m, v) for m, v in found if {entries[i]["kind"] for i in m} == set(SESSIONS)]
     best = None
