@@ -1,11 +1,14 @@
 """Build the site from templates/ and data/.
 
-Writes site/index.html and four sheets, then copies in the files from static/
-(the icons and Cloudflare's _redirects file). Each game gets an F1Laps meta
-sheet and a kerb-attack sheet:
+Writes site/index.html, four sheets and two breakdown pages, then copies in the
+files from static/ (the icons and Cloudflare's _redirects file). Each game gets
+a consensus sheet, a kerb-attack sheet and a breakdown page:
 
-  site/f1-25/              site/f1-25/kerb-attack/
-  site/f1-26/              site/f1-26/kerb-attack/
+  site/f1-25/    site/f1-25/kerb-attack/    site/f1-25/breakdown/
+  site/f1-26/    site/f1-26/kerb-attack/    site/f1-26/breakdown/
+
+templates/common.js holds the setting list and the consensus rule. build.py
+pastes it into every sheet and breakdown page.
 
 Usage: python3 scripts/build.py
 """
@@ -31,24 +34,25 @@ MODES = {
     "meta": {
         "title": "{short} Setup Sheet",
         "path": "{game}/",
-        "lede": "F1Laps' setup for each track, built from the 100 fastest setups its users "
-                "uploaded, for {lede_cars}.{extra} Settings marked Agreed are the ones where fast "
-                "drivers use the same value. The Dirty air column shows what to change for a race "
-                "spent following other cars.",
-        "description": "{short} car setups for every track from F1Laps' 100 fastest setups, "
-                       "with dirty-air changes for racing in traffic.",
+        "lede": "Each value is the one most of the 20 fastest setups on F1Laps run at that "
+                "track, for {lede_cars}.{extra} F1Laps' own meta setup takes the median of 100 setups instead, "
+                "so some values differ from it. Settings marked Agreed are ones at least 70% of the "
+                "20 run. The Dirty air column shows what to change for a race spent following "
+                "other cars.",
+        "description": "{short} car setups for every track, using the value most of the 20 "
+                       "fastest setups on F1Laps run, with dirty-air changes for racing in traffic.",
         "sibling": ("{game}/kerb-attack/", "Kerb attack version"),
     },
     "kerb": {
         "title": "{short} Kerb-Attack Sheet",
         "path": "{game}/kerb-attack/",
-        "lede": "F1Laps' setup for each track, for {lede_cars}, tuned for a driver who attacks "
-                "corners and rides kerbs.{extra} Settings fast drivers agree on stay exactly as "
-                "F1Laps has them, and only the settings where they disagree change. The Dirty air "
-                "column shows what to change on top for a race spent following other cars.",
-        "description": "{short} kerb-attack car setups for every track, built on F1Laps' meta "
-                       "setups, with dirty-air changes for racing in traffic.",
-        "sibling": ("{game}/", "F1Laps meta version"),
+        "lede": "The consensus setup for each track, for {lede_cars}, tuned for a driver who "
+                "attacks corners and rides kerbs.{extra} Settings marked Agreed stay as the fastest "
+                "setups run them, and only the others change. The Dirty air column shows what to "
+                "change on top for a race spent following other cars.",
+        "description": "{short} kerb-attack car setups for every track, built on the values the "
+                       "fastest F1Laps setups run, with dirty-air changes for racing in traffic.",
+        "sibling": ("{game}/", "Consensus version"),
     },
 }
 
@@ -77,17 +81,17 @@ def names(items):
 
 def notes(tracks):
     out = [
-        "Some F1Laps values fall between two clicks, such as 26.5 on a wing. Pick either "
-        "neighbouring click.",
-        "Most of the fastest laps behind these numbers are likely Time Trial laps, and Time Trial "
-        "turns off tyre wear. For a race, raise tyre pressures if the tyres overheat or wear fast.",
+        "Each value is the one most of the fastest setups F1Laps lists for the track run: the 20 "
+        "fastest dry setups, or up to 20 wet ones. A tie goes to the value closest to F1Laps' "
+        "median. Where F1Laps lists fewer than five setups, or leaves a setting off its setup "
+        "pages, the sheet uses F1Laps' meta value, the median of its 100 fastest setups.",
+        "A median can fall between two clicks, such as 26.5 on a wing. Pick either neighbouring "
+        "click.",
+        "Most of the fastest laps are Time Trial laps, and Time Trial turns off tyre wear. For a "
+        "race, raise tyre pressures if the tyres overheat or wear fast.",
         "Parc fermé locks the setup once qualifying starts. If you expect to start behind other "
         "cars, enter the Dirty air values before qualifying.",
     ]
-    out.append("The line under each open setting counts the fastest setups F1Laps lists for the "
-               "track: the 20 fastest dry setups, or up to 20 wet ones. Most are Time Trial laps. F1Laps "
-               "builds its meta value from 100 setups, so the most common value in the line can differ "
-               "from it.")
     dry_only = [t["name"] for t in tracks if not t["wet"]]
     if dry_only:
         out.append(f"F1Laps has no wet data for {names(dry_only)}. For those, start from the dry "
@@ -109,8 +113,20 @@ def esc(s):
     return s.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
 
 
+BREAKDOWN = {
+    "title": "{short} Setup Breakdown",
+    "lede": "What the 20 fastest setups on F1Laps run for every setting, for {lede_cars}, against "
+            "F1Laps' median of its 100 fastest.{extra} The sheets use the value the most setups "
+            "run. Cards with an orange border are where that differs from F1Laps' median.",
+    "description": "How many of the fastest {short} setups on F1Laps run each value, setting by "
+                   "setting, for every track, against F1Laps' median.",
+}
+
+
 def build():
-    template = (ROOT / "templates" / "sheet.html").read_text()
+    common = (ROOT / "templates" / "common.js").read_text()
+    template = (ROOT / "templates" / "sheet.html").read_text().replace("__COMMON__", common)
+    breakdown = (ROOT / "templates" / "breakdown.html").read_text().replace("__COMMON__", common)
     for game, g in GAMES.items():
         data = json.loads((ROOT / "data" / f"{game}.json").read_text())
         fetched = datetime.date.fromisoformat(data["fetched"])
@@ -130,6 +146,7 @@ def build():
                     .replace("__LEDE__", m["lede"].format(**fill))
                     .replace("__SIBLING_URL__", "/" + sib_path.format(**fill))
                     .replace("__SIBLING_LABEL__", sib_label)
+                    .replace("__BREAKDOWN_URL__", f"/{game}/breakdown/")
                     .replace("__CONFIG__", json.dumps(config, ensure_ascii=False))
                     .replace("__DATA__", json.dumps(data["tracks"], separators=(",", ":"),
                                                     ensure_ascii=False)))
@@ -137,6 +154,21 @@ def build():
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(page(html))
             print(f"wrote {out.relative_to(ROOT)} ({len(data['tracks'])} tracks)")
+        fill = dict(g, game=game)
+        config = {"key": f"breakdown-{game}", "cars": g["cars"],
+                  "fetched": f"{fetched.day} {fetched:%B %Y}", "notes": version_html()}
+        html = (breakdown
+                .replace("__TITLE__", BREAKDOWN["title"].format(**fill))
+                .replace("__DESCRIPTION__", esc(BREAKDOWN["description"].format(**fill)))
+                .replace("__LEDE__", BREAKDOWN["lede"].format(**fill))
+                .replace("__SHEET_URL__", f"/{game}/")
+                .replace("__KERB_URL__", f"/{game}/kerb-attack/")
+                .replace("__CONFIG__", json.dumps(config, ensure_ascii=False))
+                .replace("__DATA__", json.dumps(data["tracks"], separators=(",", ":"), ensure_ascii=False)))
+        out = ROOT / "site" / game / "breakdown" / "index.html"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(page(html))
+        print(f"wrote {out.relative_to(ROOT)} ({len(data['tracks'])} tracks)")
     index = (ROOT / "templates" / "index.html").read_text().replace("__VERSION__", version_html())
     (ROOT / "site" / "index.html").write_text(page(index))
     print("wrote site/index.html")

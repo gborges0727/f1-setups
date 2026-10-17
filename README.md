@@ -2,7 +2,11 @@
 
 Car setups for every track in EA Sports F1 25, for both the 2025 cars and the 2026 cars from the F1 26 Season Pack. The live site is https://f1-setups-cgn.pages.dev/.
 
-The setups come from [F1Laps](https://www.f1laps.com/). For each track, F1Laps looks at the 100 fastest setups its users uploaded and publishes the value fast drivers use for each setting. It also marks the settings where fast drivers agree. The sheets shade those settings purple. Most of the laps behind these numbers are Time Trial laps, which have no tyre wear, so race setups may need higher tyre pressures and a more open on-throttle differential.
+The setups come from [F1Laps](https://www.f1laps.com/). For each track, F1Laps lists the 20 fastest setups its users uploaded, dry and wet. For each setting, the sheets use the value the most of those setups run. A tie goes to the tied value closest to F1Laps' meta value. A setting counts as Agreed, shaded purple, when at least 70% of the setups run the same value.
+
+F1Laps' own meta setup takes the median of its 100 fastest setups, the middle value when they're lined up from lowest to highest. F1Laps doesn't state this, but every meta value sits on a click or exactly halfway between two, which is what a median of 100 gives. The median often differs from what most fast drivers run. At Suzuka in F1 25, 15 of the 20 fastest setups run the front anti-roll bar at 6, while the median is 1. The sheets fall back to F1Laps' meta value where F1Laps lists fewer than five setups, and for engine braking, which its setup pages leave out.
+
+Most of the laps behind these numbers are Time Trial laps, which have no tyre wear, so race setups may need higher tyre pressures and a more open on-throttle differential.
 
 The game cannot import setup files. To use a setup, type it in once on the setup screen, then save it in the game as a custom setup for that track.
 
@@ -11,10 +15,11 @@ The game cannot import setup files. To use a setup, type it in once on the setup
 | Page | What it shows |
 |---|---|
 | `/` | A start page where you pick the cars (2025 or 2026) and the setup style |
-| `/f1-25/` and `/f1-26/` | The F1Laps setup for every track: 27 tracks with the 2025 cars, including the three reverse layouts, and 25 with the 2026 cars |
+| `/f1-25/` and `/f1-26/` | The consensus setup for every track: 27 tracks with the 2025 cars, including the three reverse layouts, and 25 with the 2026 cars |
 | `/f1-25/kerb-attack/` and `/f1-26/kerb-attack/` | The same setups, with the settings fast drivers disagree on changed for riding kerbs, in qualifying and race versions |
+| `/f1-25/breakdown/` and `/f1-26/breakdown/` | Every value the 20 fastest setups run for each setting, as a bar chart, with F1Laps' median marked and a list of the settings where the two differ |
 
-Under each setting fast drivers disagree on, a line shows what the fastest setups F1Laps lists for that track actually run. F1Laps lists the 20 fastest dry setups and up to 20 wet ones. The line gives the range and the share of each common value, such as "35% run 56%" for Monaco brake bias. The most common value among those setups can differ from the F1Laps meta value, which comes from 100 setups. The line is left out when F1Laps lists fewer than five setups.
+Under each setting not marked Agreed, a line shows what the fastest setups run. It gives their range and the share of each common value, such as "35% run 56%" for Monaco brake bias. It also gives F1Laps' median when that differs from the sheet's value. The page addresses carry the chosen track (`/f1-25/breakdown/#japan`), so the links between a game's sheets and its breakdown page keep the same track.
 
 Every sheet has a Dirty air column. It shows what to change for a race spent following other cars: two clicks more front wing, a softer front anti-roll bar, and brake bias one step rearward. Parc fermé locks the setup once qualifying starts, so those changes go in before qualifying.
 
@@ -24,10 +29,10 @@ F1Laps updates its numbers as new laps arrive. To pull the latest numbers and re
 
 ```sh
 python3 scripts/fetch.py    # downloads every track's meta page and fastest setups into data/f1-25.json and data/f1-26.json
-python3 scripts/build.py    # writes the start page and all four sheets into site/, and copies in static/
+python3 scripts/build.py    # writes the start page, four sheets and two breakdown pages into site/, and copies in static/
 ```
 
-A first run reads about 2,000 setup pages, one per second, so it takes about 40 minutes. Setup pages never change, so `fetch.py` caches them in `.cache/setups/` and a later run reads only new ones. Both scripts use only the Python standard library. The kerb-attack and dirty-air changes live in `templates/sheet.html`, in the `KERB` and `DIRTY` tables. The built `site/` folder is the whole website, and git ignores it.
+A first run reads about 2,000 setup pages, one per second, so it takes about 40 minutes. Setup pages never change, so `fetch.py` caches them in `.cache/setups/` and a later run reads only new ones. Both scripts use only the Python standard library. The kerb-attack and dirty-air changes live in `templates/sheet.html`, in the `KERB` and `DIRTY` tables. The setting list and the consensus rule live in `templates/common.js`, which `build.py` pastes into every sheet and breakdown page. The built `site/` folder is the whole website, and git ignores it.
 
 ## Releases and deploys
 
