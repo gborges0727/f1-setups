@@ -53,6 +53,14 @@
           "Rear Left Tyre Pressure": 26.5
         }
       }
+    },
+    "imola": {
+      "segrob": {
+        "why": "segrob changed the rear suspension from 10 to 3 after testing it at Imola in October 2026. The softer rear springs gave more grip out of the slow corners. On soft tyres it set faster practice laps than the F1Laps version of this setup and the Safe column.",
+        "values": {
+          "Rear Suspension": 3
+        }
+      }
     }
   }
 }

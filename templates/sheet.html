@@ -277,7 +277,7 @@ function render() {
   const fast = KERB_MODE ? null : base.quick, qi = base.quickInfo;
   if (fast && !base.sameAsMain) h += `<p class="note">The Fast column is ${legacy(tf) ? "the shared setup with the best lap" : "the quickest shared setup of any kind, open differentials included"}. ${who(qi)} run it. ${paceLine(qi)}</p>`;
   const mine = KERB_MODE ? null : base.mine, mi = base.mineInfo;
-  if (mine) h += `<p class="note">The Segrob's column is the setup among ${pool40} that drives most like segrob's tested Saudi Arabia setup. It compares every setting except the wings and ride heights, which change from track to track. ${mi.runs === 1 ? "One driver runs" : `${mi.runs} different drivers run`} it. ${paceLine(mi)}</p>`;
+  if (mine) h += `<p class="note">The Segrob's column is the setup among ${pool40} that drives most like segrob's tested Saudi Arabia setup. It compares every setting except the wings and ride heights, which change from track to track. ${mi.runs === 1 ? "One driver runs" : `${mi.runs} different drivers run`} it. ${paceLine(mi)}${base.mineWhy ? ` ${esc(base.mineWhy)}` : ""}</p>`;
   if (base.picked.size) {
     h += `<h4>Picked by hand</h4>` + changeList([...base.picked], base.voted, meta);
     h += `<p class="note">${esc(base.why)}</p>`;

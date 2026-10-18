@@ -108,8 +108,11 @@ function consensus(t, cond) {
   // setup (fetch.py segrob()). Settings its setup pages leave out keep the sheet's value.
   const m = cond === "dry" && f && f.n >= 5 && f.segrob;
   const mine = m ? Object.fromEntries(Object.keys(out).map(k => [k, m.values[F[k].src] ?? out[k]])) : null;
+  // A "segrob" entry in data/picks.json changes single settings of the Segrob's column by hand.
+  const mp = mine && t.pick && t.pick.segrob;
+  if (mp) for (const [label, v] of Object.entries(mp.values)) mine[FIELDS.find(x => x[1] === label)[0]] = v;
   return { out, voted, median, agreed, against, counted, picked, forgiving, quick, quickInfo: q || null, sameAsMain,
-    mine, mineInfo: m || null,
+    mine, mineInfo: m || null, mineWhy: mp ? mp.why : "",
     why: pick ? pick.why : "", n: f ? f.n : 0 };
 }
 

@@ -157,7 +157,9 @@ def with_picks(tracks, picks):
         p = picks.get(t["id"])
         if p:
             for cond, pick in p.items():
-                bad = [k for k in pick["values"] if not t.get(cond) or k not in t[cond]]
+                # A "segrob" pick changes the Segrob's column, which uses the dry settings.
+                have = t.get("dry" if cond == "segrob" else cond)
+                bad = [k for k in pick["values"] if not have or k not in have]
                 if bad:
                     raise SystemExit(f"data/picks.json: {t['id']} {cond} has no {', '.join(bad)}")
             t = dict(t, pick=p)
