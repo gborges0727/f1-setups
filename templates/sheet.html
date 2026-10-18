@@ -14,7 +14,6 @@
   --lock: #7a8693;
   --lock-bg: #e9edf1;
   --change: #b4410f;
-  --change-bg: #fdeee5;
   --dirty: #0b6e7f;
   --agree: #7b2fd6;
   --dirty-bg: #e1f2f4;
@@ -27,12 +26,12 @@
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
-  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --change-bg: #3a2318;
+  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62;
   --dirty: #5fd3e3; --dirty-bg: #12313a; --agree: #b07cff;
   --accent: #5d9ce6; --accent-ink: #0f151c; --mine: #6fd38a; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
-  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --change-bg: #3a2318;
+  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62;
   --dirty: #5fd3e3; --dirty-bg: #12313a; --agree: #b07cff;
   --accent: #5d9ce6; --accent-ink: #0f151c; --mine: #6fd38a; color-scheme: dark }
 
@@ -83,12 +82,9 @@ thead th { border-top: 0; font-size: 0.72rem; text-transform: uppercase; letter-
 td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 td.name { font-weight: 500; }
 td.why { color: var(--muted); font-size: 0.86rem; min-width: 18ch; }
-tr.changed { background: var(--change-bg); }
-tr.changed td.yours { color: var(--change); font-weight: 600; }
 td.dirty.moved { color: var(--dirty); font-weight: 600; background: var(--dirty-bg); }
 .chip { display: inline-block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
 .chip.lock { background: var(--agree); color: var(--sheet); }
-.chip.chg { background: var(--change); color: var(--sheet); }
 .chip.same { border: 1px solid var(--rule); color: var(--muted); }
 .chip.dirt { background: var(--dirty); color: var(--sheet); }
 .chip.pick { background: var(--accent); color: var(--accent-ink); }
@@ -110,7 +106,7 @@ details.rules td.why { display: table-cell; }
 table.sheet { table-layout: fixed; }
 /* The name column holds the setting and its chip. The value columns share the rest equally. */
 table.sheet th.c-name { width: 46%; }
-table.sheet.kerb th.c-name, table.sheet.has-fast th.c-name { width: 40%; }
+table.sheet.has-fast th.c-name { width: 40%; }
 table.sheet.has-fast.has-mine th.c-name { width: 34%; }
 td.name .chip { margin-left: 6px; vertical-align: 1px; }
 td.fast.moved { color: var(--accent); font-weight: 600; }
@@ -125,7 +121,7 @@ td.mine.moved { color: var(--mine); font-weight: 600; }
   table.sheet td.num { font-size: 0.86rem; }
   table.sheet .unit { display: none; }
   table.sheet th.c-name { width: 40%; }
-  table.sheet.kerb th.c-name, table.sheet.has-fast th.c-name { width: 37%; }
+  table.sheet.has-fast th.c-name { width: 37%; }
   table.sheet.has-fast.has-mine th.c-name { width: 30%; }
   td.name .chip { margin-left: 0; margin-top: 3px; }
   td.name .lbl { display: block; }
@@ -133,14 +129,13 @@ td.mine.moved { color: var(--mine); font-weight: 600; }
 </style>
 
 <header class="top"><div class="wrap">
-  <nav class="home"><a href="/">← All setup sheets</a><a data-keep="__SIBLING_URL__" href="__SIBLING_URL__">__SIBLING_LABEL__ →</a><a data-keep="__BREAKDOWN_URL__" href="__BREAKDOWN_URL__">Breakdown →</a></nav>
+  <nav class="home"><a href="/">← All setup sheets</a><a data-keep="__BREAKDOWN_URL__" href="__BREAKDOWN_URL__">Breakdown →</a></nav>
   <h1>__TITLE__</h1>
   <p class="lede">__LEDE__</p>
 </div></header>
 
 <div class="bar"><div class="wrap">
   <div class="ctl track"><span>Track</span><select id="track" aria-label="Track"></select></div>
-  <div class="ctl" id="session-ctl"><span>Session</span><div class="seg" id="session" role="group" aria-label="Session"></div></div>
   <div class="ctl"><span>Weather</span><div class="seg" id="weather" role="group" aria-label="Weather"></div></div>
 </div></div>
 
@@ -152,19 +147,6 @@ const TRACKS = __DATA__;
 
 __COMMON__
 
-// Kerb attack: changes for a kerb-riding, corner-attacking style, applied only to settings not marked Agreed.
-const KERB = {
-  quali: { rear_wing: +1, diff_on: -5, rear_susp: -3, rear_arb: -2, front_rh: +1, rear_rh: +2 },
-  race: { rear_wing: +2, diff_on: -10, rear_susp: -4, rear_arb: -3, front_rh: +1, rear_rh: +2 },
-};
-const KERB_WHY = {
-  rear_wing: "More rear grip on corner exit. Costs a little top speed.",
-  diff_on: "Lets the inside rear wheel turn more freely, so the rear doesn't snap when one wheel goes light on a kerb.",
-  rear_susp: "A softer rear keeps the rear tyres on the ground over kerbs and when you put power down.",
-  rear_arb: "Lets the rear lean more in corners, so the rear tyres grip longer before they slide.",
-  front_rh: "Lifts the floor so it doesn't hit kerbs and unsettle the car.",
-  rear_rh: "Lifts the floor so it doesn't hit kerbs and launch the car. Costs a little top speed.",
-};
 // Dirty air: changes for a race spent following other cars, applied on top of this page's setup.
 const DIRTY = { front_wing: +2, front_arb: -1, brake_bias: -1 };
 const DIRTY_WHY = {
@@ -173,20 +155,18 @@ const DIRTY_WHY = {
   brake_bias: "Moves braking toward the rear, so the front tyres slide and overheat less while you follow. You can also change this from the in-car menu during the race.",
 };
 
-const KERB_MODE = CONFIG.mode === "kerb";
 const ORDER = TRACKS.map(t => t.id);
 const BY_ID = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 
-function shift(base, rules, skip) {
-  const out = Object.assign({}, base), changed = [], held = [];
+function shift(base, rules) {
+  const out = Object.assign({}, base), changed = [];
   for (const [k, d] of Object.entries(rules)) {
     if (!(k in base)) continue;
-    if (skip && skip.has(k)) { held.push(k); continue; }
     const v = clamp(k, Math.round(base[k]) + d);
     out[k] = v;
     if (v !== base[k]) changed.push(k);
   }
-  return { out, changed, held };
+  return { out, changed };
 }
 // What the fastest setups F1Laps lists use for one setting: the range, the share of each common value,
 // and F1Laps' median when it differs from the value this page shows.
@@ -207,7 +187,7 @@ function spread(t, cond, k, shown, median) {
   return `<div class="dist">${h}</div>`;
 }
 
-let state = { slug: ORDER[0], session: "race", cond: "dry" };
+let state = { slug: ORDER[0], cond: "dry" };
 try {
   const s = JSON.parse(localStorage.getItem(CONFIG.key) || "null");
   if (s && BY_ID[s.slug]) state = Object.assign(state, s);
@@ -238,18 +218,13 @@ function render() {
   const meta = base.out;
   const lock = base.agreed;
 
-  document.getElementById("session-ctl").hidden = !KERB_MODE;
-  if (KERB_MODE) seg(document.getElementById("session"), [["quali", "Qualifying"], ["race", "Race"]], state.session, v => { state.session = v; render(); });
   seg(document.getElementById("weather"), [["dry", "Dry"], ["wet", "Wet"]], state.cond, v => { state.cond = v; render(); }, v => !t[v]);
   const sel = document.getElementById("track");
   sel.innerHTML = ORDER.map(s => `<option value="${s}"${s === state.slug ? " selected" : ""}>${esc(BY_ID[s].name)}</option>`).join("");
 
-  const kerb = KERB_MODE ? shift(meta, KERB[state.session], lock) : { out: meta, changed: [], held: [] };
-  const yours = kerb.out;
-  const dirty = shift(yours, DIRTY, null);
+  const dirty = shift(meta, DIRTY);
 
   const sub = [CONFIG.cars, state.cond === "dry" ? "Dry" : "Wet"];
-  if (KERB_MODE) sub.push(state.session === "quali" ? "Qualifying" : "Race");
   let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${sub.join(" · ")}</div>`;
   // How a picked setup's best qualifying and race laps compare with the fastest in each list.
   const paceLine = p => "best" in p ? (p.best === 1 ? "It set the fastest lap." : `Its best lap is ${p.gap.toFixed(3)} s off the fastest.`) : [["quali", "qualifying"], ["race", "race"]].map(([k, name]) => {
@@ -272,46 +247,37 @@ function render() {
     : fg.runs >= 2 ? `The safe setup is the quickest setup with a locked on-throttle differential that two or more drivers share among ${pool40}. ${who(fg)} run it.`
     : `The safe setup is the quickest setup with a locked on-throttle differential among ${pool40}. No two drivers share a setup with one here, so this is one driver's setup.`;
   if (fg && legacy(tf)) h += `<p class="note">This is the most forgiving setup that ${among} share. ${who(fg)} run it. ${paceLine(fg)}</p>`;
-  else if (fg) h += base.picked.size ? "" : `<p class="note">${safeLine} ${paceLine(fg)}${base.sameAsMain && !KERB_MODE ? " The Fast column matches it, because the quickest shared setup also has a locked differential." : ""}</p>`;
+  else if (fg) h += base.picked.size ? "" : `<p class="note">${safeLine} ${paceLine(fg)}${base.sameAsMain ? " The Fast column matches it, because the quickest shared setup also has a locked differential." : ""}</p>`;
   else if (state.cond === "dry" && tf && tf.n >= 5) h += `<p class="warn">No setup here is shared by two or more drivers, so each setting uses the value most of these setups run.</p>`;
-  const fast = KERB_MODE ? null : base.quick, qi = base.quickInfo;
+  const fast = base.quick, qi = base.quickInfo;
   if (fast && !base.sameAsMain) h += `<p class="note">The Fast column is ${legacy(tf) ? "the shared setup with the best lap" : "the quickest shared setup of any kind, open differentials included"}. ${who(qi)} run it. ${paceLine(qi)}</p>`;
-  const mine = KERB_MODE ? null : base.mine, mi = base.mineInfo;
+  const mine = base.mine, mi = base.mineInfo;
   if (mine) h += `<p class="note">The Segrob's column is the setup among ${pool40} that drives most like segrob's tested Saudi Arabia setup. It compares every setting except the wings and ride heights, which change from track to track. ${mi.runs === 1 ? "One driver runs" : `${mi.runs} different drivers run`} it. ${paceLine(mi)}${base.mineWhy ? ` ${esc(base.mineWhy)}` : ""}</p>`;
   if (base.picked.size) {
     h += `<h4>Picked by hand</h4>` + changeList([...base.picked], base.voted, meta);
     h += `<p class="note">${esc(base.why)}</p>`;
   }
-  if (KERB_MODE) {
-    h += `<h4>Kerb attack changes</h4>`;
-    h += kerb.changed.length ? changeList(kerb.changed, meta, yours)
-      : `<p class="none">Fast drivers agree on every setting this style would change, so this setup matches the main sheet exactly.</p>`;
-    if (kerb.held.length) h += `<p class="note">Left alone because fast drivers agree on them here: ${kerb.held.map(k => F[k].label.toLowerCase()).join(", ")}.</p>`;
-  }
   h += `<h4>If you'll race in traffic</h4>`;
-  h += dirty.changed.length ? changeList(dirty.changed, yours, dirty.out)
+  h += dirty.changed.length ? changeList(dirty.changed, meta, dirty.out)
     : `<p class="none">This setup is already at the game's limits for every dirty-air change.</p>`;
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry setup is available.</p>`;
   h += `</div>`;
 
   h += `<details class="rules"><summary>What each change does, and by how much</summary><div class="tablewrap" style="border:0"><table><thead><tr><th>Setting</th>`;
-  h += KERB_MODE ? `<th>Kerb, qualifying</th><th>Kerb, race</th>` : "";
   h += `<th>Dirty air</th><th>What it fixes</th></tr></thead><tbody>`;
-  const ruleKeys = FIELDS.map(f => f[0]).filter(k => (KERB_MODE && k in KERB.race) || k in DIRTY);
+  const ruleKeys = FIELDS.map(f => f[0]).filter(k => k in DIRTY);
   const sign = v => v === undefined ? "—" : (v > 0 ? "+" : "") + v;
   for (const k of ruleKeys) {
     h += `<tr><td class="name">${F[k].label}</td>`;
-    if (KERB_MODE) h += `<td class="num">${sign(KERB.quali[k])}</td><td class="num">${sign(KERB.race[k])}</td>`;
-    h += `<td class="num">${sign(DIRTY[k])}</td><td class="why">${[KERB_MODE ? KERB_WHY[k] : null, DIRTY_WHY[k]].filter(Boolean).join(" ")}</td></tr>`;
+    h += `<td class="num">${sign(DIRTY[k])}</td><td class="why">${DIRTY_WHY[k]}</td></tr>`;
   }
   h += `</tbody></table></div>
-    <p class="note">${KERB_MODE ? "Kerb attack changes apply only to settings not marked Agreed. " : ""}Dirty-air changes apply on top of this page's setup, whether or not fast drivers agree on the setting, because their laps were set in clean air. Values are rounded to whole clicks and kept inside the game's limits.</p>
+    <p class="note">Dirty-air changes apply on top of this page's setup, whether or not fast drivers agree on the setting, because their laps were set in clean air. Values are rounded to whole clicks and kept inside the game's limits.</p>
   </details>`;
 
   h += `<div class="legend">
     <span><span class="chip lock">Agreed</span> at least 70% of the fastest setups run this value</span>
     ${base.picked.size ? `<span><span class="chip pick">Picked</span> set by hand for this track instead of the vote</span>` : ""}
-    ${KERB_MODE ? `<span><span class="chip chg">Changed</span> adjusted for kerb attack</span>` : ""}
     <span><span class="chip same">Open</span> the fastest setups split, so adjust it to taste. The line under it shows what they run.</span>
     ${base.against.size ? `<span><span class="chip odd">Unusual</span> at least 70% of the fastest setups run a different value. The line under it shows which.</span>` : ""}
     <span><span class="chip dirt">Dirty air</span> extra change for a race spent following other cars</span>
@@ -322,21 +288,19 @@ function render() {
   for (const [g, keys] of GROUPS) {
     const rows = keys.filter(k => k in meta);
     if (!rows.length) continue;
-    h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet ${CONFIG.mode}${fast ? " has-fast" : ""}${mine ? " has-mine" : ""}"><thead><tr>
-      <th class="c-name">Setting</th><th class="c-val">${fg && !legacy(tf) ? "Safe" : "Setup"}</th>${KERB_MODE ? `<th class="c-val">Kerb attack</th>` : ""}<th class="c-val">Dirty air</th>${fast ? `<th class="c-val">Fast</th>` : ""}${mine ? `<th class="c-val">Segrob's</th>` : ""}</tr></thead><tbody>`;
+    h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet${fast ? " has-fast" : ""}${mine ? " has-mine" : ""}"><thead><tr>
+      <th class="c-name">Setting</th><th class="c-val">${fg && !legacy(tf) ? "Safe" : "Setup"}</th><th class="c-val">Dirty air</th>${fast ? `<th class="c-val">Fast</th>` : ""}${mine ? `<th class="c-val">Segrob's</th>` : ""}</tr></thead><tbody>`;
     for (const k of rows) {
-      const isChanged = kerb.changed.includes(k);
       const isDirty = dirty.changed.includes(k);
-      const chip = isChanged ? `<span class="chip chg">Changed</span>` : base.picked.has(k) ? `<span class="chip pick">Picked</span>`
+      const chip = base.picked.has(k) ? `<span class="chip pick">Picked</span>`
         : lock.has(k) ? `<span class="chip lock">Agreed</span>` : base.against.has(k) ? `<span class="chip odd">Unusual</span>` : `<span class="chip same">Open</span>`;
-      h += `<tr class="${isChanged ? "changed" : ""}"><td class="name"><span class="lbl">${F[k].label}</span>${chip}</td><td class="num">${fmt(k, meta[k])}</td>`;
-      if (KERB_MODE) h += `<td class="num yours">${fmt(k, yours[k])}</td>`;
+      h += `<tr><td class="name"><span class="lbl">${F[k].label}</span>${chip}</td><td class="num">${fmt(k, meta[k])}</td>`;
       h += `<td class="num dirty${isDirty ? " moved" : ""}">${fmt(k, dirty.out[k])}</td>`;
       if (fast) h += `<td class="num fast${fast[k] !== meta[k] ? " moved" : ""}">${fmt(k, fast[k])}</td>`;
       if (mine) h += `<td class="num mine${mine[k] !== meta[k] ? " moved" : ""}">${fmt(k, mine[k])}</td>`;
       h += `</tr>`;
       const dist = lock.has(k) && meta[k] === base.median[k] ? "" : spread(t, state.cond, k, meta[k], base.median[k]);
-      if (dist) h += `<tr class="spread${isChanged ? " changed" : ""}"><td colspan="${3 + (KERB_MODE ? 1 : 0) + (fast ? 1 : 0) + (mine ? 1 : 0)}">${dist}</td></tr>`;
+      if (dist) h += `<tr class="spread"><td colspan="${3 + (fast ? 1 : 0) + (mine ? 1 : 0)}">${dist}</td></tr>`;
     }
     h += `</tbody></table></div></section>`;
   }

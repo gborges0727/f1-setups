@@ -26,20 +26,19 @@ The game cannot import setup files. To use a setup, type it in once on the setup
 
 | Page | What it shows |
 |---|---|
-| `/` | A start page where you pick the cars (2025 or 2026) and the setup style |
+| `/` | A start page where you pick the cars (2025 or 2026), then open their main sheet or breakdown page |
 | `/f1-25/` and `/f1-26/` | The main setup for every track: 27 tracks with the 2025 cars, including the three reverse layouts, and 25 with the 2026 cars |
-| `/f1-25/kerb-attack/` and `/f1-26/kerb-attack/` | The same setups, with the settings fast drivers disagree on changed for riding kerbs, in qualifying and race versions |
 | `/f1-25/breakdown/` and `/f1-26/breakdown/` | Every value the fastest qualifying and race setups run for each setting, as a bar chart, with F1Laps' median marked and a list of the settings where the two differ |
 
 Under each setting not marked Agreed, a line shows what the fastest setups run. It gives their range and the share of each common value, such as "35% run 56%" for Monaco brake bias. It also gives F1Laps' median when that differs from the sheet's value. The page addresses carry the chosen track (`/f1-25/breakdown/#japan`), so the links between a game's sheets and its breakdown page keep the same track.
 
 ## Picked values
 
-Some values on the sheets can be picked by hand, and a pick replaces the sheet's own value. `data/picks.json` lists them by game, track and weather, with each setting under its F1Laps label. Each entry also has a `why`, which the sheet prints above the setup. A picked setting shows a blue Picked chip, and the kerb-attack and dirty-air changes still apply on top of it. The breakdown pages ignore picks. `fetch.py` never writes `data/picks.json`, so a refresh keeps the picks. `build.py` stops with an error when a pick names a track or setting the data doesn't have.
+Some values on the sheets can be picked by hand, and a pick replaces the sheet's own value. `data/picks.json` lists them by game, track and weather, with each setting under its F1Laps label. Each entry also has a `why`, which the sheet prints above the setup. A picked setting shows a blue Picked chip, and the dirty-air changes still apply on top of it. The breakdown pages ignore picks. `fetch.py` never writes `data/picks.json`, so a refresh keeps the picks. `build.py` stops with an error when a pick names a track or setting the data doesn't have.
 
 ## Dirty air
 
-Each dry main sheet also has a Fast column. It shows the quickest shared setup of any kind, open differentials included, taken whole like the safe setup. Where the quickest shared setup has a locked differential, the two columns match. The kerb-attack and wet sheets don't have it.
+Each dry main sheet also has a Fast column. It shows the quickest shared setup of any kind, open differentials included, taken whole like the safe setup. Where the quickest shared setup has a locked differential, the two columns match. The wet sheets don't have it.
 
 The F1 25 dry main sheets also have a Segrob's column. It starts from segrob's tested Saudi Arabia setup, kept as `MINE` in `scripts/fetch.py`. For each track it takes the setup among the fastest qualifying and race setups that sits closest to it. The comparison covers every setting except the wings and ride heights, which change from track to track. Each setting's difference is divided by the game's range for it, so a click on a narrow setting counts for as much as its share of a wide one. Only setups with an on-throttle differential of 85% or more count. A `segrob` entry under a track in `data/picks.json` changes single settings of this column by hand, and its `why` prints under the column's note.
 
@@ -51,10 +50,10 @@ F1Laps updates its numbers as new laps arrive. To pull the latest numbers and re
 
 ```sh
 python3 scripts/fetch.py    # downloads every track's meta page and fastest setups into data/f1-25.json and data/f1-26.json
-python3 scripts/build.py    # writes the start page, four sheets and two breakdown pages into site/, and copies in static/
+python3 scripts/build.py    # writes the start page, two sheets and two breakdown pages into site/, and copies in static/
 ```
 
-A first run reads about 4,000 setup pages, one per second, so it takes over an hour. Setup pages never change, so `fetch.py` caches them in `.cache/setups/` and a later run reads only new ones. Both scripts use only the Python standard library. The kerb-attack and dirty-air changes live in `templates/sheet.html`, in the `KERB` and `DIRTY` tables. The setting list and the rule that applies the safe setup and the vote live in `templates/common.js`, which `build.py` pastes into every sheet and breakdown page. The built `site/` folder is the whole website, and git ignores it.
+A first run reads about 4,000 setup pages, one per second, so it takes over an hour. Setup pages never change, so `fetch.py` caches them in `.cache/setups/` and a later run reads only new ones. Both scripts use only the Python standard library. The dirty-air changes live in `templates/sheet.html`, in the `DIRTY` table. The setting list and the rule that applies the safe setup and the vote live in `templates/common.js`, which `build.py` pastes into every sheet and breakdown page. The built `site/` folder is the whole website, and git ignores it.
 
 ## Releases and deploys
 

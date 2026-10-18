@@ -1,11 +1,11 @@
 """Build the site from templates/ and data/.
 
-Writes site/index.html, four sheets and two breakdown pages, then copies in the
+Writes site/index.html, two sheets and two breakdown pages, then copies in the
 files from static/ (the icons and Cloudflare's _redirects file). Each game gets
-a main sheet, a kerb-attack sheet and a breakdown page:
+a main sheet and a breakdown page:
 
-  site/f1-25/    site/f1-25/kerb-attack/    site/f1-25/breakdown/
-  site/f1-26/    site/f1-26/kerb-attack/    site/f1-26/breakdown/
+  site/f1-25/    site/f1-25/breakdown/
+  site/f1-26/    site/f1-26/breakdown/
 
 templates/common.js holds the setting list and the rule that picks each value. build.py
 pastes it into every sheet and breakdown page.
@@ -47,19 +47,6 @@ MODES = {
         "description": "{short} car setups for every track, using the quickest safe setup fast "
                        "F1Laps qualifying and race drivers share, with dirty-air changes for "
                        "racing in traffic.",
-        "sibling": ("{game}/kerb-attack/", "Kerb attack version"),
-    },
-    "kerb": {
-        "title": "{short} Kerb-Attack Sheet",
-        "path": "{game}/kerb-attack/",
-        "lede": "The main sheet's setup for each track, for {lede_cars}, tuned for a driver who "
-                "attacks corners and rides kerbs.{extra} Settings marked Agreed stay as the fastest "
-                "setups run them, and only the others change. The Dirty air column shows what to "
-                "change on top for a race spent following other cars.",
-        "description": "{short} kerb-attack car setups for every track, built on the quickest "
-                       "safe setups fast F1Laps qualifying and race drivers share, with "
-                       "dirty-air changes for racing in traffic.",
-        "sibling": ("{game}/", "Main version"),
     },
 }
 
@@ -178,9 +165,7 @@ def build():
         fetched = datetime.date.fromisoformat(data["fetched"])
         for mode, m in MODES.items():
             fill = dict(g, game=game)
-            sib_path, sib_label = m["sibling"]
             config = {
-                "mode": mode,
                 "key": f"sheet-{game}-{mode}",
                 "cars": g["cars"],
                 "fetched": f"{fetched.day} {fetched:%B %Y}",
@@ -190,8 +175,6 @@ def build():
                     .replace("__TITLE__", m["title"].format(**fill))
                     .replace("__DESCRIPTION__", esc(m["description"].format(**fill)))
                     .replace("__LEDE__", m["lede"].format(**fill))
-                    .replace("__SIBLING_URL__", "/" + sib_path.format(**fill))
-                    .replace("__SIBLING_LABEL__", sib_label)
                     .replace("__BREAKDOWN_URL__", f"/{game}/breakdown/")
                     .replace("__CONFIG__", json.dumps(config, ensure_ascii=False))
                     .replace("__DATA__", json.dumps(picked, separators=(",", ":"),
@@ -208,7 +191,6 @@ def build():
                 .replace("__DESCRIPTION__", esc(BREAKDOWN["description"].format(**fill)))
                 .replace("__LEDE__", BREAKDOWN["lede"].format(**fill))
                 .replace("__SHEET_URL__", f"/{game}/")
-                .replace("__KERB_URL__", f"/{game}/kerb-attack/")
                 .replace("__CONFIG__", json.dumps(config, ensure_ascii=False))
                 .replace("__DATA__", json.dumps(data["tracks"], separators=(",", ":"), ensure_ascii=False)))
         out = ROOT / "site" / game / "breakdown" / "index.html"
