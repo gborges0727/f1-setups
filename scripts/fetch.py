@@ -112,13 +112,6 @@ def lap(s):
 LISTS = {"race": "5", "tt": "6"}
 
 
-# The Forgiving column starts from the quickest race setup with a locked on-throttle
-# differential, so both rear wheels drive together out of corners. That leaves out the soft
-# setup many race drivers share, whose open differential (30 to 60%) and locked off-throttle
-# differential make the car slow to turn in.
-LOCKED = 85
-
-
 def pace(values, lap_, drivers):
     """Score a setup on lap time. The score is minus its best lap's gap to the list's fastest lap."""
     return -lap_["gap"] if lap_["gap"] is not None else float("-inf")
@@ -134,6 +127,11 @@ def fast(setups, entries):
     return pick(setups, entries, pace, min_drivers=1)
 
 
+def shared(setups, entries):
+    """The quickest setup two or more drivers run, for the Shared Fast column. See pick()."""
+    return pick(setups, entries, pace)
+
+
 def most_run(setups, entries):
     """The setup the most different drivers run, for the Popular column. See pick().
 
@@ -141,19 +139,6 @@ def most_run(setups, entries):
     is the quickest one-driver setup.
     """
     return pick(setups, entries, popular, min_drivers=1)
-
-
-def safe(setups, entries):
-    """The starting setup for the Forgiving column, or None. See pick().
-
-    It takes the quickest setup with an on-throttle differential of LOCKED% or more that two or
-    more drivers share. When no two drivers share one, it takes the quickest one-driver setup
-    with a locked differential. When no setup has one, it takes the quickest setup two or more drivers run.
-    """
-    locked = lambda s: s.get("Differential On Throttle", 0) >= LOCKED
-    return (pick(setups, entries, pace, keep=locked)
-            or pick(setups, entries, pace, keep=locked, min_drivers=1)
-            or pick(setups, entries, pace))
 
 
 def pick(setups, entries, score, keep=None, min_drivers=2):
@@ -201,8 +186,7 @@ def one_list(game, slug, cond, kind):
     """Count the values one of F1Laps' lists of the 20 fastest setups uses.
 
     kind is a key of LISTS. Returns {"n": setups, "counts": {setting: [[value, count], ...]}},
-    plus "fast" and "popular" for dry setups, and "forgiving" (the Forgiving column's
-    starting setup, see safe()) for dry race setups. Wet laps are set in changing rain, so the
+    plus "fast", "shared" and "popular" for dry setups. Wet laps are set in changing rain, so the
     wet sheets keep the vote.
     """
     page = get(f"{BASE}/{game}/setups/{slug}/" + ("wet/" if cond == "wet" else "") +
@@ -226,9 +210,8 @@ def one_list(game, slug, cond, kind):
                       for k, c in counts.items()}}
     if cond == "dry":
         out["fast"] = fast(setups, entries)
+        out["shared"] = shared(setups, entries)
         out["popular"] = most_run(setups, entries)
-        if kind == "race":
-            out["forgiving"] = safe(setups, entries)
     return out
 
 

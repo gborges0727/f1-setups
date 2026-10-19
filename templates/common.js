@@ -61,16 +61,7 @@ function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<":
 const AGREE = 0.7;
 const CLOSE = 0.1;
 const VIEWS = [["race", "Race"], ["tt", "Time Trial"]];
-// The Forgiving column's rules, from the owner's Time Trial testing in October 2026.
-// Rule 1 caps the on-throttle differential at 90%. Rule 2 stiffens a soft front anti-roll bar
-// and softens a stiff rear one, so the rear steps out less.
-function forgive(v) {
-  const out = { ...v };
-  if (out.diff_on > 90) out.diff_on = 90;
-  if (out.front_arb <= 3 && out.rear_arb >= 18) { out.front_arb = 5; out.rear_arb -= 3; }
-  return out;
-}
-function consensus(t, cond, view, opts) {
+function consensus(t, cond, view) {
   const median = values(t[cond]);
   const f = t.fastest && t.fastest[cond] && t.fastest[cond][view];
   const marked = new Set(t.important.map(label => FIELDS.find(x => x[1] === label)?.[0]).filter(Boolean));
@@ -109,18 +100,10 @@ function consensus(t, cond, view, opts) {
   const cols = [];
   if (dry) {
     if (f.fast) cols.push({ key: "fast", name: "Fast", values: full(f.fast.values), info: f.fast });
+    const sh = f.shared;
+    cols.push({ key: "shared", name: "Shared Fast", values: sh ? full(sh.values) : vote, info: sh || null });
     cols.push({ key: "popular", name: "Popular", values: out, info: pop || null });
   } else cols.push({ key: "setup", name: "Setup", values: out, info: null });
-  // The Forgiving column (race view only) starts from fetch.py's safe() setup, or from a
-  // "forgiving_base" in data/picks.json, and forgive() changes it. A "forgiving" entry in
-  // data/picks.json replaces the whole column with a setup the owner tested.
-  const pk = t.pick || {};
-  if (dry && view === "race" && opts && opts.forgiving && (f.forgiving || pk.forgiving || pk.forgiving_base)) {
-    const base = pk.forgiving_base ? full(pk.forgiving_base.values) : f.forgiving ? full(f.forgiving.values) : null;
-    const pin = pk.forgiving ? full(pk.forgiving.values) : null;
-    cols.push({ key: "forgiving", name: "Forgiving", values: pin || forgive(base), base, info: f.forgiving || null,
-      pinned: !!pin, baseWhy: pk.forgiving_base ? pk.forgiving_base.why : "", why: pin ? pk.forgiving.why : "" });
-  }
   return { out, median, agreed, against, counted, cols, n: f ? f.n : 0 };
 }
 

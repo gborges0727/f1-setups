@@ -7,18 +7,10 @@ The setups come from [F1Laps](https://www.f1laps.com/). For each track, F1Laps l
 For a dry track, `fetch.py` groups the up to 20 setups in a list that share the same wings, springs and anti-roll bars. It counts the different drivers in each group, not uploads, because one driver can upload the same setup twice. A group's pace is how far its best lap is behind the fastest lap in the list. Each column uses its group whole, so it never mixes two setups. The dry sheets have these columns, left to right:
 
 1. Fast, the quickest group, even when only one driver runs it (`fast()` in `fetch.py`)
-2. Popular, the group the most drivers run, with the quicker group winning a tie (`most_run()`)
-3. Forgiving, on the race view only, a race setup for driving consistently with traction control off
+2. Shared Fast, the quickest group that two or more drivers run (`shared()`)
+3. Popular, the group the most drivers run, with the quicker group winning a tie (`most_run()`)
 
-Values in the Popular and Forgiving columns show in blue where they differ from the Fast column. When two columns hold the same setup, a note under the track name says so.
-
-The Forgiving column starts from `safe()` in `fetch.py`, run on the race list. A locked on-throttle differential drives both rear wheels together, so the car pulls straight out of corners. `safe()` takes the first of these that exists:
-
-1. the quickest group with an on-throttle differential of 85% or more that two or more drivers run
-2. the quickest such setup one driver runs
-3. the quickest group two or more drivers run, when no setup at the track has a locked differential
-
-Then `forgive()` in `templates/common.js` changes two settings. It caps the on-throttle differential at 90%. If the front anti-roll bar is 3 or lower and the rear is 18 or higher, it sets the front to 5 and lowers the rear by 3. The site's owner settled on both rules from Time Trial testing in F1 25 in October 2026. F1 26 uses the same rules, untested in that game.
+Values in the Shared Fast and Popular columns show in blue where they differ from the Fast column. When two columns hold the same setup, a note under the track name says so.
 
 For a wet track, each setting uses the value the most of the fastest wet setups run. Wet laps are set in changing rain, so their lap times can't rank setups. When F1Laps' meta value is one of the values the setups run, and its share is within 10 percentage points of the most common value's share, the meta value wins. So if 55% run 55% brake bias and 45% run 53%, and F1Laps says 53%, the sheet says 53%.
 
@@ -38,10 +30,6 @@ The game cannot import setup files. To use a setup, type it in once on the setup
 
 On each setting not marked Agreed, hovering over or tapping the chip shows what the fastest setups run. It gives their range and the share of each common value, such as "35% run 56%" for Monaco brake bias. It also gives F1Laps' median when that differs from the Popular column's value. The page addresses carry the chosen track and view (`/f1-25/breakdown/?view=tt#japan`), so the links between a game's sheet and its breakdown page keep both. Without them, a page opens on the track and view the viewer chose last, and then on race setups.
 
-## Picked setups
-
-`data/picks.json` holds setups picked by hand for the F1 25 Forgiving column, by track, with each setting under its F1Laps label. A `forgiving` entry replaces the whole column with a setup the site's owner tested. Bahrain, Saudi Arabia, Hungary, Japan and Monza have one. A `forgiving_base` entry replaces the setup the column starts from, and `forgive()` still changes it. Monaco has one. Each entry also has a `why`, which the sheet prints in the column's note. The breakdown pages ignore picks. `fetch.py` never writes `data/picks.json`, so a refresh keeps the picks. `build.py` stops with an error when a pick names a track or setting the data doesn't have.
-
 ## Refresh the data
 
 F1Laps updates its numbers as new laps arrive. To pull the latest numbers and rebuild every sheet:
@@ -51,7 +39,7 @@ python3 scripts/fetch.py    # downloads every track's meta page and fastest setu
 python3 scripts/build.py    # writes the start page, two sheets and two breakdown pages into site/, and copies in static/
 ```
 
-A first run reads several thousand setup pages, one per second, so it takes over an hour. Setup pages never change, so `fetch.py` caches them in `.cache/setups/` and a later run reads only new ones. Both scripts use only the Python standard library. The setting list, the vote, the column builder `consensus()` and the Forgiving rules in `forgive()` live in `templates/common.js`, which `build.py` pastes into every sheet and breakdown page. The built `site/` folder is the whole website, and git ignores it.
+A first run reads several thousand setup pages, one per second, so it takes over an hour. Setup pages never change, so `fetch.py` caches them in `.cache/setups/` and a later run reads only new ones. Both scripts use only the Python standard library. The setting list, the vote and the column builder `consensus()` live in `templates/common.js`, which `build.py` pastes into every sheet and breakdown page. The built `site/` folder is the whole website, and git ignores it.
 
 ## Releases and deploys
 

@@ -25,13 +25,9 @@ VERSION = os.environ.get("SITE_VERSION", "dev")
 
 GAMES = {
     "f1-25": {"short": "F1 25", "cars": "2025 cars", "lede_cars": "the 2025 cars",
-              "extra": " The three reverse layouts are included.", "forgiving": True, "tested": True,
-              "forgiving_lede": " The Race view adds a Forgiving column, a race setup for driving "
-                                "consistently with traction control off."},
+              "extra": " The three reverse layouts are included."},
     "f1-26": {"short": "F1 26", "cars": "2026 cars", "lede_cars": "the 2026 Season Pack cars",
-              "extra": "", "forgiving": True, "tested": False,
-              "forgiving_lede": " The Race view adds a Forgiving column, a race setup for driving "
-                                "consistently with traction control off."},
+              "extra": ""},
 }
 
 MODES = {
@@ -41,9 +37,9 @@ MODES = {
         "lede": "Setups for {lede_cars}, from the 20 fastest race setups on F1Laps for each "
                 "track. A switch shows the 20 fastest Time Trial setups instead. Qualifying "
                 "setups are left out, because career mode's parc fermé makes qualifying run on "
-                "the race setup. The Fast and Popular columns show the quickest setup and the one "
-                "most drivers run."
-                "{forgiving_lede}{extra} Each wet setting is the "
+                "the race setup. The Fast, Shared Fast and Popular columns show the quickest setup, "
+                "the quickest one two or more drivers run, and the one most drivers run."
+                "{extra} Each wet setting is the "
                 "value most of the fastest wet setups run. Settings marked Agreed are ones at "
                 "least 70% of the setups run.",
         "description": "{short} car setups for every track from F1Laps' fastest race setups, "
@@ -83,27 +79,12 @@ def columns(game):
         "sheet groups the setups that share wings, springs and anti-roll bars, and counts the "
         "different drivers who run each group. A group's pace is how far its best lap is behind "
         "the fastest lap in the list.",
-        "The Fast column is the quickest group, even when only one driver runs it. The Popular "
-        "column is the group the most drivers run, and the quicker group wins a tie. When no two "
-        "drivers share a setup, the Popular column shows the quickest setup.",
+        "The Fast column is the quickest group, even when only one driver runs it. The Shared "
+        "Fast column is the quickest group that two or more drivers run. The Popular column is "
+        "the group the most drivers run, and the quicker group wins a tie. When no two drivers "
+        "share a setup, the Shared Fast column shows the most common value for each setting, and "
+        "the Popular column shows the quickest setup.",
     ]
-    if GAMES[game]["forgiving"]:
-        out.append(
-            "The Forgiving column is a race setup for driving consistently with traction control "
-            "off. It starts from the quickest race setup with an on-throttle differential of 85% "
-            "or more, so both rear wheels drive together out of corners. It prefers a setup two "
-            "or more drivers run. Then it caps the on-throttle differential at 90%. If the front "
-            "anti-roll bar is 3 or lower and the rear is 18 or higher, it sets the front to 5. "
-            "It also lowers the rear by 3, so the rear steps out less.")
-    if GAMES[game]["forgiving"] and not GAMES[game]["tested"]:
-        out.append(
-            "The site's owner worked out both rules from Time Trial testing in F1 25 in October "
-            "2026. Nobody has tested them in F1 26 yet.")
-    if GAMES[game]["tested"]:
-        out.append(
-            "At Bahrain, Saudi Arabia, Hungary, Japan and Monza, the Forgiving column shows the "
-            "setup the site's owner tested in Time Trial in October 2026 instead. At Monaco it "
-            "starts from a setup picked by hand.")
     return out
 
 
@@ -155,38 +136,12 @@ BREAKDOWN = {
 }
 
 
-def with_picks(tracks, picks):
-    """Copy the tracks with each one's hand-picked values from data/picks.json attached as "pick"."""
-    ids = {t["id"] for t in tracks}
-    for slug in picks:
-        if slug not in ids:
-            raise SystemExit(f"data/picks.json: no track {slug!r}")
-    out = []
-    for t in tracks:
-        p = picks.get(t["id"])
-        if p:
-            for cond, pick in p.items():
-                # "forgiving" replaces the Forgiving column and "forgiving_base" replaces its
-                # starting setup. Both use the dry settings.
-                if cond not in ("forgiving", "forgiving_base"):
-                    raise SystemExit(f"data/picks.json: {t['id']} has unknown pick {cond!r}")
-                have = t.get("dry")
-                bad = [k for k in pick["values"] if not have or k not in have]
-                if bad:
-                    raise SystemExit(f"data/picks.json: {t['id']} {cond} has no {', '.join(bad)}")
-            t = dict(t, pick=p)
-        out.append(t)
-    return out
-
-
 def build():
     common = (ROOT / "templates" / "common.js").read_text()
     template = (ROOT / "templates" / "sheet.html").read_text().replace("__COMMON__", common)
     breakdown = (ROOT / "templates" / "breakdown.html").read_text().replace("__COMMON__", common)
-    picks = json.loads((ROOT / "data" / "picks.json").read_text())
     for game, g in GAMES.items():
         data = json.loads((ROOT / "data" / f"{game}.json").read_text())
-        picked = with_picks(data["tracks"], picks.get(game, {}))
         fetched = datetime.date.fromisoformat(data["fetched"])
         for mode, m in MODES.items():
             fill = dict(g, game=game)
@@ -194,8 +149,6 @@ def build():
                 "key": f"sheet-{game}-{mode}",
                 "cars": g["cars"],
                 "fetched": f"{fetched.day} {fetched:%B %Y}",
-                "forgiving": g["forgiving"],
-                "untested": not g["tested"],
                 "notes": notes(data["tracks"], game) + version_html(),
             }
             html = (template
@@ -204,7 +157,7 @@ def build():
                     .replace("__LEDE__", m["lede"].format(**fill))
                     .replace("__BREAKDOWN_URL__", f"/{game}/breakdown/")
                     .replace("__CONFIG__", json.dumps(config, ensure_ascii=False))
-                    .replace("__DATA__", json.dumps(picked, separators=(",", ":"),
+                    .replace("__DATA__", json.dumps(data["tracks"], separators=(",", ":"),
                                                     ensure_ascii=False)))
             out = ROOT / "site" / m["path"].format(**fill) / "index.html"
             out.parent.mkdir(parents=True, exist_ok=True)

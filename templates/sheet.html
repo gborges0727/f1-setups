@@ -94,9 +94,8 @@ button.chip { font-family: inherit; line-height: inherit; background: none; bord
 /* Fixed column widths so every group's table lines up with the others. */
 table.sheet { table-layout: fixed; }
 /* The name column holds the setting and its chip. The value columns share the rest equally.
-   cols-N counts the value columns: 1 on a wet sheet, 2 on a dry Time Trial one, 3 on a dry race one. */
+   cols-N counts the value columns: 1 on a wet sheet and 3 on a dry one. */
 table.sheet th.c-name { width: 52%; }
-table.sheet.cols-2 th.c-name { width: 46%; }
 table.sheet.cols-3 th.c-name { width: 40%; }
 td.name .chip { margin-left: 6px; vertical-align: 1px; }
 td.val.moved { color: var(--accent); font-weight: 600; }
@@ -110,7 +109,6 @@ td.val.moved { color: var(--accent); font-weight: 600; }
   table.sheet .unit { display: none; }
   table.sheet thead th { letter-spacing: 0.03em; }
   table.sheet th.c-name { width: 46%; }
-  table.sheet.cols-2 th.c-name { width: 40%; }
   table.sheet.cols-3 th.c-name { width: 34%; }
   td.name .chip { margin-left: 0; margin-top: 3px; }
   td.name .lbl { display: block; }
@@ -190,7 +188,7 @@ function render() {
   // and hide the switch. The chosen view comes back on the dry sheet.
   const view = state.cond === "wet" ? "race" : state.view;
   const race = view === "race";
-  const base = consensus(t, state.cond, view, { forgiving: CONFIG.forgiving });
+  const base = consensus(t, state.cond, view);
   const meta = base.out;
   const lock = base.agreed;
   const cols = base.cols;
@@ -218,22 +216,11 @@ function render() {
     const p = c.info;
     if (c.key === "setup" && base.n >= 5) h += note(`Each setting is the value most of ${list} run.`);
     if (c.key === "fast") h += note(`The Fast column is the quickest of ${list}, even when only one driver runs it. ${who(p)} ${paceLine(p)}`);
+    if (c.key === "shared") h += note(p ? `The Shared Fast column is the quickest setup that two or more different drivers run. ${who(p)} ${paceLine(p)}`
+      : `No two drivers among ${list} run the same setup, so the Shared Fast column shows the value most of them run for each setting.`);
     if (c.key === "popular" && !p) h += note(`F1Laps shows no setup groups for ${list}, so the Popular column shows the value most of them run for each setting.`);
     else if (c.key === "popular") h += note(p.runs >= 2 ? `The Popular column is the setup the most different drivers run, and the quicker one wins a tie. ${who(p)} ${paceLine(p)}`
       : `No two drivers among ${list} run the same setup, so the Popular column shows the quickest one-driver setup. ${paceLine(p)}`);
-    if (c.key === "forgiving") {
-      if (c.pinned) { h += note(`The Forgiving column is the setup the site's owner tested here with traction control off. ${esc(c.why)}`); continue; }
-      let s = "The Forgiving column is a race setup for driving consistently with traction control off. ";
-      if (c.baseWhy) s += esc(c.baseWhy) + " ";
-      else if (p.values["Differential On Throttle"] < 85) s += "No race setup here has an on-throttle differential of 85% or more, so it starts from the quickest setup two or more drivers run. ";
-      else if (p.runs >= 2) s += `It starts from the quickest race setup with an on-throttle differential of 85% or more that two or more drivers run. ${who(p)} ${paceLine(p)} `;
-      else s += `It starts from the quickest race setup with an on-throttle differential of 85% or more. No two drivers share one, so this is one driver's setup. ${paceLine(p)} `;
-      const v = c.values, b = c.base, moves = [];
-      if (v.diff_on !== b.diff_on) moves.push(`It lowers the on-throttle differential from ${fmt("diff_on", b.diff_on)} to ${fmt("diff_on", v.diff_on)}.`);
-      if (v.front_arb !== b.front_arb) moves.push(`It raises the front anti-roll bar from ${b.front_arb} to ${v.front_arb} and lowers the rear from ${b.rear_arb} to ${v.rear_arb}, so the rear steps out less.`);
-      if (CONFIG.untested) moves.push("Both rules come from Time Trial testing in F1 25, and nobody has tested them in F1 26 yet.");
-      h += note(s + (moves.length ? moves.join(" ") : "Neither Forgiving rule changes this setup."));
-    }
   }
   // Two columns can hold the same setup. Say so instead of hiding one.
   const same = {};
