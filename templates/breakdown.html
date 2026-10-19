@@ -55,7 +55,7 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid
 .ctl.track { flex: 1 1 220px; min-width: 0; }
 .ctl.track select { width: 100%; }
 
-main { padding-block: 20px 48px; display: grid; gap: 22px; }
+main { padding-block: 20px 48px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
 .summary { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; }
 .summary h2 { font-family: var(--display); font-size: 1.5rem; text-transform: uppercase; margin: 0; line-height: 1.1; }
 .summary .sub { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
@@ -107,6 +107,7 @@ section.group h3 { font-family: var(--display); font-weight: 600; font-size: 1.0
 <div class="bar"><div class="wrap">
   <div class="ctl track"><span>Track</span><select id="track" aria-label="Track"></select></div>
   <div class="ctl"><span>Weather</span><div class="seg" id="weather" role="group" aria-label="Weather"></div></div>
+  <div class="ctl"><span>Setups from</span><div class="seg" id="view" role="group" aria-label="Setups from"></div></div>
 </div></div>
 
 <main class="wrap" id="main"></main>
@@ -120,12 +121,13 @@ __COMMON__
 const ORDER = TRACKS.map(t => t.id);
 const BY_ID = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 
-let state = { slug: ORDER[0], cond: "dry" };
+let state = { slug: ORDER[0], cond: "dry", view: "race" };
 try {
   const s = JSON.parse(localStorage.getItem(CONFIG.key) || "null");
   if (s && BY_ID[s.slug]) state = Object.assign(state, s);
 } catch (e) {}
 state.slug = startSlug(state.slug);
+state.view = startView(state.view);
 function save() { try { localStorage.setItem(CONFIG.key, JSON.stringify(state)); } catch (e) {} }
 
 function seg(el, opts, cur, onPick, disabled) {
@@ -140,13 +142,14 @@ function seg(el, opts, cur, onPick, disabled) {
   }
 }
 
-// One card: every value the fastest setups run, lowest first, with the sheet's value coloured and the median marked.
-function card(k, base, f) {
+// One card: every value the fastest setups run, lowest first, with the reference value coloured and the median marked.
+// The reference is the Shared column's value on a dry sheet and the sheet's value on a wet one.
+function card(k, base, f, ref) {
   const shown = base.out[k], median = base.median[k];
   const differs = shown !== median;
   const chip = base.agreed.has(k) ? `<span class="chip lock">Agreed</span>` : `<span class="chip same">Open</span>`;
   let h = `<div class="set${differs ? " differs" : ""}"><div class="head"><span class="name">${F[k].label}</span>${chip}</div>`;
-  h += `<p class="vs">Sheet <b>${fmt(k, shown)}</b> · F1Laps median <b>${fmt(k, median)}</b></p>`;
+  h += `<p class="vs">${ref} <b>${fmt(k, shown)}</b> · F1Laps median <b>${fmt(k, median)}</b></p>`;
   if (!base.counted.has(k)) {
     const why = f && f.n >= 5 ? "F1Laps' setup pages don't show this setting." : `F1Laps lists only ${f ? f.n : 0} setups here, too few to count.`;
     return h + `<p class="nodata">${why} The sheet uses F1Laps' median.</p></div>`;
@@ -165,10 +168,13 @@ function card(k, base, f) {
 function render() {
   const t = BY_ID[state.slug];
   if (!t.wet) state.cond = "dry";
-  const base = consensus(t, state.cond);
-  const f = t.fastest && t.fastest[state.cond];
+  const base = consensus(t, state.cond, state.view);
+  const f = t.fastest && t.fastest[state.cond] && t.fastest[state.cond][state.view];
+  const ref = base.cols.some(c => c.key === "shared") ? "Shared" : "Sheet";
+  const refName = ref === "Shared" ? "the Shared column" : "the sheet";
 
   seg(document.getElementById("weather"), [["dry", "Dry"], ["wet", "Wet"]], state.cond, v => { state.cond = v; render(); }, v => !t[v]);
+  seg(document.getElementById("view"), VIEWS, state.view, v => { state.view = v; render(); });
   const sel = document.getElementById("track");
   sel.innerHTML = ORDER.map(s => `<option value="${s}"${s === state.slug ? " selected" : ""}>${esc(BY_ID[s].name)}</option>`).join("");
 
@@ -178,33 +184,32 @@ function render() {
     const c = base.counted.has(k) && f.counts[F[k].src].find(([v]) => v === base.out[k]);
     return c ? ` (${Math.round(c[1] / f.n * 100)}% of setups)` : "";
   };
-  let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${CONFIG.cars} · ${state.cond === "dry" ? "Dry" : "Wet"} · ${f ? f.n : 0} fastest ${pool(f)} counted</div>`;
-  h += `<h4>Where the sheet differs from F1Laps' median</h4>`;
+  let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${CONFIG.cars} · ${state.cond === "dry" ? "Dry" : "Wet"} · ${f ? f.n : 0} fastest ${pool(state.view)} counted</div>`;
+  h += `<h4>Where ${refName} differs from F1Laps' median</h4>`;
   h += moved.length
     ? `<ul>` + moved.map(k => `<li>${F[k].label}: <span class="mono">${fmt(k, base.median[k])} → <strong>${fmt(k, base.out[k])}</strong></span>${share(k)}</li>`).join("") + `</ul>`
-    : `<p class="none">The sheet matches F1Laps' median on every setting.</p>`;
-  if (!f || f.n < 5) h += `<p class="warn">F1Laps lists only ${f ? f.n : 0} ${state.cond} setups at this track, too few to count. Every value here is F1Laps' median.</p>`;
-  if (f && f.race === undefined) h += `<p class="warn">This track still counts the ${f.n} fastest Time Trial setups. Its qualifying and race setups are still downloading and arrive in the next update.</p>`;
+    : `<p class="none">${refName[0].toUpperCase() + refName.slice(1)} matches F1Laps' median on every setting.</p>`;
+  if (!f || f.n < 5) h += `<p class="warn">F1Laps lists only ${f ? f.n : 0} ${state.cond} ${pool(state.view)} at this track, too few to count. Every value here is F1Laps' median.</p>`;
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry breakdown is available.</p>`;
   h += `</div>`;
 
   h += `<div class="legend">
-    <span><span class="swatch top"></span> the value the sheets use</span>
+    <span><span class="swatch top"></span> the value in ${refName}</span>
     <span><span class="swatch"></span> other values</span>
     <span><span style="color:var(--change)">◆</span> F1Laps median of its 100 fastest setups</span>
-    <span><span class="chip lock">Agreed</span> at least 70% run the sheet's value</span>
+    <span><span class="chip lock">Agreed</span> at least 70% run the value in ${refName}</span>
   </div>`;
 
   for (const [g, gk] of GROUPS) {
     const rows = gk.filter(k => k in base.out);
     if (!rows.length) continue;
-    h += `<section class="group"><h3>${g}</h3><div class="cards">${rows.map(k => card(k, base, f)).join("")}</div></section>`;
+    h += `<section class="group"><h3>${g}</h3><div class="cards">${rows.map(k => card(k, base, f, ref)).join("")}</div></section>`;
   }
 
   h += `<div class="notes">${CONFIG.notes}<p>Source: <a href="${esc(t.url.replace(/meta\/$/, ""))}" target="_blank" rel="noopener">F1Laps ${esc(t.name)} setups</a> and <a href="${esc(t.url)}" target="_blank" rel="noopener">meta setup</a>, fetched ${esc(CONFIG.fetched)}.</p></div>`;
 
   document.getElementById("main").innerHTML = h;
-  keepTrack(state.slug);
+  keepTrack(state.slug, state.view);
   save();
 }
 document.getElementById("track").addEventListener("change", e => { state.slug = e.target.value; render(); });

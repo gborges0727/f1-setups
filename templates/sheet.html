@@ -14,26 +14,21 @@
   --lock: #7a8693;
   --lock-bg: #e9edf1;
   --change: #b4410f;
-  --dirty: #0b6e7f;
   --agree: #7b2fd6;
-  --dirty-bg: #e1f2f4;
   --accent: #1d5fa8;
   --accent-ink: #ffffff;
-  --mine: #2f7d32;
   --display: "Barlow Condensed", "Arial Narrow", sans-serif;
   --body: "IBM Plex Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
-  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62;
-  --dirty: #5fd3e3; --dirty-bg: #12313a; --agree: #b07cff;
-  --accent: #5d9ce6; --accent-ink: #0f151c; --mine: #6fd38a; color-scheme: dark } }
+  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --agree: #b07cff;
+  --accent: #5d9ce6; --accent-ink: #0f151c; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0f151c; --sheet: #17202a; --ink: #e6ebf0; --muted: #98a5b3; --rule: #2a3542;
-  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62;
-  --dirty: #5fd3e3; --dirty-bg: #12313a; --agree: #b07cff;
-  --accent: #5d9ce6; --accent-ink: #0f151c; --mine: #6fd38a; color-scheme: dark }
+  --lock: #8592a0; --lock-bg: #1f2a36; --change: #ff9a62; --agree: #b07cff;
+  --accent: #5d9ce6; --accent-ink: #0f151c; color-scheme: dark }
 
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
@@ -49,6 +44,7 @@ h1 { font-family: var(--display); font-weight: 700; font-size: 2.4rem; line-heig
 .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--sheet); border-bottom: 1px solid var(--rule); margin-top: 18px; }
 .bar .wrap { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: end; padding-block: 12px; }
 .ctl { display: flex; flex-direction: column; gap: 4px; }
+.ctl[hidden] { display: none; }
 .ctl > span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
 .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
 .seg button { font: 500 0.9rem var(--body); background: transparent; color: var(--ink); border: 0; padding: 7px 12px; cursor: pointer; }
@@ -60,13 +56,10 @@ button:focus-visible, select:focus-visible, a:focus-visible, summary:focus-visib
 .ctl.track { flex: 1 1 220px; min-width: 0; }
 .ctl.track select { width: 100%; }
 
-main { padding-block: 20px 48px; display: grid; gap: 22px; }
+main { padding-block: 20px 48px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
 .summary { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; }
 .summary h2 { font-family: var(--display); font-size: 1.5rem; text-transform: uppercase; margin: 0; line-height: 1.1; }
 .summary .sub { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
-.summary h4 { margin: 14px 0 0; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
-.summary ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; }
-.summary .none { margin: 6px 0 0; color: var(--muted); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .note { margin: 12px 0 0; font-size: 0.88rem; color: var(--muted); }
 .warn { margin: 12px 0 0; font-size: 0.9rem; padding: 10px 12px; border-radius: 6px; background: var(--lock-bg); }
@@ -81,38 +74,29 @@ th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--rule);
 thead th { border-top: 0; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
 td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 td.name { font-weight: 500; }
-td.why { color: var(--muted); font-size: 0.86rem; min-width: 18ch; }
-td.dirty.moved { color: var(--dirty); font-weight: 600; background: var(--dirty-bg); }
 .chip { display: inline-block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
 .chip.lock { background: var(--agree); color: var(--sheet); }
 .chip.same { border: 1px solid var(--rule); color: var(--muted); }
-.chip.dirt { background: var(--dirty); color: var(--sheet); }
-.chip.pick { background: var(--accent); color: var(--accent-ink); }
 .chip.odd { border: 1px solid var(--change); color: var(--change); }
 tr.spread td { border-top: 0; padding-top: 0; font-size: 0.8rem; color: var(--muted); }
 .dist { display: flex; flex-wrap: wrap; gap: 2px 14px; }
 .dist b { color: var(--ink); font-weight: 600; }
 .dist .num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-details.rules { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 16px; }
-details.rules summary { cursor: pointer; font-weight: 600; }
-details.rules table { margin-top: 10px; }
-details.rules td.why { display: table-cell; }
 .notes { color: var(--muted); font-size: 0.9rem; display: grid; gap: 8px; max-width: 72ch; }
 .notes p { margin: 0; }
 .notes a { color: var(--accent); }
 
 /* Fixed column widths so every group's table lines up with the others. */
 table.sheet { table-layout: fixed; }
-/* The name column holds the setting and its chip. The value columns share the rest equally. */
-table.sheet th.c-name { width: 46%; }
-table.sheet.has-fast th.c-name { width: 40%; }
-table.sheet.has-fast.has-mine th.c-name { width: 34%; }
+/* The name column holds the setting and its chip. The value columns share the rest equally.
+   cols-N counts the value columns: 1 on a wet sheet, 3 on a dry one, 4 in an F1 25 race. */
+table.sheet th.c-name { width: 52%; }
+table.sheet.cols-3 th.c-name { width: 40%; }
+table.sheet.cols-4 th.c-name { width: 34%; }
 td.name .chip { margin-left: 6px; vertical-align: 1px; }
-td.fast.moved { color: var(--accent); font-weight: 600; }
-.fastkey { color: var(--accent); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
-td.mine.moved { color: var(--mine); font-weight: 600; }
-.minekey { color: var(--mine); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+td.val.moved { color: var(--accent); font-weight: 600; }
+.movedkey { color: var(--accent); }
 
 @media (max-width: 560px) {
   h1 { font-size: 2rem; }
@@ -120,9 +104,13 @@ td.mine.moved { color: var(--mine); font-weight: 600; }
   table.sheet .chip { font-size: 0.62rem; padding: 2px 5px; letter-spacing: 0.03em; }
   table.sheet td.num { font-size: 0.86rem; }
   table.sheet .unit { display: none; }
-  table.sheet th.c-name { width: 40%; }
-  table.sheet.has-fast th.c-name { width: 37%; }
-  table.sheet.has-fast.has-mine th.c-name { width: 30%; }
+  table.sheet thead th { letter-spacing: 0.03em; }
+  table.sheet th.c-name { width: 46%; }
+  table.sheet.cols-3 th.c-name { width: 34%; }
+  /* Four value columns don't fit a narrow phone. The table scrolls inside its box and the setting names stay put. */
+  table.sheet.cols-4 { min-width: 400px; }
+  table.sheet.cols-4 th.c-name { width: 28%; }
+  table.sheet.cols-4 th.c-name, table.sheet.cols-4 td.name { position: sticky; left: 0; z-index: 1; background: var(--sheet); }
   td.name .chip { margin-left: 0; margin-top: 3px; }
   td.name .lbl { display: block; }
 }
@@ -137,6 +125,7 @@ td.mine.moved { color: var(--mine); font-weight: 600; }
 <div class="bar"><div class="wrap">
   <div class="ctl track"><span>Track</span><select id="track" aria-label="Track"></select></div>
   <div class="ctl"><span>Weather</span><div class="seg" id="weather" role="group" aria-label="Weather"></div></div>
+  <div class="ctl"><span>Setups from</span><div class="seg" id="view" role="group" aria-label="Setups from"></div></div>
 </div></div>
 
 <main class="wrap" id="main"></main>
@@ -147,31 +136,13 @@ const TRACKS = __DATA__;
 
 __COMMON__
 
-// Dirty air: changes for a race spent following other cars, applied on top of this page's setup.
-const DIRTY = { front_wing: +2, front_arb: -1, brake_bias: -1 };
-const DIRTY_WHY = {
-  front_wing: "Following a car takes air off your front wing more than your rear, so the car understeers. Two clicks more front wing bring the front back.",
-  front_arb: "A softer front bar adds front grip that doesn't depend on air, which helps while the car ahead disturbs your front wing.",
-  brake_bias: "Moves braking toward the rear, so the front tyres slide and overheat less while you follow. You can also change this from the in-car menu during the race.",
-};
-
 const ORDER = TRACKS.map(t => t.id);
 const BY_ID = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 
-function shift(base, rules) {
-  const out = Object.assign({}, base), changed = [];
-  for (const [k, d] of Object.entries(rules)) {
-    if (!(k in base)) continue;
-    const v = clamp(k, Math.round(base[k]) + d);
-    out[k] = v;
-    if (v !== base[k]) changed.push(k);
-  }
-  return { out, changed };
-}
-// What the fastest setups F1Laps lists use for one setting: the range, the share of each common value,
-// and F1Laps' median when it differs from the value this page shows.
-function spread(t, cond, k, shown, median) {
-  const f = t.fastest && t.fastest[cond];
+// What one F1Laps list's fastest setups use for one setting: the range, the share of each common
+// value, and F1Laps' median when it differs from the reference value.
+function spread(t, cond, view, k, shown, median) {
+  const f = t.fastest && t.fastest[cond] && t.fastest[cond][view];
   const counts = f && f.counts[F[k].src];
   if (!counts || f.n < 5) return "";
   const vals = counts.map(([v]) => v);
@@ -180,19 +151,20 @@ function spread(t, cond, k, shown, median) {
   // Show up to five values. Past that, show four and add up the rest.
   const top = counts.length > 5 ? counts.slice(0, 4) : counts, rest = counts.slice(top.length);
   const bare = v => fmt(k, v).replace(/<span class="unit">.*?<\/span>|[%°]/g, "");
-  let h = `<span>The ${f.n} fastest ${pool(f)} use <span class="num">${lo === hi ? fmt(k, lo) : bare(lo) + "–" + fmt(k, hi)}</span></span>`;
+  let h = `<span>The ${f.n} fastest ${pool(view)} use <span class="num">${lo === hi ? fmt(k, lo) : bare(lo) + "–" + fmt(k, hi)}</span></span>`;
   h += top.map(([v, c]) => `<span class="num"><b>${pct(c)}</b> run ${fmt(k, v)}</span>`).join("");
   if (rest.length) h += `<span><b>${pct(rest.reduce((a, [, c]) => a + c, 0))}</b> spread over ${rest.length} other values</span>`;
   if (shown !== median) h += `<span>F1Laps median <span class="num">${fmt(k, median)}</span></span>`;
   return `<div class="dist">${h}</div>`;
 }
 
-let state = { slug: ORDER[0], cond: "dry" };
+let state = { slug: ORDER[0], cond: "dry", view: "race" };
 try {
   const s = JSON.parse(localStorage.getItem(CONFIG.key) || "null");
   if (s && BY_ID[s.slug]) state = Object.assign(state, s);
 } catch (e) {}
 state.slug = startSlug(state.slug);
+state.view = startView(state.view);
 function save() { try { localStorage.setItem(CONFIG.key, JSON.stringify(state)); } catch (e) {} }
 
 function seg(el, opts, cur, onPick, disabled) {
@@ -207,109 +179,99 @@ function seg(el, opts, cur, onPick, disabled) {
   }
 }
 
-function changeList(keys, from, to) {
-  return `<ul>` + keys.map(k => `<li>${F[k].label}: <span class="mono">${fmt(k, from[k])} → <strong>${fmt(k, to[k])}</strong></span></li>`).join("") + `</ul>`;
-}
+function names(items) { return items.length === 1 ? items[0] : items.slice(0, -1).join(", ") + " and " + items[items.length - 1]; }
 
 function render() {
   const t = BY_ID[state.slug];
   if (!t.wet) state.cond = "dry";
-  const base = consensus(t, state.cond);
+  // F1Laps lists too few wet Time Trial setups to count, so wet sheets always show race setups
+  // and hide the switch. The chosen view comes back on the dry sheet.
+  const view = state.cond === "wet" ? "race" : state.view;
+  const race = view === "race";
+  const base = consensus(t, state.cond, view, { forgiving: CONFIG.forgiving });
   const meta = base.out;
   const lock = base.agreed;
+  const cols = base.cols;
+  const byKey = Object.fromEntries(cols.map(c => [c.key, c]));
 
   seg(document.getElementById("weather"), [["dry", "Dry"], ["wet", "Wet"]], state.cond, v => { state.cond = v; render(); }, v => !t[v]);
+  seg(document.getElementById("view"), VIEWS, state.view, v => { state.view = v; render(); });
+  document.getElementById("view").parentElement.hidden = state.cond === "wet";
   const sel = document.getElementById("track");
   sel.innerHTML = ORDER.map(s => `<option value="${s}"${s === state.slug ? " selected" : ""}>${esc(BY_ID[s].name)}</option>`).join("");
 
-  const dirty = shift(meta, DIRTY);
+  const fast = byKey.fast;
 
-  const sub = [CONFIG.cars, state.cond === "dry" ? "Dry" : "Wet"];
+  const sub = [CONFIG.cars, state.cond === "dry" ? "Dry" : "Wet", race ? "Race" : "Time Trial"];
   let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${sub.join(" · ")}</div>`;
-  // How a picked setup's best qualifying and race laps compare with the fastest in each list.
-  const paceLine = p => "best" in p ? (p.best === 1 ? "It set the fastest lap." : `Its best lap is ${p.gap.toFixed(3)} s off the fastest.`) : [["quali", "qualifying"], ["race", "race"]].map(([k, name]) => {
-    const x = p[k];
-    if (!x) return `Nobody in the ${name} list runs it.`;
-    if (x.best === 1) return `It set the fastest ${name} lap.`;
-    return x.gap === null ? `Its best ${name} lap is number ${x.best} in the list, and F1Laps shows no lap time for it.`
-      : `Its best ${name} lap is ${x.gap.toFixed(3)} s off the fastest.`;
-  }).join(" ");
-  // Time Trial data from before the switch counted uploads, not drivers.
-  const who = p => "best" in p ? `${p.runs} of them` : `${p.runs} different drivers`;
-  const legacy = f => f && f.race === undefined;
-  const fg = base.forgiving;
-  const tf = t.fastest && t.fastest[state.cond];
-  if (tf && tf.race === undefined) h += `<p class="warn">This track still uses the ${tf.n} fastest Time Trial setups. Its qualifying and race setups are still downloading and arrive in the next update.</p>`;
-  const among = legacy(tf) ? `two or more of the ${base.n} fastest Time Trial setups` : `two or more drivers among the ${base.n} fastest qualifying and race setups`;
-  const locked = fg && fg.values["Differential On Throttle"] >= 85;
-  const pool40 = `the ${base.n} fastest qualifying and race setups`;
-  const safeLine = !locked ? `None of ${pool40} has a locked on-throttle differential, so this is the quickest setup two or more drivers share.`
-    : fg.runs >= 2 ? `The safe setup is the quickest setup with a locked on-throttle differential that two or more drivers share among ${pool40}. ${who(fg)} run it.`
-    : `The safe setup is the quickest setup with a locked on-throttle differential among ${pool40}. No two drivers share a setup with one here, so this is one driver's setup.`;
-  if (fg && legacy(tf)) h += `<p class="note">This is the most forgiving setup that ${among} share. ${who(fg)} run it. ${paceLine(fg)}</p>`;
-  else if (fg) h += base.picked.size ? "" : `<p class="note">${safeLine} ${paceLine(fg)}${base.sameAsMain ? " The Fast column matches it, because the quickest shared setup also has a locked differential." : ""}</p>`;
-  else if (state.cond === "dry" && tf && tf.n >= 5) h += `<p class="warn">No setup here is shared by two or more drivers, so each setting uses the value most of these setups run.</p>`;
-  const fast = base.quick, qi = base.quickInfo;
-  if (fast && !base.sameAsMain) h += `<p class="note">The Fast column is ${legacy(tf) ? "the shared setup with the best lap" : "the quickest shared setup of any kind, open differentials included"}. ${who(qi)} run it. ${paceLine(qi)}</p>`;
-  const mine = base.mine, mi = base.mineInfo;
-  if (mine) h += `<p class="note">The Segrob's column is the setup among ${pool40} that drives most like segrob's tested Saudi Arabia setup. It compares every setting except the wings and ride heights, which change from track to track. ${mi.runs === 1 ? "One driver runs" : `${mi.runs} different drivers run`} it. ${paceLine(mi)}${base.mineWhy ? ` ${esc(base.mineWhy)}` : ""}</p>`;
-  if (base.picked.size) {
-    h += `<h4>Picked by hand</h4>` + changeList([...base.picked], base.voted, meta);
-    h += `<p class="note">${esc(base.why)}</p>`;
+  const list = `the ${base.n} fastest ${pool(view)}`;
+  // Who runs a column's setup, and how its best lap compares with the fastest in the list.
+  const who = p => p.runs === 1 ? "One driver runs it." : `${p.runs} different drivers run it.`;
+  const paceLine = p => p.best === 1 ? "It set the fastest lap in the list."
+    : p.gap === null ? `Its best lap is number ${p.best} in the list, and F1Laps shows no lap time for it.`
+    : `Its best lap is ${p.gap.toFixed(3)} s off the fastest.`;
+  const note = s => `<p class="note">${s}</p>`;
+  if (base.n < 5) h += `<p class="warn">F1Laps lists only ${base.n} ${state.cond} ${pool(view)} at this track, too few to count. Every value here is F1Laps' median of its 100 fastest setups.</p>`;
+  for (const c of cols) {
+    const p = c.info;
+    if (c.key === "setup" && base.n >= 5) h += note(`Each setting is the value most of ${list} run.`);
+    if (c.key === "fast") h += note(`The Fast column is the quickest of ${list}, even when only one driver runs it. ${who(p)} ${paceLine(p)}`);
+    if (c.key === "shared") h += note(p ? `The Shared column is the quickest setup that two or more different drivers run. ${who(p)} ${paceLine(p)}`
+      : `No two drivers among ${list} run the same setup, so the Shared column shows the value most of them run for each setting.`);
+    if (c.key === "popular") h += note(p.runs >= 2 ? `The Popular column is the setup the most different drivers run, and the quicker one wins a tie. ${who(p)} ${paceLine(p)}`
+      : `No two drivers among ${list} run the same setup, so the Popular column shows the quickest one-driver setup. ${paceLine(p)}`);
+    if (c.key === "forgiving") {
+      if (c.pinned) { h += note(`The Forgiving column is the setup the site's owner tested here with traction control off. ${esc(c.why)}`); continue; }
+      let s = "The Forgiving column is a race setup for driving consistently with traction control off. ";
+      if (c.baseWhy) s += esc(c.baseWhy) + " ";
+      else if (p.values["Differential On Throttle"] < 85) s += "No race setup here has an on-throttle differential of 85% or more, so it starts from the Shared column. ";
+      else if (p.runs >= 2) s += `It starts from the quickest race setup with an on-throttle differential of 85% or more that two or more drivers run. ${who(p)} ${paceLine(p)} `;
+      else s += `It starts from the quickest race setup with an on-throttle differential of 85% or more. No two drivers share one, so this is one driver's setup. ${paceLine(p)} `;
+      const v = c.values, b = c.base, moves = [];
+      if (v.diff_on !== b.diff_on) moves.push(`It lowers the on-throttle differential from ${fmt("diff_on", b.diff_on)} to ${fmt("diff_on", v.diff_on)}.`);
+      if (v.front_arb !== b.front_arb) moves.push(`It raises the front anti-roll bar from ${b.front_arb} to ${v.front_arb} and lowers the rear from ${b.rear_arb} to ${v.rear_arb}, so the rear steps out less.`);
+      h += note(s + (moves.length ? moves.join(" ") : "Neither Forgiving rule changes this setup."));
+    }
   }
-  h += `<h4>If you'll race in traffic</h4>`;
-  h += dirty.changed.length ? changeList(dirty.changed, meta, dirty.out)
-    : `<p class="none">This setup is already at the game's limits for every dirty-air change.</p>`;
+  // Two columns can hold the same setup. Say so instead of hiding one.
+  const same = {};
+  for (const c of cols) (same[JSON.stringify(Object.keys(meta).map(k => c.values[k]))] ||= []).push(c.name);
+  for (const group of Object.values(same)) if (group.length > 1) h += note(`The ${names(group)} columns are the same setup here.`);
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry setup is available.</p>`;
   h += `</div>`;
 
-  h += `<details class="rules"><summary>What each change does, and by how much</summary><div class="tablewrap" style="border:0"><table><thead><tr><th>Setting</th>`;
-  h += `<th>Dirty air</th><th>What it fixes</th></tr></thead><tbody>`;
-  const ruleKeys = FIELDS.map(f => f[0]).filter(k => k in DIRTY);
-  const sign = v => v === undefined ? "—" : (v > 0 ? "+" : "") + v;
-  for (const k of ruleKeys) {
-    h += `<tr><td class="name">${F[k].label}</td>`;
-    h += `<td class="num">${sign(DIRTY[k])}</td><td class="why">${DIRTY_WHY[k]}</td></tr>`;
-  }
-  h += `</tbody></table></div>
-    <p class="note">Dirty-air changes apply on top of this page's setup, whether or not fast drivers agree on the setting, because their laps were set in clean air. Values are rounded to whole clicks and kept inside the game's limits.</p>
-  </details>`;
-
+  const ref = byKey.shared ? "the value in the Shared column" : "the value shown";
   h += `<div class="legend">
-    <span><span class="chip lock">Agreed</span> at least 70% of the fastest setups run this value</span>
-    ${base.picked.size ? `<span><span class="chip pick">Picked</span> set by hand for this track instead of the vote</span>` : ""}
+    <span><span class="chip lock">Agreed</span> at least 70% of these setups run ${ref}</span>
     <span><span class="chip same">Open</span> the fastest setups split, so adjust it to taste. The line under it shows what they run.</span>
-    ${base.against.size ? `<span><span class="chip odd">Unusual</span> at least 70% of the fastest setups run a different value. The line under it shows which.</span>` : ""}
-    <span><span class="chip dirt">Dirty air</span> extra change for a race spent following other cars</span>
-    ${fast ? `<span><b class="fastkey">Fast</b> the quickest shared setup of any kind. Blue values differ from the Safe column.</span>` : ""}
-    ${mine ? `<span><b class="minekey">Segrob's</b> the setup here that drives most like segrob's Saudi Arabia setup. Green values differ from the Safe column.</span>` : ""}
+    ${base.against.size ? `<span><span class="chip odd">Unusual</span> at least 70% of these setups run a value other than ${ref}. The line under it shows which.</span>` : ""}
+    ${fast ? `<span><b class="movedkey">Blue values</b> differ from the Fast column.</span>` : ""}
   </div>`;
 
+  const shown = cols.map(c => ({ name: c.name, cls: c === fast ? "" : fast ? " val" : "", values: c.values }));
   for (const [g, keys] of GROUPS) {
     const rows = keys.filter(k => k in meta);
     if (!rows.length) continue;
-    h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet${fast ? " has-fast" : ""}${mine ? " has-mine" : ""}"><thead><tr>
-      <th class="c-name">Setting</th><th class="c-val">${fg && !legacy(tf) ? "Safe" : "Setup"}</th><th class="c-val">Dirty air</th>${fast ? `<th class="c-val">Fast</th>` : ""}${mine ? `<th class="c-val">Segrob's</th>` : ""}</tr></thead><tbody>`;
+    h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet cols-${shown.length}"><thead><tr>
+      <th class="c-name">Setting</th>${shown.map(c => `<th class="c-val">${c.name}</th>`).join("")}</tr></thead><tbody>`;
     for (const k of rows) {
-      const isDirty = dirty.changed.includes(k);
-      const chip = base.picked.has(k) ? `<span class="chip pick">Picked</span>`
-        : lock.has(k) ? `<span class="chip lock">Agreed</span>` : base.against.has(k) ? `<span class="chip odd">Unusual</span>` : `<span class="chip same">Open</span>`;
-      h += `<tr><td class="name"><span class="lbl">${F[k].label}</span>${chip}</td><td class="num">${fmt(k, meta[k])}</td>`;
-      h += `<td class="num dirty${isDirty ? " moved" : ""}">${fmt(k, dirty.out[k])}</td>`;
-      if (fast) h += `<td class="num fast${fast[k] !== meta[k] ? " moved" : ""}">${fmt(k, fast[k])}</td>`;
-      if (mine) h += `<td class="num mine${mine[k] !== meta[k] ? " moved" : ""}">${fmt(k, mine[k])}</td>`;
+      const chip = lock.has(k) ? `<span class="chip lock">Agreed</span>` : base.against.has(k) ? `<span class="chip odd">Unusual</span>` : `<span class="chip same">Open</span>`;
+      h += `<tr><td class="name"><span class="lbl">${F[k].label}</span>${chip}</td>`;
+      for (const c of shown) {
+        const moved = c.cls === " val" && c.values[k] !== fast.values[k];
+        h += `<td class="num${c.cls}${moved ? " moved" : ""}">${fmt(k, c.values[k])}</td>`;
+      }
       h += `</tr>`;
-      const dist = lock.has(k) && meta[k] === base.median[k] ? "" : spread(t, state.cond, k, meta[k], base.median[k]);
-      if (dist) h += `<tr class="spread"><td colspan="${3 + (fast ? 1 : 0) + (mine ? 1 : 0)}">${dist}</td></tr>`;
+      const dist = lock.has(k) && meta[k] === base.median[k] ? "" : spread(t, state.cond, view, k, meta[k], base.median[k]);
+      if (dist) h += `<tr class="spread"><td colspan="${1 + shown.length}">${dist}</td></tr>`;
     }
     h += `</tbody></table></div></section>`;
   }
 
-
   h += `<div class="notes">${CONFIG.notes}<p>Source: <a href="${esc(t.url.replace(/meta\/$/, ""))}" target="_blank" rel="noopener">F1Laps ${esc(t.name)} setups</a> and <a href="${esc(t.url)}" target="_blank" rel="noopener">meta setup</a>, fetched ${esc(CONFIG.fetched)}. F1Laps updates these numbers as new laps arrive.</p></div>`;
 
   document.getElementById("main").innerHTML = h;
-  keepTrack(state.slug);
+  keepTrack(state.slug, state.view);
   save();
 }
 document.getElementById("track").addEventListener("change", e => { state.slug = e.target.value; render(); });

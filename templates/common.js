@@ -52,25 +52,37 @@ function fmt(k, v) {
 }
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
 
-// The value each setting gets on this site. A dry sheet uses the safe setup (fetch.py safe()) that two
-// or more of the fastest share, when there is one. Otherwise the value is the one most of the
-// fastest setups F1Laps lists run. When F1Laps' median is a value whose share is within 10 points of the top share (45% against
-// 55%, say), the median wins instead. F1Laps' own value, the median of its 100 fastest setups,
-// fills in where it lists fewer than five setups, or where its setup pages leave the setting out
-// (engine braking).
+// The value each setting gets on this site. Each sheet has a Race view and a Time Trial view,
+// and each view counts only its own F1Laps list of the fastest setups. The vote for a setting is
+// the value most of that list runs. When F1Laps' median is a value whose share is within 10
+// points of the top share (45% against 55%, say), the median wins instead. F1Laps' own value,
+// the median of its 100 fastest setups, fills in where the list has fewer than five setups, or
+// where its setup pages leave the setting out (engine braking).
 const AGREE = 0.7;
 const CLOSE = 0.1;
-function consensus(t, cond) {
+const VIEWS = [["race", "Race"], ["tt", "Time Trial"]];
+// The Forgiving column's rules, from the owner's Time Trial testing in October 2026.
+// Rule 1 caps the on-throttle differential at 90%. Rule 2 stiffens a soft front anti-roll bar
+// and softens a stiff rear one, so the rear steps out less.
+function forgive(v) {
+  const out = { ...v };
+  if (out.diff_on > 90) out.diff_on = 90;
+  if (out.front_arb <= 3 && out.rear_arb >= 18) { out.front_arb = 5; out.rear_arb -= 3; }
+  return out;
+}
+function consensus(t, cond, view, opts) {
   const median = values(t[cond]);
-  const f = t.fastest && t.fastest[cond];
+  const f = t.fastest && t.fastest[cond] && t.fastest[cond][view];
   const marked = new Set(t.important.map(label => FIELDS.find(x => x[1] === label)?.[0]).filter(Boolean));
-  // against: settings where at least 70% run one value and the sheet runs another.
+  const dry = cond === "dry" && f && f.n >= 5;
+  // A setup from fetch.py as a full set of values. Settings its setup pages leave out (engine
+  // braking) keep the vote.
+  const vote = {}, full = vals => Object.fromEntries(Object.keys(median).map(k => [k, vals[F[k].src] ?? vote[k]]));
   const out = {}, agreed = new Set(), against = new Set(), counted = new Set();
   for (const k of Object.keys(median)) {
     const counts = f && f.n >= 5 && f.counts[F[k].src];
     if (!counts) {
-      out[k] = median[k];
-      if (marked.has(k)) agreed.add(k);
+      vote[k] = median[k];
       continue;
     }
     const most = counts[0][1];
@@ -78,54 +90,57 @@ function consensus(t, cond) {
     // An exact tie for the top share, with the median not among them, goes to the tied value
     // closest to the median.
     const tied = counts.filter(([, c]) => c === most).map(([v]) => v);
-    out[k] = within.includes(median[k]) ? median[k]
+    vote[k] = within.includes(median[k]) ? median[k]
       : tied.reduce((a, b) => Math.abs(b - median[k]) < Math.abs(a - median[k]) ? b : a);
-    // A dry sheet takes every counted setting from the safe setup two or more of the
-    // fastest share (fetch.py picks it). Agreed then means the setup runs the value at least
-    // 70% of the fastest run.
-    const easy = cond === "dry" && f.forgiving ? f.forgiving.values[F[k].src] : undefined;
-    if (easy !== undefined) out[k] = easy;
-    if (most / f.n >= AGREE) (out[k] === counts[0][0] ? agreed : against).add(k);
     counted.add(k);
   }
-  // A pick from data/picks.json replaces the sheet's value for that setting. The sheets get
-  // picks, and the breakdown pages don't.
-  const voted = { ...out }, picked = new Set(), pick = t.pick && t.pick[cond];
-  if (pick) for (const [label, v] of Object.entries(pick.values)) {
-    const k = FIELDS.find(x => x[1] === label)[0];
-    if (out[k] === v) continue;
-    out[k] = v;
-    picked.add(k);
-    agreed.delete(k);
+  // A dry sheet's reference values come from the Shared column, the quickest setup two or more
+  // drivers run. Where nobody shares a setup, they come from the vote. Agreed means the reference
+  // runs the value at least 70% of the list runs, and against means 70% run another value.
+  const sh = dry && f.shared;
+  Object.assign(out, sh ? full(sh.values) : vote);
+  for (const k of Object.keys(median)) {
+    if (!counted.has(k)) { if (marked.has(k)) agreed.add(k); continue; }
+    const counts = f.counts[F[k].src];
+    if (counts[0][1] / f.n >= AGREE) (out[k] === counts[0][0] ? agreed : against).add(k);
   }
-  const forgiving = cond === "dry" && f && f.n >= 5 ? f.forgiving : null;
-  // The Fast column: the quickest shared setup of any kind, open differentials included.
-  // Settings its setup pages leave out (engine braking) keep the sheet's value.
-  const q = cond === "dry" && f && f.n >= 5 && f.quickest;
-  const quick = q ? Object.fromEntries(Object.keys(out).map(k => [k, q.values[F[k].src] ?? out[k]])) : null;
-  const sameAsMain = !!quick && Object.keys(out).every(k => quick[k] === out[k]);
-  // The Segrob's column: the setup here that drives most like the owner's tested Saudi Arabia
-  // setup (fetch.py segrob()). Settings its setup pages leave out keep the sheet's value.
-  const m = cond === "dry" && f && f.n >= 5 && f.segrob;
-  const mine = m ? Object.fromEntries(Object.keys(out).map(k => [k, m.values[F[k].src] ?? out[k]])) : null;
-  // A "segrob" entry in data/picks.json changes single settings of the Segrob's column by hand.
-  const mp = mine && t.pick && t.pick.segrob;
-  if (mp) for (const [label, v] of Object.entries(mp.values)) mine[FIELDS.find(x => x[1] === label)[0]] = v;
-  return { out, voted, median, agreed, against, counted, picked, forgiving, quick, quickInfo: q || null, sameAsMain,
-    mine, mineInfo: m || null, mineWhy: mp ? mp.why : "",
-    why: pick ? pick.why : "", n: f ? f.n : 0 };
+  // The columns, left to right. Each has a key, a heading, its values and fetch.py's record of
+  // who runs it and how quick it is.
+  const cols = [];
+  if (dry) {
+    if (f.fast) cols.push({ key: "fast", name: "Fast", values: full(f.fast.values), info: f.fast });
+    cols.push({ key: "shared", name: "Shared", values: out, info: sh || null });
+    if (f.popular) cols.push({ key: "popular", name: "Popular", values: full(f.popular.values), info: f.popular });
+  } else cols.push({ key: "setup", name: "Setup", values: out, info: null });
+  // The Forgiving column (F1 25 race view only) starts from fetch.py's safe() setup, or from a
+  // "forgiving_base" in data/picks.json, and forgive() changes it. A "forgiving" entry in
+  // data/picks.json replaces the whole column with a setup the owner tested.
+  const pk = t.pick || {};
+  if (dry && view === "race" && opts && opts.forgiving && (f.forgiving || pk.forgiving || pk.forgiving_base)) {
+    const base = pk.forgiving_base ? full(pk.forgiving_base.values) : f.forgiving ? full(f.forgiving.values) : null;
+    const pin = pk.forgiving ? full(pk.forgiving.values) : null;
+    cols.push({ key: "forgiving", name: "Forgiving", values: pin || forgive(base), base, info: f.forgiving || null,
+      pinned: !!pin, baseWhy: pk.forgiving_base ? pk.forgiving_base.why : "", why: pin ? pk.forgiving.why : "" });
+  }
+  return { out, median, agreed, against, counted, cols, n: f ? f.n : 0 };
 }
 
-// The chosen track rides in the address (#monaco), so links between one game's pages open the same track.
-// Which F1Laps lists a track's counts come from. Data fetched before the switch to qualifying and
-// race setups has no "race" count and came from the Time Trial list.
-function pool(f) { return f && f.race === undefined ? "Time Trial setups" : "qualifying and race setups"; }
+// Which F1Laps list a view counts.
+function pool(view) { return view === "tt" ? "Time Trial setups" : "race setups"; }
 
+// The chosen track rides in the address (#monaco) and so does the view (?view=tt), so links
+// between one game's pages open the same track in the same view. Without either, the page uses
+// what this viewer chose last, and then the race view.
 function startSlug(fallback) {
   const h = decodeURIComponent(location.hash.slice(1));
   return BY_ID[h] ? h : fallback;
 }
-function keepTrack(slug) {
-  try { history.replaceState(null, "", "#" + slug); } catch (e) {}
-  for (const a of document.querySelectorAll("a[data-keep]")) a.href = a.dataset.keep + "#" + slug;
+function startView(fallback) {
+  const v = new URLSearchParams(location.search).get("view");
+  return v === "tt" || v === "race" ? v : fallback === "tt" ? "tt" : "race";
+}
+function keepTrack(slug, view) {
+  const q = view === "tt" ? "?view=tt" : "";
+  try { history.replaceState(null, "", location.pathname + q + "#" + slug); } catch (e) {}
+  for (const a of document.querySelectorAll("a[data-keep]")) a.href = a.dataset.keep + q + "#" + slug;
 }

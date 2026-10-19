@@ -1,35 +1,89 @@
 {
   "f1-25": {
-    "saudi_arabia": {
-      "dry": {
-        "why": "The owner's tested Jeddah setup, picked by hand. Five different drivers among the 40 fastest qualifying and race setups run it, more than run any other setup here.",
+    "japan": {
+      "forgiving": {
+        "why": "Tested in Time Trial in October 2026. The differential at 90 passed with a quicker median lap than the same setup at 100.",
         "values": {
-          "Front Wing": 11,
-          "Rear Wing": 5,
-          "Differential On Throttle": 100,
-          "Differential Off Throttle": 10,
+          "Front Wing": 26,
+          "Rear Wing": 20,
+          "Differential On Throttle": 90,
+          "Differential Off Throttle": 20,
           "Front Camber": -3.5,
           "Rear Camber": -2,
           "Front Toe": 0,
           "Rear Toe": 0.1,
           "Front Suspension": 41,
-          "Rear Suspension": 12,
-          "Front Anti-Roll Bar": 21,
-          "Rear Anti-Roll Bar": 18,
+          "Rear Suspension": 1,
+          "Front Anti-Roll Bar": 7,
+          "Rear Anti-Roll Bar": 21,
           "Front Ride Height": 20,
+          "Rear Ride Height": 48,
+          "Brake Pressure": 100,
+          "Front Brake Bias": 54,
+          "Front Right Tyre Pressure": 29.5,
+          "Front Left Tyre Pressure": 29.5,
+          "Rear Right Tyre Pressure": 26.5,
+          "Rear Left Tyre Pressure": 26.5
+        }
+      }
+    },
+    "bahrain": {
+      "forgiving": {
+        "why": "Tested in Time Trial in October 2026. The on-throttle differential at 90 snapped no more often than at 100 and set the faster lap, and the rear was easier to catch.",
+        "values": {
+          "Front Wing": 32,
+          "Rear Wing": 27,
+          "Differential On Throttle": 90,
+          "Differential Off Throttle": 35,
+          "Front Camber": -3.5,
+          "Rear Camber": -2,
+          "Front Toe": 0,
+          "Rear Toe": 0.1,
+          "Front Suspension": 38,
+          "Rear Suspension": 3,
+          "Front Anti-Roll Bar": 9,
+          "Rear Anti-Roll Bar": 14,
+          "Front Ride Height": 23,
+          "Rear Ride Height": 50,
+          "Brake Pressure": 100,
+          "Front Brake Bias": 54,
+          "Front Right Tyre Pressure": 29,
+          "Front Left Tyre Pressure": 29,
+          "Rear Right Tyre Pressure": 22,
+          "Rear Left Tyre Pressure": 22
+        }
+      }
+    },
+    "saudi_arabia": {
+      "forgiving": {
+        "why": "Tested in Time Trial in October 2026. Front wing 8 sharpened turn-in over the shared setup's 6 without the spins front wing 9 caused. The differential at 90 follows the other tracks and was not tested here.",
+        "values": {
+          "Front Wing": 8,
+          "Rear Wing": 6,
+          "Differential On Throttle": 90,
+          "Differential Off Throttle": 35,
+          "Front Camber": -3.5,
+          "Rear Camber": -2,
+          "Front Toe": 0,
+          "Rear Toe": 0.1,
+          "Front Suspension": 39,
+          "Rear Suspension": 3,
+          "Front Anti-Roll Bar": 5,
+          "Rear Anti-Roll Bar": 17,
+          "Front Ride Height": 21,
           "Rear Ride Height": 44,
           "Brake Pressure": 100,
-          "Front Brake Bias": 52,
+          "Front Brake Bias": 53,
           "Front Right Tyre Pressure": 26.5,
           "Front Left Tyre Pressure": 26.5,
-          "Rear Right Tyre Pressure": 23,
-          "Rear Left Tyre Pressure": 23
+          "Rear Right Tyre Pressure": 22.7,
+          "Rear Left Tyre Pressure": 22.7
         }
       }
     },
     "monaco": {
-      "dry": {
-        "why": "The Monaco Safe setup from v1.8.0, put back by hand because the owner drives it better. One driver runs it with a locked differential, fourth fastest in qualifying and 14th in the race.",
+      "forgiving_base": {
+        "why": "The Forgiving column at Monaco starts from the v1.8.0 Monaco setup, picked by hand because the owner drives it better.",
         "values": {
           "Front Wing": 50,
           "Rear Wing": 50,
@@ -54,11 +108,57 @@
         }
       }
     },
-    "imola": {
-      "segrob": {
-        "why": "segrob changed the rear suspension from 10 to 3 after testing it at Imola in October 2026. The softer rear springs gave more grip out of the slow corners. On soft tyres it set faster practice laps than the F1Laps version of this setup and the Safe column.",
+    "hungary": {
+      "forgiving": {
+        "why": "Tested in Time Trial in October 2026. Anti-roll bars at 5 front and 15 rear calmed the car, and with the differential at 90 it set the owner's best lap here.",
         "values": {
-          "Rear Suspension": 3
+          "Front Wing": 47,
+          "Rear Wing": 47,
+          "Differential On Throttle": 90,
+          "Differential Off Throttle": 20,
+          "Front Camber": -3.5,
+          "Rear Camber": -2,
+          "Front Toe": 0,
+          "Rear Toe": 0.1,
+          "Front Suspension": 41,
+          "Rear Suspension": 5,
+          "Front Anti-Roll Bar": 5,
+          "Rear Anti-Roll Bar": 15,
+          "Front Ride Height": 20,
+          "Rear Ride Height": 42,
+          "Brake Pressure": 100,
+          "Front Brake Bias": 54,
+          "Front Right Tyre Pressure": 29.5,
+          "Front Left Tyre Pressure": 29.5,
+          "Rear Right Tyre Pressure": 26.5,
+          "Rear Left Tyre Pressure": 26.5
+        }
+      }
+    },
+    "monza": {
+      "forgiving": {
+        "why": "Tested in Time Trial in October 2026. The differential at 90 passed with a quicker median lap and no invalid laps.",
+        "values": {
+          "Front Wing": 0,
+          "Rear Wing": 0,
+          "Differential On Throttle": 90,
+          "Differential Off Throttle": 20,
+          "Front Camber": -3.5,
+          "Rear Camber": -2,
+          "Front Toe": 0,
+          "Rear Toe": 0.1,
+          "Front Suspension": 41,
+          "Rear Suspension": 3,
+          "Front Anti-Roll Bar": 4,
+          "Rear Anti-Roll Bar": 20,
+          "Front Ride Height": 23,
+          "Rear Ride Height": 41,
+          "Brake Pressure": 100,
+          "Front Brake Bias": 54,
+          "Front Right Tyre Pressure": 29.5,
+          "Front Left Tyre Pressure": 29.5,
+          "Rear Right Tyre Pressure": 26.5,
+          "Rear Left Tyre Pressure": 26.5
         }
       }
     }

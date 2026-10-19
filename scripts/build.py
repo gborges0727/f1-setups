@@ -25,28 +25,28 @@ VERSION = os.environ.get("SITE_VERSION", "dev")
 
 GAMES = {
     "f1-25": {"short": "F1 25", "cars": "2025 cars", "lede_cars": "the 2025 cars",
-              "extra": " The three reverse layouts are included.",
-              "mine": " The Segrob's column is the setup that drives most like segrob's tested Saudi "
-                      "Arabia setup."},
+              "extra": " The three reverse layouts are included.", "forgiving": True,
+              "forgiving_lede": " The Race view adds a Forgiving column, a race setup for driving "
+                                "consistently with traction control off."},
     "f1-26": {"short": "F1 26", "cars": "2026 cars", "lede_cars": "the 2026 Season Pack cars",
-              "extra": "", "mine": ""},
+              "extra": "", "forgiving": False, "forgiving_lede": ""},
 }
 
 MODES = {
     "meta": {
         "title": "{short} Setup Sheet",
         "path": "{game}/",
-        "lede": "Each dry Safe column is the quickest setup with a locked on-throttle "
-                "differential among the fastest qualifying and race setups on F1Laps for "
-                "{lede_cars}, shared by two or more drivers where possible. The Fast "
-                "column next to it is the quickest shared setup of any kind.{mine}{extra} Time Trial "
-                "setups are left out, because Time Trial has no tyre wear or fuel load. Each wet "
-                "setting is the value most of the fastest wet setups run. Settings marked Agreed "
-                "are ones at least 70% of the setups run. The Dirty air column shows what to "
-                "change for a race spent following other cars.",
-        "description": "{short} car setups for every track, using the quickest safe setup fast "
-                       "F1Laps qualifying and race drivers share, with dirty-air changes for "
-                       "racing in traffic.",
+        "lede": "Setups for {lede_cars}, from the 20 fastest race setups on F1Laps for each "
+                "track. A switch shows the 20 fastest Time Trial setups instead. Qualifying "
+                "setups are left out, because career mode's parc fermé makes qualifying run on "
+                "the race setup. The Fast, Shared and Popular columns show the quickest setup, the "
+                "quickest one two or more drivers run, and the one most drivers run."
+                "{forgiving_lede}{extra} Each wet setting is the "
+                "value most of the fastest wet setups run. Settings marked Agreed are ones at "
+                "least 70% of the setups run.",
+        "description": "{short} car setups for every track from F1Laps' fastest race setups, "
+                       "with a Time Trial view. Each sheet shows the quickest setup, the "
+                       "quickest one drivers share and the one most drivers run.",
     },
 }
 
@@ -73,31 +73,47 @@ def names(items):
     return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
 
 
-def notes(tracks):
+def columns(game):
+    """The paragraphs that say how each dry column picks its setup."""
     out = [
-        "A dry setup comes from up to 20 of the fastest qualifying setups and up to 20 of the "
-        "fastest race setups F1Laps lists for the track. The sheet groups the ones that share "
-        "wings, springs and anti-roll bars. The safe setup is the quickest group with an "
-        "on-throttle differential of 85% or more, so both rear wheels drive together out of "
-        "corners. It needs two or more different drivers where any such group has them, and "
-        "among those it prefers a group run in both qualifying and the race. A group's pace is "
-        "the average of how far its best qualifying and race laps are behind the fastest in "
-        "each list. The Fast column shows the quickest shared setup of any kind, open "
-        "differentials included.",
-        "On F1 25, the Segrob's column starts from segrob's tested Saudi Arabia setup. For each "
-        "track it takes the setup among the fastest qualifying and race setups that sits closest "
-        "to it. The comparison covers every setting except the wings and ride heights, which "
-        "change from track to track. Only setups with an on-throttle differential of 85% or more count.",
-        "A wet setting is the value most of the fastest wet setups run. When F1Laps' median is a "
-        "value whose share is within 10 points of the most common one's, the median wins. Where "
-        "F1Laps lists fewer than five setups, or leaves a setting off its setup pages, the sheet "
-        "uses F1Laps' meta value, the median of its 100 fastest setups.",
+        "A dry setup comes from up to 20 of the fastest setups F1Laps lists for the track. The "
+        "Race view reads its race list and the Time Trial view reads its Time Trial list. The "
+        "sheet groups the setups that share wings, springs and anti-roll bars, and counts the "
+        "different drivers who run each group. A group's pace is how far its best lap is behind "
+        "the fastest lap in the list.",
+        "The Fast column is the quickest group, even when only one driver runs it. The Shared "
+        "column is the quickest group that two or more drivers run. The Popular column is the "
+        "group the most drivers run, and the quicker group wins a tie. When no two drivers share "
+        "a setup, the Shared column shows the most common value for each setting, and the "
+        "Popular column shows the quickest setup.",
+    ]
+    if GAMES[game]["forgiving"]:
+        out.append(
+            "The Forgiving column is a race setup for driving consistently with traction control "
+            "off. It starts from the quickest race setup with an on-throttle differential of 85% "
+            "or more, so both rear wheels drive together out of corners. It prefers a setup two "
+            "or more drivers run. Then it caps the on-throttle differential at 90%. If the front "
+            "anti-roll bar is 3 or lower and the rear is 18 or higher, it sets the front to 5. "
+            "It also lowers the rear by 3, so the rear steps out less.")
+        out.append(
+            "At Bahrain, Saudi Arabia, Hungary, Japan and Monza, the Forgiving column shows the "
+            "setup the site's owner tested in Time Trial in October 2026 instead. At Monaco it "
+            "starts from a setup picked by hand.")
+    return out
+
+
+def notes(tracks, game):
+    out = columns(game) + [
+        "A wet setting is the value most of the fastest wet setups in the list run. When F1Laps' "
+        "median is a value whose share is within 10 points of the most common one's, the median "
+        "wins. Where F1Laps lists fewer than five setups, or leaves a setting off its setup "
+        "pages, the sheet uses F1Laps' meta value, the median of its 100 fastest setups.",
         "A median can fall between two clicks, such as 26.5 on a wing. Pick either neighbouring "
         "click.",
-        "The sheets leave out Time Trial setups, because Time Trial has no tyre wear or fuel "
-        "load. If the tyres overheat or wear fast in a race, raise the tyre pressures.",
-        "Parc fermé locks the setup once qualifying starts. If you expect to start behind other "
-        "cars, enter the Dirty air values before qualifying.",
+        "The sheets leave out qualifying setups, because career mode's parc fermé makes "
+        "qualifying run on the race setup. Time Trial has no tyre wear or fuel load, so its "
+        "setups suit a single lap. If the tyres overheat or wear fast in a race, raise the tyre "
+        "pressures.",
     ]
     dry_only = [t["name"] for t in tracks if not t["wet"]]
     if dry_only:
@@ -122,14 +138,15 @@ def esc(s):
 
 BREAKDOWN = {
     "title": "{short} Setup Breakdown",
-    "lede": "What up to 20 of the fastest qualifying setups and 20 of the fastest race setups on "
-            "F1Laps run for every setting, for {lede_cars}, against "
-            "F1Laps' median of its 100 fastest.{extra} The blue bar is the value the sheets use. "
-            "A dry sheet takes the quickest safe setup two or more drivers share, so its value "
-            "isn't always the most common one. Cards with an orange border are where the sheet "
-            "differs from the median.",
-    "description": "How many of the fastest {short} setups on F1Laps run each value, setting by "
-                   "setting, for every track, against F1Laps' median.",
+    "lede": "What up to 20 of the fastest race setups on F1Laps run for every setting, for "
+            "{lede_cars}, against F1Laps' median of its 100 fastest.{extra} A switch shows the "
+            "20 fastest Time Trial setups instead. Qualifying setups are left out, because career "
+            "mode's parc fermé makes qualifying run on the race setup. The blue bar is the Shared "
+            "column's value on a dry sheet, the quickest setup two or more drivers run, so it "
+            "isn't always the most common value. Cards with an orange border are where that "
+            "value differs from the median.",
+    "description": "How many of the fastest {short} race and Time Trial setups on F1Laps run "
+                   "each value, setting by setting, for every track, against F1Laps' median.",
 }
 
 
@@ -144,8 +161,11 @@ def with_picks(tracks, picks):
         p = picks.get(t["id"])
         if p:
             for cond, pick in p.items():
-                # A "segrob" pick changes the Segrob's column, which uses the dry settings.
-                have = t.get("dry" if cond == "segrob" else cond)
+                # "forgiving" replaces the Forgiving column and "forgiving_base" replaces its
+                # starting setup. Both use the dry settings.
+                if cond not in ("forgiving", "forgiving_base"):
+                    raise SystemExit(f"data/picks.json: {t['id']} has unknown pick {cond!r}")
+                have = t.get("dry")
                 bad = [k for k in pick["values"] if not have or k not in have]
                 if bad:
                     raise SystemExit(f"data/picks.json: {t['id']} {cond} has no {', '.join(bad)}")
@@ -169,7 +189,8 @@ def build():
                 "key": f"sheet-{game}-{mode}",
                 "cars": g["cars"],
                 "fetched": f"{fetched.day} {fetched:%B %Y}",
-                "notes": notes(data["tracks"]) + version_html(),
+                "forgiving": g["forgiving"],
+                "notes": notes(data["tracks"], game) + version_html(),
             }
             html = (template
                     .replace("__TITLE__", m["title"].format(**fill))
@@ -185,7 +206,8 @@ def build():
             print(f"wrote {out.relative_to(ROOT)} ({len(data['tracks'])} tracks)")
         fill = dict(g, game=game)
         config = {"key": f"breakdown-{game}", "cars": g["cars"],
-                  "fetched": f"{fetched.day} {fetched:%B %Y}", "notes": version_html()}
+                  "fetched": f"{fetched.day} {fetched:%B %Y}",
+                  "notes": "".join(f"<p>{p}</p>" for p in columns(game)) + version_html()}
         html = (breakdown
                 .replace("__TITLE__", BREAKDOWN["title"].format(**fill))
                 .replace("__DESCRIPTION__", esc(BREAKDOWN["description"].format(**fill)))
