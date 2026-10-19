@@ -143,7 +143,7 @@ function seg(el, opts, cur, onPick, disabled) {
 }
 
 // One card: every value the fastest setups run, lowest first, with the reference value coloured and the median marked.
-// The reference is the Shared column's value on a dry sheet and the sheet's value on a wet one.
+// The reference is the Popular column's value on a dry sheet and the sheet's value on a wet one.
 function card(k, base, f, ref) {
   const shown = base.out[k], median = base.median[k];
   const differs = shown !== median;
@@ -170,8 +170,8 @@ function render() {
   if (!t.wet) state.cond = "dry";
   const base = consensus(t, state.cond, state.view);
   const f = t.fastest && t.fastest[state.cond] && t.fastest[state.cond][state.view];
-  const ref = base.cols.some(c => c.key === "shared") ? "Shared" : "Sheet";
-  const refName = ref === "Shared" ? "the Shared column" : "the sheet";
+  const ref = base.cols.some(c => c.key === "popular") ? "Popular" : "Sheet";
+  const refName = ref === "Popular" ? "the Popular column" : "the sheet";
 
   seg(document.getElementById("weather"), [["dry", "Dry"], ["wet", "Wet"]], state.cond, v => { state.cond = v; render(); }, v => !t[v]);
   seg(document.getElementById("view"), VIEWS, state.view, v => { state.view = v; render(); });

@@ -41,8 +41,8 @@ MODES = {
         "lede": "Setups for {lede_cars}, from the 20 fastest race setups on F1Laps for each "
                 "track. A switch shows the 20 fastest Time Trial setups instead. Qualifying "
                 "setups are left out, because career mode's parc fermé makes qualifying run on "
-                "the race setup. The Fast, Shared and Popular columns show the quickest setup, the "
-                "quickest one two or more drivers run, and the one most drivers run."
+                "the race setup. The Fast and Popular columns show the quickest setup and the one "
+                "most drivers run."
                 "{forgiving_lede}{extra} Each wet setting is the "
                 "value most of the fastest wet setups run. Settings marked Agreed are ones at "
                 "least 70% of the setups run.",
@@ -83,11 +83,9 @@ def columns(game):
         "sheet groups the setups that share wings, springs and anti-roll bars, and counts the "
         "different drivers who run each group. A group's pace is how far its best lap is behind "
         "the fastest lap in the list.",
-        "The Fast column is the quickest group, even when only one driver runs it. The Shared "
-        "column is the quickest group that two or more drivers run. The Popular column is the "
-        "group the most drivers run, and the quicker group wins a tie. When no two drivers share "
-        "a setup, the Shared column shows the most common value for each setting, and the "
-        "Popular column shows the quickest setup.",
+        "The Fast column is the quickest group, even when only one driver runs it. The Popular "
+        "column is the group the most drivers run, and the quicker group wins a tie. When no two "
+        "drivers share a setup, the Popular column shows the quickest setup.",
     ]
     if GAMES[game]["forgiving"]:
         out.append(
@@ -148,9 +146,9 @@ BREAKDOWN = {
     "lede": "What up to 20 of the fastest race setups on F1Laps run for every setting, for "
             "{lede_cars}, against F1Laps' median of its 100 fastest.{extra} A switch shows the "
             "20 fastest Time Trial setups instead. Qualifying setups are left out, because career "
-            "mode's parc fermé makes qualifying run on the race setup. The blue bar is the Shared "
-            "column's value on a dry sheet, the quickest setup two or more drivers run, so it "
-            "isn't always the most common value. Cards with an orange border are where that "
+            "mode's parc fermé makes qualifying run on the race setup. The blue bar is the Popular "
+            "column's value on a dry sheet, the whole setup the most drivers run, so it isn't "
+            "always the most common value for each setting. Cards with an orange border are where that "
             "value differs from the median.",
     "description": "How many of the fastest {short} race and Time Trial setups on F1Laps run "
                    "each value, setting by setting, for every track, against F1Laps' median.",

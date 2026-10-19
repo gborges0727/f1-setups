@@ -78,7 +78,11 @@ td.name { font-weight: 500; }
 .chip.lock { background: var(--agree); color: var(--sheet); }
 .chip.same { border: 1px solid var(--rule); color: var(--muted); }
 .chip.odd { border: 1px solid var(--change); color: var(--change); }
-tr.spread td { border-top: 0; padding-top: 0; font-size: 0.8rem; color: var(--muted); }
+/* A chip with a spread opens a box listing what the fastest setups run, on hover, focus or tap. */
+button.chip { font-family: inherit; line-height: inherit; background: none; border: 0; cursor: help; }
+.tipbox { position: fixed; z-index: 10; max-width: min(320px, calc(100vw - 32px)); padding: 8px 10px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); font-size: 0.8rem; color: var(--muted); }
+.tipbox[hidden] { display: none; }
+.tipbox .dist { flex-direction: column; gap: 2px; }
 .dist { display: flex; flex-wrap: wrap; gap: 2px 14px; }
 .dist b { color: var(--ink); font-weight: 600; }
 .dist .num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -90,10 +94,10 @@ tr.spread td { border-top: 0; padding-top: 0; font-size: 0.8rem; color: var(--mu
 /* Fixed column widths so every group's table lines up with the others. */
 table.sheet { table-layout: fixed; }
 /* The name column holds the setting and its chip. The value columns share the rest equally.
-   cols-N counts the value columns: 1 on a wet sheet, 3 on a dry one, 4 in an F1 25 race. */
+   cols-N counts the value columns: 1 on a wet sheet, 2 on a dry Time Trial one, 3 on a dry race one. */
 table.sheet th.c-name { width: 52%; }
+table.sheet.cols-2 th.c-name { width: 46%; }
 table.sheet.cols-3 th.c-name { width: 40%; }
-table.sheet.cols-4 th.c-name { width: 34%; }
 td.name .chip { margin-left: 6px; vertical-align: 1px; }
 td.val.moved { color: var(--accent); font-weight: 600; }
 .movedkey { color: var(--accent); }
@@ -106,11 +110,8 @@ td.val.moved { color: var(--accent); font-weight: 600; }
   table.sheet .unit { display: none; }
   table.sheet thead th { letter-spacing: 0.03em; }
   table.sheet th.c-name { width: 46%; }
+  table.sheet.cols-2 th.c-name { width: 40%; }
   table.sheet.cols-3 th.c-name { width: 34%; }
-  /* Four value columns don't fit a narrow phone. The table scrolls inside its box and the setting names stay put. */
-  table.sheet.cols-4 { min-width: 400px; }
-  table.sheet.cols-4 th.c-name { width: 28%; }
-  table.sheet.cols-4 th.c-name, table.sheet.cols-4 td.name { position: sticky; left: 0; z-index: 1; background: var(--sheet); }
   td.name .chip { margin-left: 0; margin-top: 3px; }
   td.name .lbl { display: block; }
 }
@@ -129,6 +130,7 @@ td.val.moved { color: var(--accent); font-weight: 600; }
 </div></div>
 
 <main class="wrap" id="main"></main>
+<div class="tipbox" id="tip" role="tooltip" hidden></div>
 
 <script>
 const CONFIG = __CONFIG__;
@@ -216,15 +218,14 @@ function render() {
     const p = c.info;
     if (c.key === "setup" && base.n >= 5) h += note(`Each setting is the value most of ${list} run.`);
     if (c.key === "fast") h += note(`The Fast column is the quickest of ${list}, even when only one driver runs it. ${who(p)} ${paceLine(p)}`);
-    if (c.key === "shared") h += note(p ? `The Shared column is the quickest setup that two or more different drivers run. ${who(p)} ${paceLine(p)}`
-      : `No two drivers among ${list} run the same setup, so the Shared column shows the value most of them run for each setting.`);
-    if (c.key === "popular") h += note(p.runs >= 2 ? `The Popular column is the setup the most different drivers run, and the quicker one wins a tie. ${who(p)} ${paceLine(p)}`
+    if (c.key === "popular" && !p) h += note(`F1Laps shows no setup groups for ${list}, so the Popular column shows the value most of them run for each setting.`);
+    else if (c.key === "popular") h += note(p.runs >= 2 ? `The Popular column is the setup the most different drivers run, and the quicker one wins a tie. ${who(p)} ${paceLine(p)}`
       : `No two drivers among ${list} run the same setup, so the Popular column shows the quickest one-driver setup. ${paceLine(p)}`);
     if (c.key === "forgiving") {
       if (c.pinned) { h += note(`The Forgiving column is the setup the site's owner tested here with traction control off. ${esc(c.why)}`); continue; }
       let s = "The Forgiving column is a race setup for driving consistently with traction control off. ";
       if (c.baseWhy) s += esc(c.baseWhy) + " ";
-      else if (p.values["Differential On Throttle"] < 85) s += "No race setup here has an on-throttle differential of 85% or more, so it starts from the Shared column. ";
+      else if (p.values["Differential On Throttle"] < 85) s += "No race setup here has an on-throttle differential of 85% or more, so it starts from the quickest setup two or more drivers run. ";
       else if (p.runs >= 2) s += `It starts from the quickest race setup with an on-throttle differential of 85% or more that two or more drivers run. ${who(p)} ${paceLine(p)} `;
       else s += `It starts from the quickest race setup with an on-throttle differential of 85% or more. No two drivers share one, so this is one driver's setup. ${paceLine(p)} `;
       const v = c.values, b = c.base, moves = [];
@@ -241,14 +242,15 @@ function render() {
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry setup is available.</p>`;
   h += `</div>`;
 
-  const ref = byKey.shared ? "the value in the Shared column" : "the value shown";
+  const ref = byKey.popular ? "the value in the Popular column" : "the value shown";
   h += `<div class="legend">
     <span><span class="chip lock">Agreed</span> at least 70% of these setups run ${ref}</span>
-    <span><span class="chip same">Open</span> the fastest setups split, so adjust it to taste. The line under it shows what they run.</span>
-    ${base.against.size ? `<span><span class="chip odd">Unusual</span> at least 70% of these setups run a value other than ${ref}. The line under it shows which.</span>` : ""}
+    <span><span class="chip same">Open</span> the fastest setups split, so adjust it to taste. Hover over or tap the chip to see what they run.</span>
+    ${base.against.size ? `<span><span class="chip odd">Unusual</span> at least 70% of these setups run a value other than ${ref}. Hover over or tap the chip to see which.</span>` : ""}
     ${fast ? `<span><b class="movedkey">Blue values</b> differ from the Fast column.</span>` : ""}
   </div>`;
 
+  tips = [];
   const shown = cols.map(c => ({ name: c.name, cls: c === fast ? "" : fast ? " val" : "", values: c.values }));
   for (const [g, keys] of GROUPS) {
     const rows = keys.filter(k => k in meta);
@@ -256,25 +258,56 @@ function render() {
     h += `<section class="group"><h3>${g}</h3><div class="tablewrap"><table class="sheet cols-${shown.length}"><thead><tr>
       <th class="c-name">Setting</th>${shown.map(c => `<th class="c-val">${c.name}</th>`).join("")}</tr></thead><tbody>`;
     for (const k of rows) {
-      const chip = lock.has(k) ? `<span class="chip lock">Agreed</span>` : base.against.has(k) ? `<span class="chip odd">Unusual</span>` : `<span class="chip same">Open</span>`;
+      const [cls, word] = lock.has(k) ? ["lock", "Agreed"] : base.against.has(k) ? ["odd", "Unusual"] : ["same", "Open"];
+      const dist = lock.has(k) && meta[k] === base.median[k] ? "" : spread(t, state.cond, view, k, meta[k], base.median[k]);
+      const chip = dist ? `<button type="button" class="chip ${cls}" data-tip="${tips.push(dist) - 1}" aria-label="${word}, show what the fastest setups run">${word}</button>`
+        : `<span class="chip ${cls}">${word}</span>`;
       h += `<tr><td class="name"><span class="lbl">${F[k].label}</span>${chip}</td>`;
       for (const c of shown) {
         const moved = c.cls === " val" && c.values[k] !== fast.values[k];
         h += `<td class="num${c.cls}${moved ? " moved" : ""}">${fmt(k, c.values[k])}</td>`;
       }
       h += `</tr>`;
-      const dist = lock.has(k) && meta[k] === base.median[k] ? "" : spread(t, state.cond, view, k, meta[k], base.median[k]);
-      if (dist) h += `<tr class="spread"><td colspan="${1 + shown.length}">${dist}</td></tr>`;
     }
     h += `</tbody></table></div></section>`;
   }
 
   h += `<div class="notes">${CONFIG.notes}<p>Source: <a href="${esc(t.url.replace(/meta\/$/, ""))}" target="_blank" rel="noopener">F1Laps ${esc(t.name)} setups</a> and <a href="${esc(t.url)}" target="_blank" rel="noopener">meta setup</a>, fetched ${esc(CONFIG.fetched)}. F1Laps updates these numbers as new laps arrive.</p></div>`;
 
+  hideTip();
   document.getElementById("main").innerHTML = h;
   keepTrack(state.slug, state.view);
   save();
 }
 document.getElementById("track").addEventListener("change", e => { state.slug = e.target.value; render(); });
+
+// The spread box. render() fills tips with each chip's spread, and the chip's data-tip indexes it.
+// A mouse opens the box on hover, a keyboard on focus, and a tap on a phone by clicking the chip.
+let tips = [], tipFor = null;
+const tipBox = document.getElementById("tip");
+function showTip(b) {
+  tipFor = b;
+  tipBox.innerHTML = tips[b.dataset.tip];
+  tipBox.hidden = false;
+  b.setAttribute("aria-describedby", "tip");
+  const r = b.getBoundingClientRect(), w = tipBox.offsetWidth, ht = tipBox.offsetHeight;
+  tipBox.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + "px";
+  tipBox.style.top = (r.bottom + 6 + ht > innerHeight ? r.top - 6 - ht : r.bottom + 6) + "px";
+}
+function hideTip() {
+  if (tipFor) tipFor.removeAttribute("aria-describedby");
+  tipFor = null;
+  tipBox.hidden = true;
+}
+const main = document.getElementById("main");
+main.addEventListener("pointerover", e => { const b = e.target.closest("[data-tip]"); if (b && e.pointerType === "mouse") showTip(b); });
+main.addEventListener("pointerout", e => { const b = e.target.closest("[data-tip]"); if (b && e.pointerType === "mouse" && !b.contains(e.relatedTarget) && document.activeElement !== b) hideTip(); });
+main.addEventListener("focusin", e => { const b = e.target.closest("[data-tip]"); if (b) showTip(b); });
+main.addEventListener("focusout", e => { if (e.target.closest("[data-tip]")) hideTip(); });
+main.addEventListener("click", e => { const b = e.target.closest("[data-tip]"); if (b) { e.stopPropagation(); showTip(b); } });
+document.addEventListener("click", hideTip);
+document.addEventListener("keydown", e => { if (e.key === "Escape") hideTip(); });
+addEventListener("scroll", hideTip, true);
+addEventListener("resize", hideTip);
 render();
 </script>

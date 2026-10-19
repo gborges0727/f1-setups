@@ -134,11 +134,6 @@ def fast(setups, entries):
     return pick(setups, entries, pace, min_drivers=1)
 
 
-def shared(setups, entries):
-    """The quickest setup two or more drivers run, for the Shared column. See pick()."""
-    return pick(setups, entries, pace)
-
-
 def most_run(setups, entries):
     """The setup the most different drivers run, for the Popular column. See pick().
 
@@ -153,7 +148,7 @@ def safe(setups, entries):
 
     It takes the quickest setup with an on-throttle differential of LOCKED% or more that two or
     more drivers share. When no two drivers share one, it takes the quickest one-driver setup
-    with a locked differential. When no setup has one, it takes the quickest shared setup.
+    with a locked differential. When no setup has one, it takes the quickest setup two or more drivers run.
     """
     locked = lambda s: s.get("Differential On Throttle", 0) >= LOCKED
     return (pick(setups, entries, pace, keep=locked)
@@ -206,7 +201,7 @@ def one_list(game, slug, cond, kind):
     """Count the values one of F1Laps' lists of the 20 fastest setups uses.
 
     kind is a key of LISTS. Returns {"n": setups, "counts": {setting: [[value, count], ...]}},
-    plus "fast", "shared" and "popular" for dry setups, and "forgiving" (the Forgiving column's
+    plus "fast" and "popular" for dry setups, and "forgiving" (the Forgiving column's
     starting setup, see safe()) for dry race setups. Wet laps are set in changing rain, so the
     wet sheets keep the vote.
     """
@@ -231,7 +226,6 @@ def one_list(game, slug, cond, kind):
                       for k, c in counts.items()}}
     if cond == "dry":
         out["fast"] = fast(setups, entries)
-        out["shared"] = shared(setups, entries)
         out["popular"] = most_run(setups, entries)
         if kind == "race":
             out["forgiving"] = safe(setups, entries)

@@ -94,11 +94,11 @@ function consensus(t, cond, view, opts) {
       : tied.reduce((a, b) => Math.abs(b - median[k]) < Math.abs(a - median[k]) ? b : a);
     counted.add(k);
   }
-  // A dry sheet's reference values come from the Shared column, the quickest setup two or more
-  // drivers run. Where nobody shares a setup, they come from the vote. Agreed means the reference
-  // runs the value at least 70% of the list runs, and against means 70% run another value.
-  const sh = dry && f.shared;
-  Object.assign(out, sh ? full(sh.values) : vote);
+  // A dry sheet's reference values come from the Popular column, the setup the most different
+  // drivers run. Agreed means the reference runs the value at least 70% of the list runs, and
+  // against means 70% run another value.
+  const pop = dry && f.popular;
+  Object.assign(out, pop ? full(pop.values) : vote);
   for (const k of Object.keys(median)) {
     if (!counted.has(k)) { if (marked.has(k)) agreed.add(k); continue; }
     const counts = f.counts[F[k].src];
@@ -109,8 +109,7 @@ function consensus(t, cond, view, opts) {
   const cols = [];
   if (dry) {
     if (f.fast) cols.push({ key: "fast", name: "Fast", values: full(f.fast.values), info: f.fast });
-    cols.push({ key: "shared", name: "Shared", values: out, info: sh || null });
-    if (f.popular) cols.push({ key: "popular", name: "Popular", values: full(f.popular.values), info: f.popular });
+    cols.push({ key: "popular", name: "Popular", values: out, info: pop || null });
   } else cols.push({ key: "setup", name: "Setup", values: out, info: null });
   // The Forgiving column (race view only) starts from fetch.py's safe() setup, or from a
   // "forgiving_base" in data/picks.json, and forgive() changes it. A "forgiving" entry in
