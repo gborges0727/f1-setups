@@ -25,11 +25,13 @@ VERSION = os.environ.get("SITE_VERSION", "dev")
 
 GAMES = {
     "f1-25": {"short": "F1 25", "cars": "2025 cars", "lede_cars": "the 2025 cars",
-              "extra": " The three reverse layouts are included.", "forgiving": True,
+              "extra": " The three reverse layouts are included.", "forgiving": True, "tested": True,
               "forgiving_lede": " The Race view adds a Forgiving column, a race setup for driving "
                                 "consistently with traction control off."},
     "f1-26": {"short": "F1 26", "cars": "2026 cars", "lede_cars": "the 2026 Season Pack cars",
-              "extra": "", "forgiving": False, "forgiving_lede": ""},
+              "extra": "", "forgiving": True, "tested": False,
+              "forgiving_lede": " The Race view adds a Forgiving column, a race setup for driving "
+                                "consistently with traction control off."},
 }
 
 MODES = {
@@ -95,6 +97,11 @@ def columns(game):
             "or more drivers run. Then it caps the on-throttle differential at 90%. If the front "
             "anti-roll bar is 3 or lower and the rear is 18 or higher, it sets the front to 5. "
             "It also lowers the rear by 3, so the rear steps out less.")
+    if GAMES[game]["forgiving"] and not GAMES[game]["tested"]:
+        out.append(
+            "The site's owner worked out both rules from Time Trial testing in F1 25 in October "
+            "2026. Nobody has tested them in F1 26 yet.")
+    if GAMES[game]["tested"]:
         out.append(
             "At Bahrain, Saudi Arabia, Hungary, Japan and Monza, the Forgiving column shows the "
             "setup the site's owner tested in Time Trial in October 2026 instead. At Monaco it "
@@ -190,6 +197,7 @@ def build():
                 "cars": g["cars"],
                 "fetched": f"{fetched.day} {fetched:%B %Y}",
                 "forgiving": g["forgiving"],
+                "untested": not g["tested"],
                 "notes": notes(data["tracks"], game) + version_html(),
             }
             html = (template

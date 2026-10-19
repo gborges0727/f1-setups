@@ -112,7 +112,7 @@ function consensus(t, cond, view, opts) {
     cols.push({ key: "shared", name: "Shared", values: out, info: sh || null });
     if (f.popular) cols.push({ key: "popular", name: "Popular", values: full(f.popular.values), info: f.popular });
   } else cols.push({ key: "setup", name: "Setup", values: out, info: null });
-  // The Forgiving column (F1 25 race view only) starts from fetch.py's safe() setup, or from a
+  // The Forgiving column (race view only) starts from fetch.py's safe() setup, or from a
   // "forgiving_base" in data/picks.json, and forgive() changes it. A "forgiving" entry in
   // data/picks.json replaces the whole column with a setup the owner tested.
   const pk = t.pick || {};

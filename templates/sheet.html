@@ -230,6 +230,7 @@ function render() {
       const v = c.values, b = c.base, moves = [];
       if (v.diff_on !== b.diff_on) moves.push(`It lowers the on-throttle differential from ${fmt("diff_on", b.diff_on)} to ${fmt("diff_on", v.diff_on)}.`);
       if (v.front_arb !== b.front_arb) moves.push(`It raises the front anti-roll bar from ${b.front_arb} to ${v.front_arb} and lowers the rear from ${b.rear_arb} to ${v.rear_arb}, so the rear steps out less.`);
+      if (CONFIG.untested) moves.push("Both rules come from Time Trial testing in F1 25, and nobody has tested them in F1 26 yet.");
       h += note(s + (moves.length ? moves.join(" ") : "Neither Forgiving rule changes this setup."));
     }
   }

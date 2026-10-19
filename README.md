@@ -9,7 +9,7 @@ For a dry track, `fetch.py` groups the up to 20 setups in a list that share the 
 1. Fast, the quickest group, even when only one driver runs it (`fast()` in `fetch.py`)
 2. Shared, the quickest group that two or more drivers run (`shared()`)
 3. Popular, the group the most drivers run, with the quicker group winning a tie (`most_run()`)
-4. Forgiving, on the F1 25 race view only, a race setup for driving consistently with traction control off
+4. Forgiving, on the race view only, a race setup for driving consistently with traction control off
 
 Values in the Shared, Popular and Forgiving columns show in blue where they differ from the Fast column. When two columns hold the same setup, a note under the track name says so.
 
@@ -19,7 +19,7 @@ The Forgiving column starts from `safe()` in `fetch.py`, run on the race list. A
 2. the quickest such setup one driver runs
 3. the Shared setup, when no setup at the track has a locked differential
 
-Then `forgive()` in `templates/common.js` changes two settings. It caps the on-throttle differential at 90%. If the front anti-roll bar is 3 or lower and the rear is 18 or higher, it sets the front to 5 and lowers the rear by 3. The site's owner settled on both rules from Time Trial testing in October 2026.
+Then `forgive()` in `templates/common.js` changes two settings. It caps the on-throttle differential at 90%. If the front anti-roll bar is 3 or lower and the rear is 18 or higher, it sets the front to 5 and lowers the rear by 3. The site's owner settled on both rules from Time Trial testing in F1 25 in October 2026. F1 26 uses the same rules, untested in that game.
 
 For a wet track, each setting uses the value the most of the fastest wet setups run. Wet laps are set in changing rain, so their lap times can't rank setups. When F1Laps' meta value is one of the values the setups run, and its share is within 10 percentage points of the most common value's share, the meta value wins. So if 55% run 55% brake bias and 45% run 53%, and F1Laps says 53%, the sheet says 53%.
 
