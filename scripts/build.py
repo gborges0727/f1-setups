@@ -23,11 +23,20 @@ REPO = "https://github.com/gborges0727/f1-setups"
 # CI sets SITE_VERSION to the release being deployed. A local build says "dev".
 VERSION = os.environ.get("SITE_VERSION", "dev")
 
+# "stable" turns on the Stable column, the site author's recipe built from the F1Laps Meta values.
+# Only the F1 25 sheet shows it.
 GAMES = {
     "f1-25": {"short": "F1 25", "cars": "2025 cars", "lede_cars": "the 2025 cars",
-              "extra": " The three reverse layouts are included."},
+              "extra": " The three reverse layouts are included.", "stable": True,
+              "lede_cols": "The Fast, Popular, Alt, F1Laps Meta and Stable columns show the "
+                           "quickest setup, the one most drivers run, a shared setup that differs "
+                           "a lot from both, F1Laps' own meta setup, and a recipe built from the "
+                           "meta setup."},
     "f1-26": {"short": "F1 26", "cars": "2026 cars", "lede_cars": "the 2026 Season Pack cars",
-              "extra": ""},
+              "extra": "", "stable": False,
+              "lede_cols": "The Fast, Popular, Alt and F1Laps Meta columns show the quickest "
+                           "setup, the one most drivers run, a shared setup that differs a lot "
+                           "from both, and F1Laps' own meta setup."},
 }
 
 MODES = {
@@ -37,9 +46,7 @@ MODES = {
         "lede": "Setups for {lede_cars}, from up to 100 of the fastest race setups on F1Laps "
                 "for each track. A switch shows the fastest Time Trial setups instead. "
                 "Qualifying setups are left out, because career mode's parc fermé makes "
-                "qualifying run on the race setup. The Fast, Popular, Alt and F1Laps Meta columns "
-                "show the quickest setup, the one most drivers run, a shared setup that differs "
-                "a lot from both, and F1Laps' own meta setup."
+                "qualifying run on the race setup. {lede_cols}"
                 "{extra} Each wet setting is the "
                 "value most of the fastest wet setups run. Settings marked Agreed are ones at "
                 "least 70% of the setups run.",
@@ -73,8 +80,9 @@ def names(items):
     return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
 
 
-def columns(game):
-    """The paragraphs that say how each dry column picks its setup."""
+def columns(game, sheet=False):
+    """The paragraphs that say how each dry column picks its setup. The Stable paragraph goes
+    only on a sheet that shows the Stable column."""
     out = [
         "A dry setup comes from up to 100 of the fastest setups on F1Laps for the track. F1Laps "
         "shows only the 20 fastest in a list, but it shows another 20 for each team. So the "
@@ -98,11 +106,20 @@ def columns(game):
         "no single driver runs together, and a value can fall between two clicks. It is the same "
         "in the Race and Time Trial views.",
     ]
+    if sheet and GAMES[game]["stable"]:
+        out.append(
+            "The Stable column is the site author's own recipe, built from the F1Laps Meta values. "
+            "It raises the rear wing 3 clicks and lowers the rear anti-roll bar 3 clicks. It sets "
+            "the differential to 75% on throttle and 50% off throttle. It sets brake pressure to "
+            "95% and moves front brake bias 1 point forward. Every other setting keeps the meta "
+            "value. A half value rounds to the lower wing, the softer spring and anti-roll bar, "
+            "the higher ride height and the more forward bias. The author has driven it only at "
+            "Canada so far.")
     return out
 
 
 def notes(tracks, game):
-    out = columns(game) + [
+    out = columns(game, sheet=True) + [
         "A wet setting is the value most of the fastest wet setups run. When F1Laps' "
         "median is a value whose share is within 10 points of the most common one's, the median "
         "wins. Where F1Laps lists fewer than five setups, or leaves a setting off its setup "
@@ -161,6 +178,7 @@ def build():
             config = {
                 "key": f"sheet-{game}-{mode}",
                 "cars": g["cars"],
+                "stable": g["stable"],
                 "fetched": f"{fetched.day} {fetched:%B %Y}",
                 "notes": notes(data["tracks"], game) + version_html(),
             }

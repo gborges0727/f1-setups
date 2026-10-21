@@ -12,12 +12,17 @@ For a dry track, `fetch.py` groups the setups in a pool that share the same wing
 2. Popular, the group the most drivers run, with the quicker group winning a tie (`most_run()`)
 3. Alt, the group the most drivers run among the groups that differ a lot from both Popular and Fast, with the quicker group winning a tie (`alt()`)
 4. F1Laps Meta, F1Laps' own meta setup, the track's `dry` block in `data/<game>.json`
+5. Stable, the site author's own recipe built from the F1Laps Meta values (`stable()` in `templates/common.js`), on the F1 25 sheet only
 
 A group can be the Alt column when two or more drivers run it and it has at least two big differences from Popular and at least two from Fast. A big difference is 5 or more clicks on a wing, a suspension or an anti-roll bar, or 20 points or more on a differential. Each setting counts on its own (`BIG` in `fetch.py`). When no group passes, the sheet has no Alt column and a note says so. The Alt column's note lists its big differences from Popular.
 
 The F1Laps Meta column doesn't come from a group. F1Laps takes the median of each setting across its 100 fastest setups, one setting at a time. So the column can mix values that no single driver runs together, and a value can fall between two clicks. It is the same in the Race and Time Trial views.
 
-Values in the Popular, Alt and F1Laps Meta columns show in blue where they differ from the Fast column. When the Fast and Popular columns hold the same setup, a note under the track name says so.
+The Stable column starts from the F1Laps Meta values. It raises the rear wing 3 clicks and lowers the rear anti-roll bar 3 clicks. It sets the differential to 75% on throttle and 50% off throttle. It sets brake pressure to 95% and moves front brake bias 1 point forward. Every other setting keeps the meta value. A half value rounds to the lower wing, the softer spring and anti-roll bar, the higher ride height and the more forward bias.
+
+The page works the column out each time it loads, so it follows the meta values when the data is refreshed. Only the F1 25 dry sheets show it, and the "same setup" note leaves it out. The author has driven it only at Canada so far.
+
+Values in the Popular, Alt, F1Laps Meta and Stable columns show in blue where they differ from the Fast column. When the Fast and Popular columns hold the same setup, a note under the track name says so.
 
 For a wet track, each setting uses the value the most of the fastest wet setups run. Wet laps are set in changing rain, so their lap times can't rank setups. When F1Laps' meta value is one of the values the setups run, and its share is within 10 percentage points of the most common value's share, the meta value wins. So if 55% run 55% brake bias and 45% run 53%, and F1Laps says 53%, the sheet says 53%.
 

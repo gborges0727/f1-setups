@@ -108,6 +108,29 @@ function consensus(t, cond, view) {
   return { out, median, agreed, against, counted, cols, n: f ? f.n : 0 };
 }
 
+// The Stable column, a recipe built from the F1Laps Meta values. It raises the rear wing 3 clicks,
+// lowers the rear anti-roll bar 3 clicks, and fixes the diff, brake pressure and engine braking.
+// Front bias moves 1 point forward. A half value rounds to the lower wing, the softer spring and
+// anti-roll bar, the higher ride height and the more forward bias. Other settings keep the meta value.
+function stable(median) {
+  const out = Object.assign({}, median), lim = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const set = (k, f) => { if (k in out) out[k] = f(median[k]); };
+  set("front_wing", Math.floor);
+  set("rear_wing", v => lim(Math.floor(v) + 3, 0, 50));
+  set("diff_on", () => 75);
+  set("diff_off", () => 50);
+  set("engine_braking", () => 50);
+  set("front_susp", Math.floor);
+  set("rear_susp", Math.floor);
+  set("front_arb", Math.floor);
+  set("rear_arb", v => lim(Math.floor(v) - 3, 1, 21));
+  set("front_rh", Math.ceil);
+  set("rear_rh", Math.ceil);
+  set("brake_pressure", () => 95);
+  set("brake_bias", v => Math.ceil(v + 1));
+  return out;
+}
+
 // Which F1Laps list a view counts.
 function pool(view) { return view === "tt" ? "Time Trial setups" : "race setups"; }
 

@@ -94,10 +94,11 @@ button.chip { font-family: inherit; line-height: inherit; background: none; bord
 /* Fixed column widths so every group's table lines up with the others. */
 table.sheet { table-layout: fixed; }
 /* The name column holds the setting and its chip. The value columns share the rest equally.
-   cols-N counts the value columns: 1 on a wet sheet and 3 or 4 on a dry one. */
+   cols-N counts the value columns: 1 on a wet sheet and 3 to 5 on a dry one. */
 table.sheet th.c-name { width: 52%; }
 table.sheet.cols-3 th.c-name { width: 40%; }
 table.sheet.cols-4 th.c-name { width: 32%; }
+table.sheet.cols-5 th.c-name { width: 27%; }
 td.name .chip { margin-left: 6px; vertical-align: 1px; }
 td.val.moved { color: var(--accent); font-weight: 600; }
 .movedkey { color: var(--accent); }
@@ -117,6 +118,13 @@ td.val.moved { color: var(--accent); font-weight: 600; }
   table.sheet.cols-4 th, table.sheet.cols-4 td { padding: 8px 3px; }
   table.sheet.cols-4 td.num { font-size: 0.78rem; }
   table.sheet.cols-4 thead th { font-size: 0.62rem; letter-spacing: 0; }
+  /* Five value columns at 320 px leave about 45 px each, so they get even less padding and a
+     smaller font, and the setting names shrink and break inside long words. */
+  table.sheet.cols-5 th.c-name { width: 23%; }
+  table.sheet.cols-5 th, table.sheet.cols-5 td { padding: 8px 2px; }
+  table.sheet.cols-5 td.num { font-size: 0.7rem; }
+  table.sheet.cols-5 td.name { font-size: 0.78rem; overflow-wrap: anywhere; hyphens: auto; }
+  table.sheet.cols-5 thead th { font-size: 0.58rem; letter-spacing: 0; overflow-wrap: anywhere; }
   td.name .chip { margin-left: 0; margin-top: 3px; }
   td.name .lbl { display: block; }
 }
@@ -198,7 +206,12 @@ function render() {
   const base = consensus(t, state.cond, view);
   const meta = base.out;
   const lock = base.agreed;
-  const cols = base.cols;
+  // CONFIG.stable turns on the Stable column, which only the F1 25 sheet shows. It follows the
+  // F1Laps Meta column and builds its values from them, so a sheet with no meta values has none.
+  const cols = base.cols.slice();
+  const metaCol = cols.find(c => c.key === "meta");
+  if (CONFIG.stable && metaCol && Object.keys(metaCol.values).length)
+    cols.push({ key: "stable", name: "Stable", values: stable(metaCol.values), info: null });
   const byKey = Object.fromEntries(cols.map(c => [c.key, c]));
 
   seg(document.getElementById("weather"), [["dry", "Dry"], ["wet", "Wet"]], state.cond, v => { state.cond = v; render(); }, v => !t[v]);
@@ -236,12 +249,13 @@ function render() {
     }
     if (c.key === "meta") h += note("The F1Laps Meta column is F1Laps' meta setup. F1Laps takes the median of each setting across its 100 fastest setups, one setting at a time. "
       + "So the column can mix values that no single driver runs together, and a value can fall between two clicks. It is the same in the Race and Time Trial views.");
+    if (c.key === "stable") h += note("The Stable column is a recipe built from the F1Laps Meta column. The notes under the table list its rules.");
   }
   if (byKey.fast && !byKey.alt) h += note("No setup that two or more drivers run differs enough from both the Popular and Fast columns, so this sheet has no Alt column.");
   // Two columns can hold the same setup. Say so instead of hiding one. The F1Laps Meta column
-  // takes each setting's median on its own, so it is left out.
+  // takes each setting's median on its own, and the Stable column is built from it, so both are left out.
   const same = {};
-  for (const c of cols.filter(c => c.key !== "meta")) (same[JSON.stringify(Object.keys(meta).map(k => c.values[k]))] ||= []).push(c.name);
+  for (const c of cols.filter(c => c.key !== "meta" && c.key !== "stable")) (same[JSON.stringify(Object.keys(meta).map(k => c.values[k]))] ||= []).push(c.name);
   for (const group of Object.values(same)) if (group.length > 1) h += note(`The ${names(group)} columns are the same setup here.`);
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry setup is available.</p>`;
   h += `</div>`;
