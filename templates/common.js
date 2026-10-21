@@ -96,13 +96,13 @@ function consensus(t, cond, view) {
     if (counts[0][1] / f.n >= AGREE) (out[k] === counts[0][0] ? agreed : against).add(k);
   }
   // The columns, left to right. Each has a key, a heading, its values and fetch.py's record of
-  // who runs it and how quick it is.
+  // who runs it and how quick it is. The F1Laps Meta column is the meta page's dry block, the
+  // same in both views, and has no such record.
   const cols = [];
   if (dry) {
     if (f.fast) cols.push({ key: "fast", name: "Fast", values: full(f.fast.values), info: f.fast });
-    const sh = f.shared;
-    cols.push({ key: "shared", name: "Shared Fast", values: sh ? full(sh.values) : vote, info: sh || null });
     cols.push({ key: "popular", name: "Popular", values: out, info: pop || null });
+    cols.push({ key: "meta", name: "F1Laps Meta", values: median, info: null });
   } else cols.push({ key: "setup", name: "Setup", values: out, info: null });
   return { out, median, agreed, against, counted, cols, n: f ? f.n : 0 };
 }

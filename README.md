@@ -7,10 +7,12 @@ The setups come from [F1Laps](https://www.f1laps.com/). For each track, F1Laps l
 For a dry track, `fetch.py` groups the up to 20 setups in a list that share the same wings, springs and anti-roll bars. It counts the different drivers in each group, not uploads, because one driver can upload the same setup twice. A group's pace is how far its best lap is behind the fastest lap in the list. Each column uses its group whole, so it never mixes two setups. The dry sheets have these columns, left to right:
 
 1. Fast, the quickest group, even when only one driver runs it (`fast()` in `fetch.py`)
-2. Shared Fast, the quickest group that two or more drivers run (`shared()`)
-3. Popular, the group the most drivers run, with the quicker group winning a tie (`most_run()`)
+2. Popular, the group the most drivers run, with the quicker group winning a tie (`most_run()`)
+3. F1Laps Meta, F1Laps' own meta setup, the track's `dry` block in `data/<game>.json`
 
-Values in the Shared Fast and Popular columns show in blue where they differ from the Fast column. When two columns hold the same setup, a note under the track name says so.
+The F1Laps Meta column doesn't come from a group. F1Laps takes the median of each setting across its 100 fastest setups, one setting at a time. So the column can mix values that no single driver runs together, and a value can fall between two clicks. It is the same in the Race and Time Trial views.
+
+Values in the Popular and F1Laps Meta columns show in blue where they differ from the Fast column. When the Fast and Popular columns hold the same setup, a note under the track name says so.
 
 For a wet track, each setting uses the value the most of the fastest wet setups run. Wet laps are set in changing rain, so their lap times can't rank setups. When F1Laps' meta value is one of the values the setups run, and its share is within 10 percentage points of the most common value's share, the meta value wins. So if 55% run 55% brake bias and 45% run 53%, and F1Laps says 53%, the sheet says 53%.
 

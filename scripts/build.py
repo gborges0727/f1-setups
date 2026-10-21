@@ -37,14 +37,14 @@ MODES = {
         "lede": "Setups for {lede_cars}, from the 20 fastest race setups on F1Laps for each "
                 "track. A switch shows the 20 fastest Time Trial setups instead. Qualifying "
                 "setups are left out, because career mode's parc fermé makes qualifying run on "
-                "the race setup. The Fast, Shared Fast and Popular columns show the quickest setup, "
-                "the quickest one two or more drivers run, and the one most drivers run."
+                "the race setup. The Fast, Popular and F1Laps Meta columns show the quickest setup, "
+                "the one most drivers run, and F1Laps' own meta setup."
                 "{extra} Each wet setting is the "
                 "value most of the fastest wet setups run. Settings marked Agreed are ones at "
                 "least 70% of the setups run.",
         "description": "{short} car setups for every track from F1Laps' fastest race setups, "
-                       "with a Time Trial view. Each sheet shows the quickest setup, the "
-                       "quickest one drivers share and the one most drivers run.",
+                       "with a Time Trial view. Each sheet shows the quickest setup, the one "
+                       "most drivers run and F1Laps' meta setup.",
     },
 }
 
@@ -79,11 +79,13 @@ def columns(game):
         "sheet groups the setups that share wings, springs and anti-roll bars, and counts the "
         "different drivers who run each group. A group's pace is how far its best lap is behind "
         "the fastest lap in the list.",
-        "The Fast column is the quickest group, even when only one driver runs it. The Shared "
-        "Fast column is the quickest group that two or more drivers run. The Popular column is "
-        "the group the most drivers run, and the quicker group wins a tie. When no two drivers "
-        "share a setup, the Shared Fast column shows the most common value for each setting, and "
-        "the Popular column shows the quickest setup.",
+        "The Fast column is the quickest group, even when only one driver runs it. The Popular "
+        "column is the group the most drivers run, and the quicker group wins a tie. When no two "
+        "drivers share a setup, the Popular column shows the quickest setup.",
+        "The F1Laps Meta column is F1Laps' meta setup. F1Laps takes the median of each setting "
+        "across its 100 fastest setups, one setting at a time. So the column can mix values that "
+        "no single driver runs together, and a value can fall between two clicks. It is the same "
+        "in the Race and Time Trial views.",
     ]
     return out
 

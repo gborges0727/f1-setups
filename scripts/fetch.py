@@ -127,11 +127,6 @@ def fast(setups, entries):
     return pick(setups, entries, pace, min_drivers=1)
 
 
-def shared(setups, entries):
-    """The quickest setup two or more drivers run, for the Shared Fast column. See pick()."""
-    return pick(setups, entries, pace)
-
-
 def most_run(setups, entries):
     """The setup the most different drivers run, for the Popular column. See pick().
 
@@ -186,7 +181,7 @@ def one_list(game, slug, cond, kind):
     """Count the values one of F1Laps' lists of the 20 fastest setups uses.
 
     kind is a key of LISTS. Returns {"n": setups, "counts": {setting: [[value, count], ...]}},
-    plus "fast", "shared" and "popular" for dry setups. Wet laps are set in changing rain, so the
+    plus "fast" and "popular" for dry setups. Wet laps are set in changing rain, so the
     wet sheets keep the vote.
     """
     page = get(f"{BASE}/{game}/setups/{slug}/" + ("wet/" if cond == "wet" else "") +
@@ -210,7 +205,6 @@ def one_list(game, slug, cond, kind):
                       for k, c in counts.items()}}
     if cond == "dry":
         out["fast"] = fast(setups, entries)
-        out["shared"] = shared(setups, entries)
         out["popular"] = most_run(setups, entries)
     return out
 

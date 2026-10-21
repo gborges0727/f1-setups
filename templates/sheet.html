@@ -216,15 +216,16 @@ function render() {
     const p = c.info;
     if (c.key === "setup" && base.n >= 5) h += note(`Each setting is the value most of ${list} run.`);
     if (c.key === "fast") h += note(`The Fast column is the quickest of ${list}, even when only one driver runs it. ${who(p)} ${paceLine(p)}`);
-    if (c.key === "shared") h += note(p ? `The Shared Fast column is the quickest setup that two or more different drivers run. ${who(p)} ${paceLine(p)}`
-      : `No two drivers among ${list} run the same setup, so the Shared Fast column shows the value most of them run for each setting.`);
     if (c.key === "popular" && !p) h += note(`F1Laps shows no setup groups for ${list}, so the Popular column shows the value most of them run for each setting.`);
     else if (c.key === "popular") h += note(p.runs >= 2 ? `The Popular column is the setup the most different drivers run, and the quicker one wins a tie. ${who(p)} ${paceLine(p)}`
       : `No two drivers among ${list} run the same setup, so the Popular column shows the quickest one-driver setup. ${paceLine(p)}`);
+    if (c.key === "meta") h += note("The F1Laps Meta column is F1Laps' meta setup. F1Laps takes the median of each setting across its 100 fastest setups, one setting at a time. "
+      + "So the column can mix values that no single driver runs together, and a value can fall between two clicks. It is the same in the Race and Time Trial views.");
   }
-  // Two columns can hold the same setup. Say so instead of hiding one.
+  // Two columns can hold the same setup. Say so instead of hiding one. The F1Laps Meta column
+  // takes each setting's median on its own, so it is left out.
   const same = {};
-  for (const c of cols) (same[JSON.stringify(Object.keys(meta).map(k => c.values[k]))] ||= []).push(c.name);
+  for (const c of cols.filter(c => c.key !== "meta")) (same[JSON.stringify(Object.keys(meta).map(k => c.values[k]))] ||= []).push(c.name);
   for (const group of Object.values(same)) if (group.length > 1) h += note(`The ${names(group)} columns are the same setup here.`);
   if (!t.wet) h += `<p class="warn">F1Laps doesn't have enough wet setups at this track, so only the dry setup is available.</p>`;
   h += `</div>`;
