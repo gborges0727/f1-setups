@@ -2,17 +2,22 @@
 
 Car setups for every track in EA Sports F1 25, for both the 2025 cars and the 2026 cars from the F1 26 Season Pack. The live site is https://f1-setups-cgn.pages.dev/.
 
-The setups come from [F1Laps](https://www.f1laps.com/). For each track, F1Laps lists the 20 fastest setups its users uploaded, dry and wet, and filters the list by session. The sheets read the race list and the Time Trial list and keep them apart. Each sheet opens on race setups, and a switch at the top shows Time Trial setups instead. The sheets leave out qualifying, because career mode's parc fermé makes qualifying run on the race setup.
+The setups come from [F1Laps](https://www.f1laps.com/). For each track, F1Laps lists the 20 fastest setups its users uploaded, dry and wet, and filters the list by session.
 
-For a dry track, `fetch.py` groups the up to 20 setups in a list that share the same wings, springs and anti-roll bars. It counts the different drivers in each group, not uploads, because one driver can upload the same setup twice. A group's pace is how far its best lap is behind the fastest lap in the list. Each column uses its group whole, so it never mixes two setups. The dry sheets have these columns, left to right:
+The list has no next page, but its team filter shows another 20 fastest for each team. So `fetch.py` reads the list with no filter and the list for every team except the F2 teams, and keeps the 100 fastest setups it finds. It builds this pool for race setups and for Time Trial setups and keeps the two apart. When a team's list comes back full and its last lap is quicker than the pool's 100th, the pool may miss more of that team's setups. `fetch.py` prints a warning and stores the team under `capped` in the data. Each sheet opens on race setups, and a switch at the top shows Time Trial setups instead. The sheets leave out qualifying, because career mode's parc fermé makes qualifying run on the race setup.
+
+For a dry track, `fetch.py` groups the setups in a pool that share the same wings, springs and anti-roll bars. It counts the different drivers in each group, not uploads, because one driver can upload the same setup twice. A group's pace is how far its best lap is behind the fastest lap in the pool. Each column uses its group whole, so it never mixes two setups. The dry sheets have these columns, left to right:
 
 1. Fast, the quickest group, even when only one driver runs it (`fast()` in `fetch.py`)
 2. Popular, the group the most drivers run, with the quicker group winning a tie (`most_run()`)
-3. F1Laps Meta, F1Laps' own meta setup, the track's `dry` block in `data/<game>.json`
+3. Alt, the group the most drivers run among the groups that differ a lot from both Popular and Fast, with the quicker group winning a tie (`alt()`)
+4. F1Laps Meta, F1Laps' own meta setup, the track's `dry` block in `data/<game>.json`
+
+A group can be the Alt column when two or more drivers run it and it has at least two big differences from Popular and at least two from Fast. A big difference is 5 or more clicks on a wing, a suspension or an anti-roll bar, or 20 points or more on a differential. Each setting counts on its own (`BIG` in `fetch.py`). When no group passes, the sheet has no Alt column and a note says so. The Alt column's note lists its big differences from Popular.
 
 The F1Laps Meta column doesn't come from a group. F1Laps takes the median of each setting across its 100 fastest setups, one setting at a time. So the column can mix values that no single driver runs together, and a value can fall between two clicks. It is the same in the Race and Time Trial views.
 
-Values in the Popular and F1Laps Meta columns show in blue where they differ from the Fast column. When the Fast and Popular columns hold the same setup, a note under the track name says so.
+Values in the Popular, Alt and F1Laps Meta columns show in blue where they differ from the Fast column. When the Fast and Popular columns hold the same setup, a note under the track name says so.
 
 For a wet track, each setting uses the value the most of the fastest wet setups run. Wet laps are set in changing rain, so their lap times can't rank setups. When F1Laps' meta value is one of the values the setups run, and its share is within 10 percentage points of the most common value's share, the meta value wins. So if 55% run 55% brake bias and 45% run 53%, and F1Laps says 53%, the sheet says 53%.
 
@@ -41,7 +46,7 @@ python3 scripts/fetch.py    # downloads every track's meta page and fastest setu
 python3 scripts/build.py    # writes the start page, two sheets and two breakdown pages into site/, and copies in static/
 ```
 
-A first run reads several thousand setup pages, one per second, so it takes over an hour. Setup pages never change, so `fetch.py` caches them in `.cache/setups/` and a later run reads only new ones. Both scripts use only the Python standard library. The setting list, the vote and the column builder `consensus()` live in `templates/common.js`, which `build.py` pastes into every sheet and breakdown page. The built `site/` folder is the whole website, and git ignores it.
+A first run reads about 13,000 setup pages and a few thousand list pages, one per second, so it takes about six hours. Setup pages never change, so `fetch.py` caches them in `.cache/setups/` and a later run reads only new ones. A later run still reads every list page again, the list with no filter and one for each team. When F1Laps returns a server error, `fetch.py` waits a minute and tries again, up to four times. Both scripts use only the Python standard library. The setting list, the vote and the column builder `consensus()` live in `templates/common.js`, which `build.py` pastes into every sheet and breakdown page. The built `site/` folder is the whole website, and git ignores it.
 
 ## Releases and deploys
 

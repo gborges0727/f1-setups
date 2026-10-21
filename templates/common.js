@@ -53,10 +53,10 @@ function fmt(k, v) {
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
 
 // The value each setting gets on this site. Each sheet has a Race view and a Time Trial view,
-// and each view counts only its own F1Laps list of the fastest setups. The vote for a setting is
-// the value most of that list runs. When F1Laps' median is a value whose share is within 10
+// and each view counts only its own pool of up to 100 of the fastest setups (fetch.py's
+// one_list() builds it). The vote for a setting is the value most of that pool runs. When F1Laps' median is a value whose share is within 10
 // points of the top share (45% against 55%, say), the median wins instead. F1Laps' own value,
-// the median of its 100 fastest setups, fills in where the list has fewer than five setups, or
+// the median of its 100 fastest setups, fills in where the pool has fewer than five setups, or
 // where its setup pages leave the setting out (engine braking).
 const AGREE = 0.7;
 const CLOSE = 0.1;
@@ -102,6 +102,7 @@ function consensus(t, cond, view) {
   if (dry) {
     if (f.fast) cols.push({ key: "fast", name: "Fast", values: full(f.fast.values), info: f.fast });
     cols.push({ key: "popular", name: "Popular", values: out, info: pop || null });
+    if (f.alt) cols.push({ key: "alt", name: "Alt", values: full(f.alt.values), info: f.alt });
     cols.push({ key: "meta", name: "F1Laps Meta", values: median, info: null });
   } else cols.push({ key: "setup", name: "Setup", values: out, info: null });
   return { out, median, agreed, against, counted, cols, n: f ? f.n : 0 };

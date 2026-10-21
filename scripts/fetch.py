@@ -5,10 +5,12 @@ setups uploaded for that track, a wet version when there is enough wet data,
 and which settings fast drivers agree on (marked "important").
 
 Each track's setup list on F1Laps also shows the 20 fastest setups one by one,
-dry and wet, filtered by session. The script reads the 20 fastest race setups
-and the 20 fastest Time Trial setups and keeps the two lists apart. It counts
-how many use each value, so the sheets can show how much fast drivers disagree
-on a setting. It leaves out qualifying, because career mode's parc fermé makes
+dry and wet, filtered by session. The list has no next page, but its team filter
+shows another 20 for each team. So for race setups and for Time Trial setups,
+the script reads the list with no filter and the list for each non-F2 team. It keeps
+the 100 fastest setups it finds, the pool, and keeps the race and Time Trial
+pools apart. It counts how many use each value, so the sheets can show how much
+fast drivers disagree on a setting. It leaves out qualifying, because career mode's parc fermé makes
 qualifying run on the race setup. Setup pages never change, so it caches them
 in .cache/setups/ and a later run fetches only new ones, a second apart.
 
@@ -20,6 +22,7 @@ import json
 import re
 import sys
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -41,10 +44,19 @@ NAMES = {
 }
 
 
-def get(url):
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return r.read().decode("utf-8")
+def get(url, tries=4):
+    """The page at url. A server error (5xx) or a dropped connection waits a minute and tries
+    again, up to tries times, because a full run takes hours and F1Laps sometimes goes down."""
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return r.read().decode("utf-8")
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
+            if i == tries - 1 or (isinstance(e, urllib.error.HTTPError) and e.code < 500):
+                raise
+            print(f"retry in 60 s: {url}: {e}", flush=True)
+            time.sleep(60)
 
 
 def text(s):
@@ -113,7 +125,7 @@ LISTS = {"race": "5", "tt": "6"}
 
 
 def pace(values, lap_, drivers):
-    """Score a setup on lap time. The score is minus its best lap's gap to the list's fastest lap."""
+    """Score a setup on lap time. The score is minus its best lap's gap to the pool's fastest lap."""
     return -lap_["gap"] if lap_["gap"] is not None else float("-inf")
 
 
@@ -136,14 +148,45 @@ def most_run(setups, entries):
     return pick(setups, entries, popular, min_drivers=1)
 
 
+# A big difference between two setups, for the Alt column. Each setting counts on its own, and
+# the number is how far apart the values must be, in clicks or differential points.
+BIG = {"Front Wing": 5, "Rear Wing": 5, "Front Suspension": 5, "Rear Suspension": 5,
+       "Front Anti-Roll Bar": 5, "Rear Anti-Roll Bar": 5,
+       "Differential On Throttle": 20, "Differential Off Throttle": 20}
+
+
+def big(a, b):
+    """The settings of BIG where setups a and b differ by a big difference."""
+    return [k for k, d in BIG.items() if k in a and k in b and abs(a[k] - b[k]) >= d]
+
+
+def alt(setups, entries, fast_, popular_):
+    """The setup for the Alt column, or None. See pick().
+
+    It takes the group two or more drivers run with the most drivers, among the groups with two
+    or more big differences from Popular and two or more from Fast. That leaves out the Fast and
+    Popular groups themselves. pace() breaks a tie. The result adds "vs_popular" and "vs_fast",
+    the settings that differ a lot from each.
+    """
+    if not fast_ or not popular_:
+        return None
+    apart = lambda v: len(big(v, popular_["values"])) >= 2 and len(big(v, fast_["values"])) >= 2
+    out = pick(setups, entries, lambda v, lap_, d: (apart(v), d, pace(v, lap_, d)))
+    if not out or not apart(out["values"]):
+        return None
+    return {**out, "vs_popular": big(out["values"], popular_["values"]),
+            "vs_fast": big(out["values"], fast_["values"])}
+
+
 def pick(setups, entries, score, keep=None, min_drivers=2):
     """The setup with the highest score that min_drivers or more of the fastest drivers run, or None.
 
-    setups and entries come from one F1Laps list. One driver can upload the same setup twice,
-    so the count is of different drivers, not uploads. keep(setup), when given, drops each
-    setup that fails it before the drivers are counted, so a group's drivers all pass it.
-    Returns {"values": {setting: value}, "runs": drivers who run it, "best": list position of
-    its fastest lap, "gap": seconds behind the list's fastest lap, or None when F1Laps shows no
+    setups and entries come from one pool, see one_list(). One driver can upload the same
+    setup twice, so the count is of different drivers, not uploads. keep(setup), when given,
+    drops each setup that fails it before the drivers are counted, so a group's drivers all pass
+    it.
+    Returns {"values": {setting: value}, "runs": drivers who run it, "best": pool position of
+    its fastest lap, "gap": seconds behind the pool's fastest lap, or None when F1Laps shows no
     lap time}. Inside a shared setup, each setting takes its most common value, and the setup
     listed first wins a tie. score(values, {"best", "gap"}, drivers) ranks the candidates,
     highest first.
@@ -177,22 +220,67 @@ def pick(setups, entries, score, keep=None, min_drivers=2):
     return {"values": values, "runs": drivers(members), **lap_}
 
 
-def one_list(game, slug, cond, kind):
-    """Count the values one of F1Laps' lists of the 20 fastest setups uses.
+# F1Laps shows at most 20 setups in a list and has no next page. Its team filter shows a
+# separate top 20 for each team, so one_list() reads the list once with no filter and once per
+# team, then keeps the POOL fastest setups of them all.
+PAGE = 20
+POOL = 100
 
-    kind is a key of LISTS. Returns {"n": setups, "counts": {setting: [[value, count], ...]}},
-    plus "fast" and "popular" for dry setups. Wet laps are set in changing rain, so the
-    wet sheets keep the vote.
-    """
-    page = get(f"{BASE}/{game}/setups/{slug}/" + ("wet/" if cond == "wet" else "") +
-               f"?session={LISTS[kind]}")
+
+def rows(page, game, slug):
+    """[{"lap", "user", "team", "id"}, ...] for the setups on one F1Laps list page, in its order."""
     entries, seen = [], set()
     for row in re.findall(r"<tr\b.*?</tr>", page, re.S):
         m = re.search(rf'href="/{game}/setups/{slug}/([0-9a-f-]{{36}})/"', row)
         cells = [text(c) for c in re.findall(r"<td\b.*?</td>", row, re.S)]
         if m and len(cells) > 4 and m.group(1) not in seen:
             seen.add(m.group(1))
-            entries.append({"rank": len(seen), "lap": cells[4], "user": cells[1], "id": m.group(1)})
+            entries.append({"lap": cells[4], "user": cells[1], "team": cells[2], "id": m.group(1)})
+    return entries
+
+
+def teams(page):
+    """The values of the team filter on a list page, leaving out "Any Team" and the F2 teams."""
+    i = page.find('name="filter_team"')
+    if i < 0:
+        return []
+    return [v for v in re.findall(r'<option[^>]*value="([^"]*)"', page[i:page.find("</select>", i)])
+            if v and not v.startswith("f2_")]
+
+
+def one_list(game, slug, cond, kind):
+    """Count the values the POOL fastest setups in one of F1Laps' lists use.
+
+    kind is a key of LISTS. The list with no filter and each team's list add their setups to one
+    pool, sorted by lap time. Setups with no lap time go last. Returns {"n": setups, "counts":
+    {setting: [[value, count], ...]}, "capped": teams}, plus "fast", "popular" and "alt" for dry
+    setups. capped names each team whose list came back full with its last lap quicker than the
+    pool's last, because the pool may miss more of that team's setups. Wet laps are set in
+    changing rain, so the wet sheets keep the vote.
+    """
+    url = f"{BASE}/{game}/setups/{slug}/" + ("wet/" if cond == "wet" else "") + f"?session={LISTS[kind]}"
+    page = get(url)
+    found = {e["id"]: e for e in rows(page, game, slug)}
+    full = {}
+    # The list with no filter can come back short (17 at Canada in F1 25) while the team lists
+    # still add setups, so only an empty one skips them.
+    for team in teams(page) if found else []:
+        time.sleep(1)
+        listed = rows(get(f"{url}&team={team}"), game, slug)
+        for e in listed:
+            found.setdefault(e["id"], e)
+        if len(listed) >= PAGE:
+            full[team] = lap(listed[-1]["lap"])
+    order = list(found)
+    untimed = lambda e: lap(e["lap"]) is None
+    entries = sorted(found.values(), key=lambda e: (untimed(e), lap(e["lap"]) or 0, order.index(e["id"])))[:POOL]
+    for i, e in enumerate(entries):
+        e["rank"] = i + 1
+    last = lap(entries[-1]["lap"]) if len(entries) >= POOL else None
+    capped = [team for team, t in full.items() if last is None or (t is not None and t < last)]
+    if capped:
+        print(f"warning: {game} {slug} {cond} {kind}: the pool may miss setups from "
+              f"{', '.join(capped)}, whose lists came back full")
     time.sleep(1)
     setups = [one_setup(game, slug, e["id"]) for e in entries]
     counts = {}
@@ -202,15 +290,17 @@ def one_list(game, slug, cond, kind):
             counts[k][v] = counts[k].get(v, 0) + 1
     out = {"n": len(setups),
            "counts": {k: sorted(([v, c] for v, c in c.items()), key=lambda vc: (-vc[1], vc[0]))
-                      for k, c in counts.items()}}
+                      for k, c in counts.items()},
+           "capped": capped}
     if cond == "dry":
         out["fast"] = fast(setups, entries)
         out["popular"] = most_run(setups, entries)
+        out["alt"] = alt(setups, entries, out["fast"], out["popular"])
     return out
 
 
 def fastest(game, slug, cond):
-    """{"race": the race list's counts, "tt": the Time Trial list's counts}. See one_list()."""
+    """{"race": the race pool's counts, "tt": the Time Trial pool's counts}. See one_list()."""
     return {kind: one_list(game, slug, cond, kind) for kind in LISTS}
 
 

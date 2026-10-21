@@ -94,9 +94,10 @@ button.chip { font-family: inherit; line-height: inherit; background: none; bord
 /* Fixed column widths so every group's table lines up with the others. */
 table.sheet { table-layout: fixed; }
 /* The name column holds the setting and its chip. The value columns share the rest equally.
-   cols-N counts the value columns: 1 on a wet sheet and 3 on a dry one. */
+   cols-N counts the value columns: 1 on a wet sheet and 3 or 4 on a dry one. */
 table.sheet th.c-name { width: 52%; }
 table.sheet.cols-3 th.c-name { width: 40%; }
+table.sheet.cols-4 th.c-name { width: 32%; }
 td.name .chip { margin-left: 6px; vertical-align: 1px; }
 td.val.moved { color: var(--accent); font-weight: 600; }
 .movedkey { color: var(--accent); }
@@ -110,6 +111,12 @@ td.val.moved { color: var(--accent); font-weight: 600; }
   table.sheet thead th { letter-spacing: 0.03em; }
   table.sheet th.c-name { width: 46%; }
   table.sheet.cols-3 th.c-name { width: 34%; }
+  /* Four value columns at 360 px leave about 58 px each, so they get less padding, a smaller
+     font and headings without letter spacing. */
+  table.sheet.cols-4 th.c-name { width: 28%; }
+  table.sheet.cols-4 th, table.sheet.cols-4 td { padding: 8px 3px; }
+  table.sheet.cols-4 td.num { font-size: 0.78rem; }
+  table.sheet.cols-4 thead th { font-size: 0.62rem; letter-spacing: 0; }
   td.name .chip { margin-left: 0; margin-top: 3px; }
   td.name .lbl { display: block; }
 }
@@ -139,7 +146,7 @@ __COMMON__
 const ORDER = TRACKS.map(t => t.id);
 const BY_ID = Object.fromEntries(TRACKS.map(t => [t.id, t]));
 
-// What one F1Laps list's fastest setups use for one setting: the range, the share of each common
+// What one view's fastest setups use for one setting: the range, the share of each common
 // value, and F1Laps' median when it differs from the reference value.
 function spread(t, cond, view, k, shown, median) {
   const f = t.fastest && t.fastest[cond] && t.fastest[cond][view];
@@ -205,10 +212,10 @@ function render() {
   const sub = [CONFIG.cars, state.cond === "dry" ? "Dry" : "Wet", race ? "Race" : "Time Trial"];
   let h = `<div class="summary"><h2>${esc(t.name)}</h2><div class="sub">${sub.join(" · ")}</div>`;
   const list = `the ${base.n} fastest ${pool(view)}`;
-  // Who runs a column's setup, and how its best lap compares with the fastest in the list.
+  // Who runs a column's setup, and how its best lap compares with the fastest of the setups counted.
   const who = p => p.runs === 1 ? "One driver runs it." : `${p.runs} different drivers run it.`;
-  const paceLine = p => p.best === 1 ? "It set the fastest lap in the list."
-    : p.gap === null ? `Its best lap is number ${p.best} in the list, and F1Laps shows no lap time for it.`
+  const paceLine = p => p.best === 1 ? `It set the fastest lap of the ${base.n}.`
+    : p.gap === null ? `Its best lap is number ${p.best} of the ${base.n}, and F1Laps shows no lap time for it.`
     : `Its best lap is ${p.gap.toFixed(3)} s off the fastest.`;
   const note = s => `<p class="note">${s}</p>`;
   if (base.n < 5) h += `<p class="warn">F1Laps lists only ${base.n} ${state.cond} ${pool(view)} at this track, too few to count. Every value here is F1Laps' median of its 100 fastest setups.</p>`;
@@ -219,9 +226,18 @@ function render() {
     if (c.key === "popular" && !p) h += note(`F1Laps shows no setup groups for ${list}, so the Popular column shows the value most of them run for each setting.`);
     else if (c.key === "popular") h += note(p.runs >= 2 ? `The Popular column is the setup the most different drivers run, and the quicker one wins a tie. ${who(p)} ${paceLine(p)}`
       : `No two drivers among ${list} run the same setup, so the Popular column shows the quickest one-driver setup. ${paceLine(p)}`);
+    if (c.key === "alt") {
+      const bigs = p.vs_popular.map(src => FIELDS.find(x => x[1] === src)[0])
+        .map(k => `${F[k].label.toLowerCase()} ${fmt(k, c.values[k])} against Popular's ${fmt(k, byKey.popular.values[k])}`);
+      h += note("The Alt column is a setup two or more drivers run that differs a lot from both the Popular and Fast columns. "
+        + "It needs at least two big differences from each. A big difference is 5 or more clicks on a wing, a suspension or an anti-roll bar, or 20 points or more on a differential. "
+        + `Of the setups that pass, it is the one the most different drivers run, and the quicker one wins a tie. ${who(p)} ${paceLine(p)} `
+        + `Its big differences from Popular are ${names(bigs)}.`);
+    }
     if (c.key === "meta") h += note("The F1Laps Meta column is F1Laps' meta setup. F1Laps takes the median of each setting across its 100 fastest setups, one setting at a time. "
       + "So the column can mix values that no single driver runs together, and a value can fall between two clicks. It is the same in the Race and Time Trial views.");
   }
+  if (byKey.fast && !byKey.alt) h += note("No setup that two or more drivers run differs enough from both the Popular and Fast columns, so this sheet has no Alt column.");
   // Two columns can hold the same setup. Say so instead of hiding one. The F1Laps Meta column
   // takes each setting's median on its own, so it is left out.
   const same = {};
