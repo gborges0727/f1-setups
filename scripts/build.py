@@ -24,7 +24,7 @@ REPO = "https://github.com/gborges0727/f1-setups"
 VERSION = os.environ.get("SITE_VERSION", "dev")
 
 # "stable" turns on the Stable column, the site author's recipe built from the F1Laps Meta values.
-# Only the F1 25 sheet shows it.
+# Each game has its own rules, in stable() in templates/common.js.
 GAMES = {
     "f1-25": {"short": "F1 25", "cars": "2025 cars", "lede_cars": "the 2025 cars",
               "extra": " The three reverse layouts are included.", "stable": True,
@@ -33,10 +33,11 @@ GAMES = {
                            "a lot from both, F1Laps' own meta setup, and a recipe built from the "
                            "meta setup."},
     "f1-26": {"short": "F1 26", "cars": "2026 cars", "lede_cars": "the 2026 Season Pack cars",
-              "extra": "", "stable": False,
-              "lede_cols": "The Fast, Popular, Alt and F1Laps Meta columns show the quickest "
-                           "setup, the one most drivers run, a shared setup that differs a lot "
-                           "from both, and F1Laps' own meta setup."},
+              "extra": "", "stable": True,
+              "lede_cols": "The Fast, Popular, Alt, F1Laps Meta and Stable columns show the "
+                           "quickest setup, the one most drivers run, a shared setup that differs "
+                           "a lot from both, F1Laps' own meta setup, and a recipe built from the "
+                           "meta setup."},
 }
 
 MODES = {
@@ -106,7 +107,27 @@ def columns(game, sheet=False):
         "no single driver runs together, and a value can fall between two clicks. It is the same "
         "in the Race and Time Trial views.",
     ]
-    if sheet and GAMES[game]["stable"]:
+    if sheet and game == "f1-26":
+        out += [
+            "The Stable column is the site author's own recipe. It starts from the F1Laps Meta "
+            "values, and the author's laps in the 2026 cars at Barcelona and Monaco set its rules. "
+            "It raises the rear wing 3 clicks. At Barcelona, 3 more clicks cut big rear slides into "
+            "La Caixa, the Turn 10 hairpin, from 7 in 11 passes to 3 in 5. It lowers the rear "
+            "anti-roll bar 3 clicks, a rule kept from the F1 25 recipe that no 2026 run has tested.",
+            "The Stable column sets the on-throttle differential to 75%. At Monaco on 85% and 90%, "
+            "both rear wheels spun up out of slow corners 11 times, and each one ended in a "
+            "flashback. No 2026 run has tried 75%. It sets the off-throttle differential to 50%, "
+            "because the inside rear wheel locked under braking at Monaco on 30%.",
+            "The Stable column sets engine braking to 30%. At 50%, about half the downshifts into "
+            "second gear at Monaco pushed a rear wheel close to locking, against 4% to 16% in the "
+            "2025 car. Nobody has driven 30% yet. It sets brake pressure to 95%, because the 2026 "
+            "car locked wheels at part pedal more often than the 2025 car did. It keeps F1Laps' "
+            "brake bias, because the 2026 car already locks its front wheels more than the 2025 "
+            "car, and moving the bias forward would lock them more. Every other setting keeps the "
+            "meta value. A half value rounds to the lower wing, the softer spring and anti-roll "
+            "bar, the higher ride height and the more forward bias.",
+        ]
+    elif sheet and GAMES[game]["stable"]:
         out.append(
             "The Stable column is the site author's own recipe, built from the F1Laps Meta values. "
             "It raises the rear wing 3 clicks and lowers the rear anti-roll bar 3 clicks. It sets "
@@ -178,7 +199,7 @@ def build():
             config = {
                 "key": f"sheet-{game}-{mode}",
                 "cars": g["cars"],
-                "stable": g["stable"],
+                "stable": game if g["stable"] else False,
                 "fetched": f"{fetched.day} {fetched:%B %Y}",
                 "notes": notes(data["tracks"], game) + version_html(),
             }

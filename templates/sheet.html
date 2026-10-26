@@ -206,12 +206,12 @@ function render() {
   const base = consensus(t, state.cond, view);
   const meta = base.out;
   const lock = base.agreed;
-  // CONFIG.stable turns on the Stable column, which only the F1 25 sheet shows. It follows the
+  // CONFIG.stable names the game whose Stable recipe the sheet shows, or is false. It follows the
   // F1Laps Meta column and builds its values from them, so a sheet with no meta values has none.
   const cols = base.cols.slice();
   const metaCol = cols.find(c => c.key === "meta");
   if (CONFIG.stable && metaCol && Object.keys(metaCol.values).length)
-    cols.push({ key: "stable", name: "Stable", values: stable(metaCol.values), info: null });
+    cols.push({ key: "stable", name: "Stable", values: stable(metaCol.values, CONFIG.stable), info: null });
   const byKey = Object.fromEntries(cols.map(c => [c.key, c]));
 
   seg(document.getElementById("weather"), [["dry", "Dry"], ["wet", "Wet"]], state.cond, v => { state.cond = v; render(); }, v => !t[v]);
