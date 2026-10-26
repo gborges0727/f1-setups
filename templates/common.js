@@ -111,7 +111,7 @@ function consensus(t, cond, view) {
 // lowers the rear anti-roll bar 3 clicks, and fixes the diff and brake pressure.
 // Front bias moves 1 point forward. A half value rounds to the lower wing, the softer spring and
 // anti-roll bar, the higher ride height and the more forward bias. Other settings keep the meta value.
-// The F1 26 recipe keeps the meta bias, from the author's laps in the 2026 cars.
+// The F1 26 recipe keeps the meta brake pressure and bias, from the author's laps in the 2026 cars.
 function stable(median, game) {
   const f126 = game === "f1-26";
   const out = Object.assign({}, median), lim = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -126,7 +126,7 @@ function stable(median, game) {
   set("rear_arb", v => lim(Math.floor(v) - 3, 1, 21));
   set("front_rh", Math.ceil);
   set("rear_rh", Math.ceil);
-  set("brake_pressure", () => 95);
+  set("brake_pressure", v => f126 ? Math.ceil(v) : 95);
   set("brake_bias", v => Math.ceil(f126 ? v : v + 1));
   return out;
 }

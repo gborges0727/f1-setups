@@ -118,12 +118,15 @@ def columns(game, sheet=False):
             "both rear wheels spun up out of slow corners 11 times, and each one ended in a "
             "flashback. No 2026 run has tried 75%. It sets the off-throttle differential to 50%, "
             "because the inside rear wheel locked under braking at Monaco on 30%.",
-            "The Stable column sets brake pressure to 95%, because the 2026 "
-            "car locked wheels at part pedal more often than the 2025 car did. It keeps F1Laps' "
-            "brake bias, because the 2026 car already locks its front wheels more than the 2025 "
-            "car, and moving the bias forward would lock them more. Every other setting keeps the "
-            "meta value. A half value rounds to the lower wing, the softer spring and anti-roll "
-            "bar, the higher ride height and the more forward bias.",
+            "The Stable column keeps F1Laps' brake pressure. The author drove five laps at 100% and "
+            "eased off the brake before turning in, and front wheel locks fell from 14 to 7 "
+            "against five earlier laps. So the pressure was not the cause. It keeps F1Laps' brake "
+            "bias, because the 2026 car already locks its front wheels more than the 2025 car, and "
+            "moving the bias forward would lock them more.",
+            "Every other setting keeps the meta value. A half value rounds to the lower wing, the "
+            "softer spring and anti-roll bar, the higher ride height, the higher brake pressure and "
+            "the more forward bias. The author has driven the column only at Barcelona so far, for "
+            "five laps on 26 October 2026.",
         ]
     elif sheet and GAMES[game]["stable"]:
         out.append(

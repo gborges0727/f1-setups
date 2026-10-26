@@ -20,9 +20,9 @@ The F1Laps Meta column doesn't come from a group. F1Laps takes the median of eac
 
 The F1 25 Stable column starts from the F1Laps Meta values. It raises the rear wing 3 clicks and lowers the rear anti-roll bar 3 clicks. It sets the differential to 75% on throttle and 50% off throttle. It sets brake pressure to 95% and moves front brake bias 1 point forward. Every other setting keeps the meta value. A half value rounds to the lower wing, the softer spring and anti-roll bar, the higher ride height and the more forward bias.
 
-The F1 26 Stable column follows the same rules with one change. It keeps the meta brake bias instead of moving it forward. The author's laps in the 2026 cars at Barcelona and Monaco on 2026-10-26 set the F1 26 rules, and the F1 26 sheet's notes give the numbers behind each one.
+The F1 26 Stable column follows the same rules with two changes. It keeps the meta brake pressure, with a half value rounding up, and it keeps the meta brake bias instead of moving it forward. The author's laps in the 2026 cars at Barcelona and Monaco on 2026-10-26 set the F1 26 rules, and the F1 26 sheet's notes give the numbers behind each one.
 
-The page works the column out each time it loads, so it follows the meta values when the data is refreshed. Only the dry sheets show it, and the "same setup" note leaves it out. The author has driven the F1 25 column only at Canada so far, and nobody has driven the F1 26 column yet.
+The page works the column out each time it loads, so it follows the meta values when the data is refreshed. Only the dry sheets show it, and the "same setup" note leaves it out. The author has driven the F1 25 column only at Canada so far, and the F1 26 column only at Barcelona.
 
 Values in the Popular, Alt, F1Laps Meta and Stable columns show in blue where they differ from the Fast column. When the Fast and Popular columns hold the same setup, a note under the track name says so.
 
