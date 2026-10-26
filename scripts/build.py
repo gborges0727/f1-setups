@@ -118,9 +118,7 @@ def columns(game, sheet=False):
             "both rear wheels spun up out of slow corners 11 times, and each one ended in a "
             "flashback. No 2026 run has tried 75%. It sets the off-throttle differential to 50%, "
             "because the inside rear wheel locked under braking at Monaco on 30%.",
-            "The Stable column sets engine braking to 30%. At 50%, about half the downshifts into "
-            "second gear at Monaco pushed a rear wheel close to locking, against 4% to 16% in the "
-            "2025 car. Nobody has driven 30% yet. It sets brake pressure to 95%, because the 2026 "
+            "The Stable column sets brake pressure to 95%, because the 2026 "
             "car locked wheels at part pedal more often than the 2025 car did. It keeps F1Laps' "
             "brake bias, because the 2026 car already locks its front wheels more than the 2025 "
             "car, and moving the bias forward would lock them more. Every other setting keeps the "

@@ -18,9 +18,9 @@ A group can be the Alt column when two or more drivers run it and it has at leas
 
 The F1Laps Meta column doesn't come from a group. F1Laps takes the median of each setting across its 100 fastest setups, one setting at a time. So the column can mix values that no single driver runs together, and a value can fall between two clicks. It is the same in the Race and Time Trial views.
 
-The F1 25 Stable column starts from the F1Laps Meta values. It raises the rear wing 3 clicks and lowers the rear anti-roll bar 3 clicks. It sets the differential to 75% on throttle and 50% off throttle, and engine braking to 50%. It sets brake pressure to 95% and moves front brake bias 1 point forward. Every other setting keeps the meta value. A half value rounds to the lower wing, the softer spring and anti-roll bar, the higher ride height and the more forward bias.
+The F1 25 Stable column starts from the F1Laps Meta values. It raises the rear wing 3 clicks and lowers the rear anti-roll bar 3 clicks. It sets the differential to 75% on throttle and 50% off throttle. It sets brake pressure to 95% and moves front brake bias 1 point forward. Every other setting keeps the meta value. A half value rounds to the lower wing, the softer spring and anti-roll bar, the higher ride height and the more forward bias.
 
-The F1 26 Stable column follows the same rules with two changes. It sets engine braking to 30%, and it keeps the meta brake bias. The author's laps in the 2026 cars at Barcelona and Monaco on 2026-10-26 set these rules, and the F1 26 sheet's notes give the numbers behind each one.
+The F1 26 Stable column follows the same rules with one change. It keeps the meta brake bias instead of moving it forward. The author's laps in the 2026 cars at Barcelona and Monaco on 2026-10-26 set the F1 26 rules, and the F1 26 sheet's notes give the numbers behind each one.
 
 The page works the column out each time it loads, so it follows the meta values when the data is refreshed. Only the dry sheets show it, and the "same setup" note leaves it out. The author has driven the F1 25 column only at Canada so far, and nobody has driven the F1 26 column yet.
 
@@ -30,7 +30,7 @@ For a wet track, each setting uses the value the most of the fastest wet setups 
 
 A setting counts as Agreed, shaded purple, when at least 70% of the setups run the same value and the Popular column uses it. When at least 70% run one value and the Popular column uses another, the setting is marked Unusual.
 
-F1Laps' own meta setup takes the median of its 100 fastest setups, the middle value when they're lined up from lowest to highest. F1Laps doesn't state this, but every meta value sits on a click or exactly halfway between two, which is what a median of 100 gives. The median often differs from what most fast drivers run. The sheets fall back to F1Laps' meta value where F1Laps lists fewer than five setups, and for engine braking, which its setup pages leave out.
+F1Laps' own meta setup takes the median of its 100 fastest setups, the middle value when they're lined up from lowest to highest. F1Laps doesn't state this, but every meta value sits on a click or exactly halfway between two, which is what a median of 100 gives. The median often differs from what most fast drivers run. The sheets fall back to F1Laps' meta value where F1Laps lists fewer than five setups. F1Laps also lists engine braking at 50% on every F1 26 meta setup, but the game has no such setting, so the sheets leave it out.
 
 The game cannot import setup files. To use a setup, type it in once on the setup screen, then save it in the game as a custom setup for that track.
 

@@ -6,7 +6,6 @@ const FIELDS = [
   ["rear_wing", "Rear Wing", "Rear wing", 0, 50],
   ["diff_on", "Differential On Throttle", "Differential on throttle", 10, 100],
   ["diff_off", "Differential Off Throttle", "Differential off throttle", 10, 100],
-  ["engine_braking", "Engine Braking", "Engine braking", 0, 100],
   ["front_camber", "Front Camber", "Front camber", -3.5, -2.5],
   ["rear_camber", "Rear Camber", "Rear camber", -2.2, -0.7],
   ["front_toe", "Front Toe", "Front toe", 0, 0.5],
@@ -27,7 +26,7 @@ const FIELDS = [
 const F = Object.fromEntries(FIELDS.map(([k, src, label, min, max]) => [k, { src, label, min, max }]));
 const GROUPS = [
   ["Aerodynamics", ["front_wing", "rear_wing"]],
-  ["Transmission", ["diff_on", "diff_off", "engine_braking"]],
+  ["Transmission", ["diff_on", "diff_off"]],
   ["Suspension geometry", ["front_camber", "rear_camber", "front_toe", "rear_toe"]],
   ["Suspension", ["front_susp", "rear_susp", "front_arb", "rear_arb", "front_rh", "rear_rh"]],
   ["Brakes", ["brake_pressure", "brake_bias"]],
@@ -46,7 +45,7 @@ function round2(v) { return Math.round(v * 100) / 100; }
 function fmt(k, v) {
   if (v === undefined || v === null || Number.isNaN(v)) return "—";
   if (k.endsWith("camber") || k.endsWith("toe")) return v.toFixed(2) + "°";
-  if (k.startsWith("diff") || k === "engine_braking" || k === "brake_pressure" || k === "brake_bias") return round2(v) + "%";
+  if (k.startsWith("diff") || k === "brake_pressure" || k === "brake_bias") return round2(v) + "%";
   if (k.endsWith("pressure")) return round2(v) + `<span class="unit"> psi</span>`;
   return String(round2(v));
 }
@@ -57,7 +56,7 @@ function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<":
 // one_list() builds it). The vote for a setting is the value most of that pool runs. When F1Laps' median is a value whose share is within 10
 // points of the top share (45% against 55%, say), the median wins instead. F1Laps' own value,
 // the median of its 100 fastest setups, fills in where the pool has fewer than five setups, or
-// where its setup pages leave the setting out (engine braking).
+// where its setup pages leave the setting out.
 const AGREE = 0.7;
 const CLOSE = 0.1;
 const VIEWS = [["race", "Race"], ["tt", "Time Trial"]];
@@ -66,8 +65,8 @@ function consensus(t, cond, view) {
   const f = t.fastest && t.fastest[cond] && t.fastest[cond][view];
   const marked = new Set(t.important.map(label => FIELDS.find(x => x[1] === label)?.[0]).filter(Boolean));
   const dry = cond === "dry" && f && f.n >= 5;
-  // A setup from fetch.py as a full set of values. Settings its setup pages leave out (engine
-  // braking) keep the vote.
+  // A setup from fetch.py as a full set of values. Settings its setup pages leave out keep
+  // the vote.
   const vote = {}, full = vals => Object.fromEntries(Object.keys(median).map(k => [k, vals[F[k].src] ?? vote[k]]));
   const out = {}, agreed = new Set(), against = new Set(), counted = new Set();
   for (const k of Object.keys(median)) {
@@ -109,10 +108,10 @@ function consensus(t, cond, view) {
 }
 
 // The Stable column, a recipe built from the F1Laps Meta values. It raises the rear wing 3 clicks,
-// lowers the rear anti-roll bar 3 clicks, and fixes the diff, brake pressure and engine braking.
+// lowers the rear anti-roll bar 3 clicks, and fixes the diff and brake pressure.
 // Front bias moves 1 point forward. A half value rounds to the lower wing, the softer spring and
 // anti-roll bar, the higher ride height and the more forward bias. Other settings keep the meta value.
-// The F1 26 recipe sets engine braking to 30 and keeps the meta bias, from the author's 2026-car laps.
+// The F1 26 recipe keeps the meta bias, from the author's laps in the 2026 cars.
 function stable(median, game) {
   const f126 = game === "f1-26";
   const out = Object.assign({}, median), lim = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -121,7 +120,6 @@ function stable(median, game) {
   set("rear_wing", v => lim(Math.floor(v) + 3, 0, 50));
   set("diff_on", () => 75);
   set("diff_off", () => 50);
-  set("engine_braking", () => f126 ? 30 : 50);
   set("front_susp", Math.floor);
   set("rear_susp", Math.floor);
   set("front_arb", Math.floor);
