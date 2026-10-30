@@ -208,10 +208,12 @@ function render() {
   const lock = base.agreed;
   // CONFIG.stable names the game whose Stable recipe the sheet shows, or is false. It follows the
   // F1Laps Meta column and builds its values from them, so a sheet with no meta values has none.
+  // CONFIG.tested holds the setups the author tested, by track id, and those replace the recipe.
   const cols = base.cols.slice();
   const metaCol = cols.find(c => c.key === "meta");
+  const tested = CONFIG.tested && CONFIG.tested[t.id];
   if (CONFIG.stable && metaCol && Object.keys(metaCol.values).length)
-    cols.push({ key: "stable", name: "Stable", values: stable(metaCol.values, CONFIG.stable), info: null });
+    cols.push({ key: "stable", name: "Stable", values: stable(metaCol.values, CONFIG.stable, tested), info: null });
   const byKey = Object.fromEntries(cols.map(c => [c.key, c]));
 
   seg(document.getElementById("weather"), [["dry", "Dry"], ["wet", "Wet"]], state.cond, v => { state.cond = v; render(); }, v => !t[v]);
@@ -249,11 +251,13 @@ function render() {
     }
     if (c.key === "meta") h += note("The F1Laps Meta column is F1Laps' meta setup. F1Laps takes the median of each setting across its 100 fastest setups, one setting at a time. "
       + "So the column can mix values that no single driver runs together, and a value can fall between two clicks. It is the same in the Race and Time Trial views.");
-    if (c.key === "stable") h += note("The Stable column is a recipe built from the F1Laps Meta column. The notes under the table list its rules.");
+    if (c.key === "stable") h += note(tested ? `The Stable column is the setup the site author drove at ${esc(t.name)} in a career race weekend. It replaces the recipe at this track.`
+      : "The Stable column is a recipe built from the F1Laps Meta column. The notes under the table list its rules.");
   }
   if (byKey.fast && !byKey.alt) h += note("No setup that two or more drivers run differs enough from both the Popular and Fast columns, so this sheet has no Alt column.");
   // Two columns can hold the same setup. Say so instead of hiding one. The F1Laps Meta column
-  // takes each setting's median on its own, and the Stable column is built from it, so both are left out.
+  // takes each setting's median on its own, and the Stable column is built from it or is a tested
+  // setup, so both are left out.
   const same = {};
   for (const c of cols.filter(c => c.key !== "meta" && c.key !== "stable")) (same[JSON.stringify(Object.keys(meta).map(k => c.values[k]))] ||= []).push(c.name);
   for (const group of Object.values(same)) if (group.length > 1) h += note(`The ${names(group)} columns are the same setup here.`);

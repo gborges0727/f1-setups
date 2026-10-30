@@ -112,7 +112,10 @@ function consensus(t, cond, view) {
 // Front bias moves 1 point forward. A half value rounds to the lower wing, the softer spring and
 // anti-roll bar, the higher ride height and the more forward bias. Other settings keep the meta value.
 // The F1 26 recipe keeps the meta brake pressure and bias, from the author's laps in the 2026 cars.
-function stable(median, game) {
+// A setup the author tested at the track (build.py reads it from data/stable-{game}.json) replaces
+// the recipe.
+function stable(median, game, tested) {
+  if (tested) return Object.assign({}, tested);
   const f126 = game === "f1-26";
   const out = Object.assign({}, median), lim = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   const set = (k, f) => { if (k in out) out[k] = f(median[k]); };
