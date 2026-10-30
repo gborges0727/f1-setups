@@ -24,14 +24,16 @@ REPO = "https://github.com/gborges0727/f1-setups"
 VERSION = os.environ.get("SITE_VERSION", "dev")
 
 # "stable" turns on the Stable column, the site author's recipe built from the F1Laps Meta values.
-# Each game has its own rules, in stable() in templates/common.js.
+# Each game has its own rules, in stable() in templates/common.js. data/stable-{game}.json, where it
+# exists, lists setups the author tested in the game by track id, and those replace the recipe.
 GAMES = {
     "f1-25": {"short": "F1 25", "cars": "2025 cars", "lede_cars": "the 2025 cars",
               "extra": " The three reverse layouts are included.", "stable": True,
               "lede_cols": "The Fast, Popular, Alt, F1Laps Meta and Stable columns show the "
                            "quickest setup, the one most drivers run, a shared setup that differs "
                            "a lot from both, F1Laps' own meta setup, and a recipe built from the "
-                           "meta setup."},
+                           "meta setup. At Bahrain and Japan the Stable column shows a setup the "
+                           "site author tested instead."},
     "f1-26": {"short": "F1 26", "cars": "2026 cars", "lede_cars": "the 2026 Season Pack cars",
               "extra": "", "stable": True,
               "lede_cols": "The Fast, Popular, Alt, F1Laps Meta and Stable columns show the "
@@ -129,14 +131,17 @@ def columns(game, sheet=False):
             "five laps on 26 October 2026.",
         ]
     elif sheet and GAMES[game]["stable"]:
-        out.append(
+        out += [
             "The Stable column is the site author's own recipe, built from the F1Laps Meta values. "
             "It raises the rear wing 3 clicks and lowers the rear anti-roll bar 3 clicks. It sets "
             "the differential to 75% on throttle and 50% off throttle. It sets brake pressure to "
             "95% and moves front brake bias 1 point forward. Every other setting keeps the meta "
             "value. A half value rounds to the lower wing, the softer spring and anti-roll bar, "
-            "the higher ride height and the more forward bias. The author has driven it only at "
-            "Canada so far.")
+            "the higher ride height and the more forward bias. The author drove the recipe at "
+            "Canada.",
+            "At Bahrain and Japan, the Stable column shows the setup the author drove there "
+            "instead, in a career race weekend on 29 and 30 October 2026.",
+        ]
     return out
 
 
@@ -195,12 +200,15 @@ def build():
     for game, g in GAMES.items():
         data = json.loads((ROOT / "data" / f"{game}.json").read_text())
         fetched = datetime.date.fromisoformat(data["fetched"])
+        tested = ROOT / "data" / f"stable-{game}.json"
+        tested = json.loads(tested.read_text()) if tested.exists() else {}
         for mode, m in MODES.items():
             fill = dict(g, game=game)
             config = {
                 "key": f"sheet-{game}-{mode}",
                 "cars": g["cars"],
                 "stable": game if g["stable"] else False,
+                "tested": tested,
                 "fetched": f"{fetched.day} {fetched:%B %Y}",
                 "notes": notes(data["tracks"], game) + version_html(),
             }
