@@ -2,7 +2,7 @@
   "bahrain": {
     "front_wing": 27, "rear_wing": 26, "diff_on": 75, "diff_off": 50,
     "front_camber": -3.5, "rear_camber": -2.0, "front_toe": 0.0, "rear_toe": 0.1,
-    "front_susp": 41, "rear_susp": 3, "front_arb": 9, "rear_arb": 13,
+    "front_susp": 41, "rear_susp": 10, "front_arb": 9, "rear_arb": 13,
     "front_rh": 21, "rear_rh": 46, "brake_pressure": 100, "brake_bias": 56,
     "fr_pressure": 26.2, "fl_pressure": 26.2, "rr_pressure": 21.2, "rl_pressure": 21.2
   },
