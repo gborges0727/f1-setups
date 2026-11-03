@@ -112,10 +112,16 @@ def columns(game, sheet=False):
     if sheet and game == "f1-26":
         out += [
             "The Stable column is the site author's own recipe. It starts from the F1Laps Meta "
-            "values, and the author's laps in the 2026 cars at Barcelona and Monaco set its rules. "
-            "It raises the rear wing 3 clicks. At Barcelona, 3 more clicks cut big rear slides into "
-            "La Caixa, the Turn 10 hairpin, from 7 in 11 passes to 3 in 5. It lowers the rear "
-            "anti-roll bar 3 clicks, a rule kept from the F1 25 recipe that no 2026 run has tested.",
+            "values and from the 100 fastest race setups, so it is the same in the Race and Time "
+            "Trial views. Laps in the 2026 cars at Barcelona and Monaco set its differential and "
+            "brake rules. Laps in the 2025 cars set its rear wing and rear anti-roll bar rules.",
+            "Its rear wing is the meta value plus 3 clicks, or the median rear wing of the race "
+            "setups when that is higher. At Barcelona, 3 more clicks cut big rear slides into La "
+            "Caixa, the Turn 10 hairpin, from 7 in 11 passes to 3 in 5. Its rear anti-roll bar is "
+            "the value the softest quarter of the race setups runs, and never stiffer than the meta "
+            "value. No 2026 run has tested that rule. Where F1Laps lists fewer than five race "
+            "setups, the rear wing is the meta value plus 3 and the rear anti-roll bar is the meta "
+            "value minus 3.",
             "The Stable column sets the on-throttle differential to 75%. At Monaco on 85% and 90%, "
             "both rear wheels spun up out of slow corners 11 times, and each one ended in a "
             "flashback. No 2026 run has tried 75%. It sets the off-throttle differential to 50%, "
@@ -132,13 +138,23 @@ def columns(game, sheet=False):
         ]
     elif sheet and GAMES[game]["stable"]:
         out += [
-            "The Stable column is the site author's own recipe, built from the F1Laps Meta values. "
-            "It raises the rear wing 3 clicks and lowers the rear anti-roll bar 3 clicks. It sets "
-            "the differential to 75% on throttle and 50% off throttle. It sets brake pressure to "
-            "95% and moves front brake bias 1 point forward. Every other setting keeps the meta "
-            "value. A half value rounds to the lower wing, the softer spring and anti-roll bar, "
-            "the higher ride height and the more forward bias. The author drove the recipe at "
-            "Canada.",
+            "The Stable column is the site author's own recipe. It starts from the F1Laps Meta "
+            "values and from the 100 fastest race setups, so it is the same in the Race and Time "
+            "Trial views. Its rear wing is the meta value plus 3 clicks, or the median rear wing of "
+            "the race setups when that is higher. At Japan the meta rear wing is 12, the race "
+            "setups' median is 23, and the author raced on 25.",
+            "Its rear anti-roll bar is the value the softest quarter of the race setups runs, and "
+            "never stiffer than the meta value. At Bahrain and Japan the author softened the rear "
+            "bar to 9 by hand, the value this rule gives at both tracks. Where F1Laps lists fewer "
+            "than five race setups, the rear wing is the meta value plus 3 and the rear anti-roll "
+            "bar is the meta value minus 3.",
+            "It sets the differential to 75% on throttle and 50% off throttle. It keeps F1Laps' "
+            "brake pressure. The author set 100% at 13 of 14 race weekends, and the front wheels "
+            "locked no more often than at 95%. It moves front brake bias 1 point forward. Every "
+            "other setting keeps the meta value. A half value rounds to the lower wing, the softer "
+            "spring and anti-roll bar, the higher ride height, the higher brake pressure and the "
+            "more forward bias. The author has driven the recipe at 24 tracks since 20 October "
+            "2026.",
             "At Bahrain and Japan, the Stable column shows the setup the author drove there "
             "instead, in a career race weekend on 29 and 30 October 2026.",
         ]

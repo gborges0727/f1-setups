@@ -107,29 +107,42 @@ function consensus(t, cond, view) {
   return { out, median, agreed, against, counted, cols, n: f ? f.n : 0 };
 }
 
-// The Stable column, a recipe built from the F1Laps Meta values. It raises the rear wing 3 clicks,
-// lowers the rear anti-roll bar 3 clicks, and fixes the diff and brake pressure.
-// Front bias moves 1 point forward. A half value rounds to the lower wing, the softer spring and
-// anti-roll bar, the higher ride height and the more forward bias. Other settings keep the meta value.
-// The F1 26 recipe keeps the meta brake pressure and bias, from the author's laps in the 2026 cars.
-// A setup the author tested at the track (build.py reads it from data/stable-{game}.json) replaces
-// the recipe.
-function stable(median, game, tested) {
+// The Stable column, a recipe built from the F1Laps Meta values and the dry race pool (race, up to
+// 100 of the fastest race setups, the same in both views). The rear wing is the meta value plus 3
+// clicks, or the pool's median rear wing when that is higher. The rear anti-roll bar is the value
+// the softest quarter of the pool runs, and never stiffer than the meta value. Where the pool has
+// fewer than five setups, the rear wing is meta plus 3 and the rear anti-roll bar meta minus 3.
+// The diff is fixed at 75 and 50. A half value rounds to the lower wing, the softer spring and
+// anti-roll bar, the higher ride height, the higher brake pressure and the more forward bias. The
+// F1 25 recipe moves front bias 1 point forward, and the F1 26 recipe keeps the meta bias. Other
+// settings keep the meta value. A setup the author tested at the track (build.py reads it from
+// data/stable-{game}.json) replaces the recipe.
+function stable(median, game, tested, race) {
   if (tested) return Object.assign({}, tested);
   const f126 = game === "f1-26";
   const out = Object.assign({}, median), lim = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   const set = (k, f) => { if (k in out) out[k] = f(median[k]); };
+  // The smallest value that at least share p of the race pool runs or goes below.
+  const at = (k, p) => {
+    const counts = race && race.n >= 5 && race.counts[F[k].src];
+    if (!counts) return null;
+    const sorted = counts.slice().sort((a, b) => a[0] - b[0]), total = sorted.reduce((s, [, c]) => s + c, 0);
+    let acc = 0;
+    for (const [v, c] of sorted) if ((acc += c) >= p * total) return v;
+    return null;
+  };
+  const wing = at("rear_wing", 0.5), bar = at("rear_arb", 0.25);
   set("front_wing", Math.floor);
-  set("rear_wing", v => lim(Math.floor(v) + 3, 0, 50));
+  set("rear_wing", v => lim(Math.max(Math.floor(v) + 3, wing === null ? 0 : Math.floor(wing)), 0, 50));
   set("diff_on", () => 75);
   set("diff_off", () => 50);
   set("front_susp", Math.floor);
   set("rear_susp", Math.floor);
   set("front_arb", Math.floor);
-  set("rear_arb", v => lim(Math.floor(v) - 3, 1, 21));
+  set("rear_arb", v => lim(bar === null ? Math.floor(v) - 3 : Math.min(Math.floor(bar), Math.floor(v)), 1, 21));
   set("front_rh", Math.ceil);
   set("rear_rh", Math.ceil);
-  set("brake_pressure", v => f126 ? Math.ceil(v) : 95);
+  set("brake_pressure", Math.ceil);
   set("brake_bias", v => Math.ceil(f126 ? v : v + 1));
   return out;
 }

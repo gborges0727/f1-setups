@@ -213,7 +213,7 @@ function render() {
   const metaCol = cols.find(c => c.key === "meta");
   const tested = CONFIG.tested && CONFIG.tested[t.id];
   if (CONFIG.stable && metaCol && Object.keys(metaCol.values).length)
-    cols.push({ key: "stable", name: "Stable", values: stable(metaCol.values, CONFIG.stable, tested), info: null });
+    cols.push({ key: "stable", name: "Stable", values: stable(metaCol.values, CONFIG.stable, tested, t.fastest && t.fastest.dry && t.fastest.dry.race), info: null });
   const byKey = Object.fromEntries(cols.map(c => [c.key, c]));
 
   seg(document.getElementById("weather"), [["dry", "Dry"], ["wet", "Wet"]], state.cond, v => { state.cond = v; render(); }, v => !t[v]);
