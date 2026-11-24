@@ -113,19 +113,27 @@ def columns(game, sheet=False):
         out += [
             "The Stable column is the site author's own recipe. It starts from the F1Laps Meta "
             "values and from the 100 fastest race setups, so it is the same in the Race and Time "
-            "Trial views. Laps in the 2026 cars at Barcelona and Monaco set its differential and "
-            "brake rules. Laps in the 2025 cars set its rear wing and rear anti-roll bar rules.",
+            "Trial views. Laps in the 2026 cars set its differential, brake and rear anti-roll bar "
+            "rules. Laps in the 2025 cars set its rear wing rule.",
             "Its rear wing is the meta value plus 3 clicks, or the median rear wing of the race "
             "setups when that is higher. At Barcelona, 3 more clicks cut big rear slides into La "
-            "Caixa, the Turn 10 hairpin, from 7 in 11 passes to 3 in 5. Its rear anti-roll bar is "
-            "the value the softest quarter of the race setups runs, and never stiffer than the meta "
-            "value. No 2026 run has tested that rule. Where F1Laps lists fewer than five race "
-            "setups, the rear wing is the meta value plus 3 and the rear anti-roll bar is the meta "
-            "value minus 3.",
+            "Caixa, the Turn 10 hairpin, from 7 in 11 passes to 3 in 5. Where the meta front wing "
+            "is 50, the highest the game allows, the rear wing keeps the meta value. The front "
+            "wing cannot rise there to balance more rear wing.",
+            "Its rear anti-roll bar is the value the softest quarter of the race setups runs. It "
+            "is never stiffer than the meta value and never more than 3 clicks softer. At Madrid "
+            "the author drove 18 laps on a rear bar 3 clicks softer than the meta value and 15 "
+            "laps on one 5 clicks softer. On the softer bar the rear slid on throttle 1.80 times "
+            "a lap, against 1.33 on the stiffer one. The car also understeered for 28% of its "
+            "high-speed cornering, against 22%. Where "
+            "F1Laps lists fewer than five race setups, the rear wing is the meta value plus 3 and "
+            "the rear anti-roll bar is the meta value minus 3.",
             "The Stable column sets the on-throttle differential to 75%. At Monaco on 85% and 90%, "
             "both rear wheels spun up out of slow corners 11 times, and each one ended in a "
-            "flashback. No 2026 run has tried 75%. It sets the off-throttle differential to 50%, "
-            "because the inside rear wheel locked under braking at Monaco on 30%.",
+            "flashback. It sets the off-throttle differential to 50%, because the inside rear "
+            "wheel locked under braking at Monaco on 30%. At Barcelona the author drove 8 laps on "
+            "the meta setup and 37 on this column in one race weekend. The rear slid on throttle "
+            "0.75 times a lap on the meta setup and 0.27 times a lap on this column.",
             "The Stable column keeps F1Laps' brake pressure. The author drove five laps at 100% and "
             "eased off the brake before turning in, and front wheel locks fell from 14 to 7 "
             "against five earlier laps. So the pressure was not the cause. It keeps F1Laps' brake "
@@ -133,8 +141,8 @@ def columns(game, sheet=False):
             "moving the bias forward would lock them more.",
             "Every other setting keeps the meta value. A half value rounds to the lower wing, the "
             "softer spring and anti-roll bar, the higher ride height, the higher brake pressure and "
-            "the more forward bias. The author has driven the column only at Barcelona so far, for "
-            "five laps on 26 October 2026.",
+            "the more forward bias. The author has raced earlier versions of the column at 10 "
+            "tracks since 26 October 2026.",
         ]
     elif sheet and GAMES[game]["stable"]:
         out += [

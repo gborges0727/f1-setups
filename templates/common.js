@@ -114,8 +114,11 @@ function consensus(t, cond, view) {
 // fewer than five setups, the rear wing is meta plus 3 and the rear anti-roll bar meta minus 3.
 // The diff is fixed at 75 and 50. A half value rounds to the lower wing, the softer spring and
 // anti-roll bar, the higher ride height, the higher brake pressure and the more forward bias. The
-// F1 25 recipe moves front bias 1 point forward, and the F1 26 recipe keeps the meta bias. Other
-// settings keep the meta value. A setup the author tested at the track (build.py reads it from
+// F1 25 recipe moves front bias 1 point forward, and the F1 26 recipe keeps the meta bias. The
+// F1 26 recipe also has two limits. Its rear anti-roll bar is never more than 3 clicks softer than
+// the meta value. Where the meta front wing is at the game maximum, its rear wing keeps the meta
+// value, because the front wing cannot rise to balance more rear wing. Other settings keep the
+// meta value. A setup the author tested at the track (build.py reads it from
 // data/stable-{game}.json) replaces the recipe.
 function stable(median, game, tested, race) {
   if (tested) return Object.assign({}, tested);
@@ -133,13 +136,14 @@ function stable(median, game, tested, race) {
   };
   const wing = at("rear_wing", 0.5), bar = at("rear_arb", 0.25);
   set("front_wing", Math.floor);
-  set("rear_wing", v => lim(Math.max(Math.floor(v) + 3, wing === null ? 0 : Math.floor(wing)), 0, 50));
+  const capped = f126 && median.front_wing >= F.front_wing.max;
+  set("rear_wing", v => capped ? Math.floor(v) : lim(Math.max(Math.floor(v) + 3, wing === null ? 0 : Math.floor(wing)), 0, 50));
   set("diff_on", () => 75);
   set("diff_off", () => 50);
   set("front_susp", Math.floor);
   set("rear_susp", Math.floor);
   set("front_arb", Math.floor);
-  set("rear_arb", v => lim(bar === null ? Math.floor(v) - 3 : Math.min(Math.floor(bar), Math.floor(v)), 1, 21));
+  set("rear_arb", v => lim(bar === null ? Math.floor(v) - 3 : Math.min(Math.floor(bar), Math.floor(v)), f126 ? Math.max(1, Math.floor(v) - 3) : 1, 21));
   set("front_rh", Math.ceil);
   set("rear_rh", Math.ceil);
   set("brake_pressure", Math.ceil);
